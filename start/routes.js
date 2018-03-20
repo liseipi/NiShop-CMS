@@ -21,6 +21,7 @@ Route.on('/login').render('auth.login')
 Route.post('/login', 'AuthController.signIn')
 
 Route.get('/manager/add', 'ManagerController.add')
+Route.post('/manager/add', 'ManagerController.addSave').validator('manager')
 
 Route.get('/role/add', 'RoleController.add')
 Route.post('/role/add', 'RoleController.addSave').validator('role')

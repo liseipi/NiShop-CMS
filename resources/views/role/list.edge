@@ -1,0 +1,39 @@
+@layout('layout')
+@section('content')
+<div id="page-wrapper">
+  <div id="app-page">
+    <div class="container-fluid">
+      @include('notification')
+      <h5 class="page-header">角色列表</h5>
+      <div class="main">
+        <table class="table table-striped table-hover table-bordered">
+          <tr>
+            <th>#</th>
+            <th>角色</th>
+            <th width="40%">描述</th>
+            <th width="20%">操作</th>
+          </tr>
+          @each(role in roleData)
+          <tr>
+            <td>{{role.ni_id}}</td>
+            <td>{{role.role_name}}</td>
+            <td>{{role.role_desc}}</td>
+            <td>
+              <a href="/role/edit/{{role.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
+              <a href="/role/destroy/{{role.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+            </td>
+          </tr>
+          @endeach
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /#page-wrapper -->
+<script type="text/javascript">
+  requirejs(['../js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {
+    });
+  });
+</script>
+@endsection

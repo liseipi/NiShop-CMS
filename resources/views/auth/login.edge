@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  {{ css('css/common') }}
+  {{ script('js/require') }}
+</head>
+<body>
+<div id="wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="login-panel panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Please Sign In</h3>
+          </div>
+          <div class="panel-body">
+            <form data-toggle="validate" novalidate="novalidate" action="/login" method="post">
+              {{ csrfField() }}
+              <fieldset>
+                <div class="form-group">
+                  <input class="form-control" placeholder="E-mail" name="email" type="email"
+                         value="{{old('email', '')}}}" data-rule-required="true" data-rule-email="true" autofocus>
+                  <span class="error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('email'), hasErrorFor('email')) }}</span>
+                </div>
+                <div class="form-group">
+                  <input class="form-control" placeholder="Password" name="password" type="password"
+                         value="{{old('password', '')}}}" data-rule-required="true">
+                  <span class="error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('password'), hasErrorFor('password')) }}</span>
+                </div>
+                <div class="checkbox">
+                  <label>
+                    <input name="remember" type="checkbox" value="Remember Me">Remember Me
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-xl btn-success btn-block">Login</button>
+              </fieldset>
+            </form>
+          </div>
+          @if(flashMessage('notification'))
+          <div class="panel-footer">
+            <span>{{ flashMessage('notification') }}</span>
+          </div>
+          @endif
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    requirejs(['js/config.js'], function () {
+      requirejs(['cmsui'], function (cmsui) {
+      });
+    });
+  </script>
+</div>
+<!-- /#wrapper -->
+</body>
+</html>

@@ -46,6 +46,7 @@
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_auth'), hasErrorFor('role_auth')) }}</div>
           </div>
+          <hr>
           <div class="form-group">
             <div class="col-sm-6 col-sm-offset-2">
               <input type="submit" value="提交" class="btn btn-xl btn-primary">
@@ -58,7 +59,7 @@
 </div>
 <!-- /#page-wrapper -->
 <script type="text/javascript">
-  requirejs(['../js/config.js'], function () {
+  requirejs(['/js/config.js'], function () {
     requirejs(['cmsui'], function (cmsui) {
     });
   });

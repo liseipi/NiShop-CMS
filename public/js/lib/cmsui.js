@@ -23,9 +23,11 @@ $(function () {
   });
 
   var url = window.location;
-  // var element = $('ul.nav a').filter(function() {
-  //     return this.href == url;
-  // }).addClass('active').parent().parent().addClass('in').parent();
+  var path = location.pathname;
+  var elementNav = $('ul.nav a').filter(function () {
+    return this.getAttribute('data-url') == path.slice(0, path.indexOf('/', path.indexOf('/') + 1));
+  }).addClass('active').parent().addClass('active').children('ul').addClass('in');
+
   var element = $('ul.nav a').filter(function () {
     return this.href == url;
   }).addClass('active').parent().parent().addClass('in').parent().children('a').addClass('active');

@@ -10,6 +10,10 @@ class ManagerController {
     return view.render('manager.add', {roleData})
   }
 
+  async addSave({request, response}){
+    console.log(request.all())
+  }
+
 }
 
 module.exports = ManagerController

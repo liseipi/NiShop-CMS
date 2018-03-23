@@ -1,0 +1,74 @@
+@layout('layout')
+@section('content')
+<div id="page-wrapper">
+  <div id="app-page">
+    <div class="container-fluid">
+      @include('notification')
+      <h5 class="page-header">修改菜单项</h5>
+      <div class="main">
+        <form class="form-horizontal" action="/menu/edit/{{menuInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+          {{ csrfField() }}
+          <div class="form-group">
+            <label class="col-sm-2 control-label">分类菜单</label>
+            <div class="col-sm-6">
+              <select class="form-control input-lg" name="parent_id">
+                <option value="0">根级菜单</option>
+                @each(menu in menusData)
+                <option value="{{menu.ni_id}}" {{menuInfo.ni_id==menu.ni_id?'selected':''}} {{ subData.indexOf(menu.ni_id)>=0?'disabled':'' }}>{{{ '&nbsp;&nbsp;'.repeat(menu.level_id) }}}{{{ '├'.repeat(menu.level_id>0?1:0) }}}{{menu.menuname}}</option>
+                @endeach
+              </select>
+            </div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('parent_id'), hasErrorFor('parent_id')) }}</div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">菜单名称</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="menuname" value="{{menuInfo.menuname}}" data-rule-required="true">
+            </div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('menuname'), hasErrorFor('menuname')) }}</div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">控制器名称</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" name="controller" value="{{menuInfo.controller}}" data-rule-required="true">
+            </div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('controller'), hasErrorFor('controller')) }}</div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">控制器运行</label>
+            <div class="col-sm-6">
+              <label class="radio-inline">
+                <input type="radio" name="runStatus" value="0" {{menuInfo.runStatus==0?'checked':''}}> 前台显示
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="runStatus" value="1" {{menuInfo.runStatus==1?'checked':''}}> 后台处理
+              </label>
+            </div>
+            <div class="col-sm-4 error-container"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">排序</label>
+            <div class="col-sm-6">
+              <input type="number" class="form-control" name="menu_sort" value="{{menuInfo.menu_sort}}">
+            </div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('menu_sort'), hasErrorFor('menu_sort')) }}</div>
+          </div>
+          <hr>
+          <div class="form-group">
+            <div class="col-sm-6 col-sm-offset-2">
+              <input type="submit" value="提交" class="btn btn-xl btn-primary">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /#page-wrapper -->
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {
+    });
+  });
+</script>
+@endsection

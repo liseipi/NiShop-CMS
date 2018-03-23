@@ -4,7 +4,7 @@ class role {
   get rules () {
     return {
       'role_name': 'required',
-      'role_auth': 'required'
+      'role_auth': 'required|array'
     }
   }
   get messages(){

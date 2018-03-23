@@ -5,11 +5,12 @@
     <div class="container-fluid">
       <h5 class="page-header">增加管理员</h5>
       <div class="main">
-        <form class="form-horizontal" data-toggle="validate" novalidate="novalidate">
+        <form class="form-horizontal" action="/manager/add" method="post" data-toggle="validate" novalidate="novalidate">
+          {{ csrfField() }}
           <div class="form-group">
             <label class="col-sm-2 control-label">用户名</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control" name="username" value="{{old('username', '')}}" placeholder="username" data-rule-required="true">
+              <input type="text" class="form-control" name="username" value="{{old('username', '')}}" placeholder="username" data-rule-required="true" data-rule-maxlength="32" >
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('username'), hasErrorFor('username')) }}</div>
           </div>
@@ -23,25 +24,25 @@
           <div class="form-group">
             <label for="password" class="col-sm-2 control-label">密码</label>
             <div class="col-sm-6">
-              <input type="password" id="password" class="form-control" name="password" placeholder="password" data-rule-required="true">
+              <input type="password" id="password" class="form-control" name="password" placeholder="password" data-rule-required="true" data-rule-minlength="8">
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('password'), hasErrorFor('password')) }}</div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">重复密码</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control" name="rspassword" placeholder="password" data-rule-required="true" data-rule-equalto="#password">
+              <input type="password" class="form-control" name="repassword" placeholder="password" data-rule-required="true" data-rule-minlength="8">
             </div>
-            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('rspassword'), hasErrorFor('rspassword')) }}</div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('repassword'), hasErrorFor('repassword')) }}</div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">状态</label>
             <div class="col-sm-6">
               <label class="radio-inline">
-                <input type="radio" name="statue" value="0" checked> 禁用
+                <input type="radio" name="statue" value="0" {{old('statue')?'':'checked'}} {{old('statue')==0?'checked':''}}> 禁用
               </label>
               <label class="radio-inline">
-                <input type="radio" name="statue" value="1"> 开启
+                <input type="radio" name="statue" value="1" {{old('statue')==1?'checked':''}}> 开启
               </label>
             </div>
             <div class="col-sm-4 error-container"></div>
@@ -49,29 +50,18 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">手机</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control" name="mobile" placeholder="mobile">
+              <input type="number" class="form-control" name="mobile" value="{{old('mobile', '')}}" placeholder="mobile">
             </div>
-            <div class="col-sm-4 error-container"></div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">选择角色</label>
-            <div class="col-sm-6">
-              <select class="form-control input-lg" name="auth">
-                @each(role in roleData)
-                <option value="{{role.ni_id}}">{{role.role_name}}</option>
-                @endeach
-              </select>
-            </div>
-            <div class="col-sm-4 error-container"></div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('mobile'), hasErrorFor('mobile')) }}</div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">性别</label>
             <div class="col-sm-6">
               <label class="radio-inline">
-                <input type="radio" name="user_sex" value="0" checked> 男
+                <input type="radio" name="user_sex" value="0" {{old('user_sex')?'':'checked'}} {{old('user_sex')==0?'checked':''}}> 男
               </label>
               <label class="radio-inline">
-                <input type="radio" name="user_sex" value="1"> 女
+                <input type="radio" name="user_sex" value="1" {{old('user_sex')==1?'checked':''}}> 女
               </label>
             </div>
             <div class="col-sm-4 error-container"></div>
@@ -82,6 +72,43 @@
               <input type="text" class="form-control" placeholder="输入日期" data-toggle="datepicker" value='1990-01-01' data-date-start-date='1990-01-01'/>
             </div>
             <div class="col-sm-4 error-container"></div>
+          </div>
+          <hr>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">角色</label>
+            <div class="col-sm-6">
+              <select class="form-control input-lg" name="level">
+                <option value="0">选择角色</option>
+                @each(role in roleData)
+                <option value="{{role.ni_id}}">{{role.role_name}}</option>
+                @endeach
+              </select>
+            </div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('level'), hasErrorFor('level')) }}</div>
+          </div>
+          <div class="form-group">
+            <label for="password" class="col-sm-2 control-label">分配权限</label>
+            <div class="col-sm-6">
+              <table class="table table-bordered">
+                <tr>
+                  <td width="15%"><label><input type="checkbox"> 商品管理</label></td>
+                  <td>
+                    <label><input type="checkbox" name="auth[]" value="7"> 新品</label>
+                    <label><input type="checkbox" name="auth[]" value="8"> 新品</label>
+                    <label><input type="checkbox" name="auth[]" value="9"> 新品</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="15%"><label><input type="checkbox"> 商品管理</label></td>
+                  <td>
+                    <label><input type="checkbox" name="auth[]" value="2"> 新品</label>
+                    <label><input type="checkbox" name="auth[]" value="3"> 新品</label>
+                    <label><input type="checkbox" name="auth[]" value="4"> 新品</label>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_auth'), hasErrorFor('role_auth')) }}</div>
           </div>
           <div class="form-group">
             <div class="col-sm-6 col-sm-offset-2">

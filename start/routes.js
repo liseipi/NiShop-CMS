@@ -15,10 +15,16 @@
 
 const Route = use('Route')
 
-Route.on('/').render('welcome')
+Route.on('/').render('test')
 
 Route.on('/login').render('auth.login')
 Route.post('/login', 'AuthController.signIn')
+
+Route.get('/menu/add', 'MenuController.add')
+Route.post('/menu/add', 'MenuController.addSave').validator('menu')
+Route.get('/menu/list', 'MenuController.list')
+Route.get('/menu/edit/:id', 'MenuController.edit')
+Route.post('/menu/edit/:id', 'MenuController.editSave').validator('menu')
 
 Route.get('/manager/add', 'ManagerController.add')
 Route.post('/manager/add', 'ManagerController.addSave').validator('manager')

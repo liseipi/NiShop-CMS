@@ -57,9 +57,8 @@
       <div class="main">
         <table class="table table-striped">
           <tr>
-            <th width="5%">#</th>
-            <th width="10%">排序</th>
-            <th width="20%">菜单名称</th>
+            <th width="15%">#</th>
+            <th width="25%">菜单名称</th>
             <th width="25%">控制器名称</th>
             <th width="15%">显示状态</th>
             <th>操作</th>
@@ -71,9 +70,8 @@
                 @if(menu.level_id==1)
                 <thead class="parent">
                 <tr>
-                  <th width="5%"><span class="fa fa-list-alt"></span></th>
-                  <th width="10%">{{menu.menu_sort}}</th>
-                  <th width="20%">{{menu.menuname}}</th>
+                  <th width="15%"><span class="fa fa-list-alt"></span></th>
+                  <th width="25%">{{menu.menuname}}</th>
                   <th width="25%">{{menu.controller}}</th>
                   <th width="15%">{{menu.runStatus==0?'前台显示':'后台处理'}}</th>
                   <th>
@@ -85,9 +83,8 @@
                 @else
                 <tbody>
                 <tr>
-                  <td width="5%">|{{{ '&minus;'.repeat(menu.level_id) }}}</td>
-                  <td width="10%">{{menu.menu_sort}}</td>
-                  <td width="20%">{{menu.menuname}}</td>
+                  <td width="15%">|{{{ '&minus;'.repeat(menu.level_id) }}}</td>
+                  <td width="25%">{{menu.menuname}}</td>
                   <td width="25%">{{menu.controller}}</td>
                   <td width="15%">{{menu.runStatus==0?'前台显示':'后台处理'}}</td>
                   <td>

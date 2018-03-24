@@ -1,31 +1,17 @@
-# Adonis fullstack application
+# NiShop System application
 
-This is the fullstack boilerplate for AdonisJs, it comes pre-configured with.
-
-1. Bodyparser
-2. Session
-3. Authentication
-4. Web security middleware
-5. CORS
-6. Edge template engine
-7. Lucid ORM
-8. Migrations and seeds
+本项目是使用 AdonisJS 基于NodeJS的一个MVC框架，开发的一个CMS商城系统，前端UI使用了淘宝的SUI3
 
 ## Setup
 
-Use the adonis command to install the blueprint
+使用NiShop商城后台系统，先安装包
 
 ```bash
-adonis new yardstick
+npm install
+
 ```
-
-or manually clone the repo and then run `npm install`.
-
-
-### Migrations
-
-Run the following command to run startup migrations.
+接着安装mysql
 
 ```js
-adonis migration:run
+npm i --save mysql
 ```

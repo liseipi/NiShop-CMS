@@ -32,7 +32,7 @@ class AuthController {
 
       try{
         const userInfo = await auth.attempt(email, password)
-        console.log(userInfo)
+
         if(userInfo.status!=1){
           await auth.logout()
           session.flash({notification: '登录失败，用户已经禁用！'})
@@ -44,7 +44,7 @@ class AuthController {
           thisIp : request.ip(),
           lastlogin_at: userInfo.updated_at,
           updated_at: new Date(),
-          frequency: userInfo.frequency++
+          frequency: userInfo.frequency+1
         }
         let upMsg = ''
         try{
@@ -53,9 +53,11 @@ class AuthController {
           upMsg = '用户信息更新失败。'
         }
 
+        const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
+        session.put('menusData', menusData)
 
         session.flash({notification: '登录成功！'+upMsg})
-        return response.redirect('/')
+        return response.redirect('/dashboard')
       }catch(error){
         //console.log(error)
         session.flash({notification: '登录失败！'})

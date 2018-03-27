@@ -47,4 +47,4 @@ Route.group(()=>{
   Route.post('/role/edit/:id', 'RoleController.editSave').validator('role')
   Route.get('/role/destroy/:id', 'RoleController.destroy')
 
-}).middleware(['auth', 'role']);
+})//.middleware(['auth', 'role'])

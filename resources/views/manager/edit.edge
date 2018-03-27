@@ -4,7 +4,7 @@
   <div id="app-page">
     <div class="container-fluid">
       @include('notification')
-      <h5 class="page-header">增加管理员</h5>
+      <h5 class="page-header">编辑管理员</h5>
       <div class="main">
         <form class="form-horizontal" action="/manager/edit/{{userInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
           {{ csrfField() }}

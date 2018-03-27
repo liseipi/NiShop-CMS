@@ -17,14 +17,25 @@ class ManagerController {
   async addSave({request, response, session}){
     const saveData = await GlobalFn.formatSubmitData('ni_admin_user', request.all())
     //saveData.thisIp = request.ip()
-    saveData.birthday = (new Date((saveData.birthday).replace(/-/g, '/'))).getTime()
+
+    if(saveData.birthday && saveData.birthday!=''){
+      saveData.birthday = (new Date((saveData.birthday).replace(/-/g, '/'))).getTime()
+    }else{
+      delete saveData.birthday
+    }
+
+    if(saveData.mobile && saveData.mobile!=''){
+      saveData.mobile = parseInt(saveData.mobile)
+    }else{
+      delete saveData.mobile
+    }
 
     if(saveData.auth && saveData.auth.length>0){
       saveData.auth = saveData.auth.join(",")
     }else{
       saveData.auth = ''
     }
-    //console.log(saveData)
+    console.log(saveData)
     try{
       await User.create(saveData)
       session.flash({notification: '增加成功！'})
@@ -46,7 +57,12 @@ class ManagerController {
       response.redirect('/manager/list')
       return
     }
-    userInfo.birthday = GlobalFn.timestampToTime(userInfo.birthday, 'YMD')
+    if(userInfo.birthday && userInfo.birthday!=''){
+      userInfo.birthday = GlobalFn.timestampToTime(userInfo.birthday, 'YMD')
+    }else{
+      userInfo.birthday = ''
+    }
+
     //console.log(userInfo)
     const roleData = await Database.select('*').from('ni_auth_roles')
     const menusData = await Database.select('*').from('ni_menus')

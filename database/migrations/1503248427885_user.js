@@ -18,8 +18,8 @@ class UserSchema extends Schema {
       table.integer('status', 1).notNullable().defaultTo(0)
       table.integer('frequency', 6).notNullable().defaultTo(0)
       table.text('auth')
-      table.timestamp('lastlogin_at', true)
-      table.timestamps(true)
+      table.datetime('lastlogin_at')
+      table.timestamps()
     })
   }
 

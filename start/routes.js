@@ -15,19 +15,27 @@
 
 const Route = use('Route')
 
-Route.on('/').render('test')
+Route.get('/', 'HomeController.dashboard')
 
 Route.on('/login').render('auth.login')
 Route.post('/login', 'AuthController.signIn')
+Route.get('/logout', async ({auth, response})=>{
+  await auth.logout()
+  return response.redirect('/')
+})
 
 Route.get('/menu/add', 'MenuController.add')
 Route.post('/menu/add', 'MenuController.addSave').validator('menu')
 Route.get('/menu/list', 'MenuController.list')
 Route.get('/menu/edit/:id', 'MenuController.edit')
 Route.post('/menu/edit/:id', 'MenuController.editSave').validator('menu')
+Route.get('/menu/destroy/:id', 'MenuController.destroy')
 
 Route.get('/manager/add', 'ManagerController.add')
 Route.post('/manager/add', 'ManagerController.addSave').validator('manager')
+Route.get('/manager/list', 'ManagerController.list')
+Route.get('/manager/edit/:id', 'ManagerController.edit')
+Route.post('/manager/edit/:id', 'ManagerController.editSave').validator('manager_edit')
 
 Route.get('/role/add', 'RoleController.add')
 Route.post('/role/add', 'RoleController.addSave').validator('role')

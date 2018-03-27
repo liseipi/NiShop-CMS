@@ -3,35 +3,36 @@
 <div id="page-wrapper">
   <div id="app-page">
     <div class="container-fluid">
+      @include('notification')
       <h5 class="page-header">增加管理员</h5>
       <div class="main">
-        <form class="form-horizontal" action="/manager/add" method="post" data-toggle="validate" novalidate="novalidate">
+        <form class="form-horizontal" action="/manager/edit/{{userInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
           {{ csrfField() }}
           <div class="form-group">
             <label class="col-sm-2 control-label">用户名</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control" name="username" value="{{old('username', '')}}" placeholder="username" data-rule-required="true" data-rule-maxlength="32" >
+              <input type="text" class="form-control" name="username" value="{{userInfo.username}}" placeholder="username" disabled>
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('username'), hasErrorFor('username')) }}</div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">登录邮箱</label>
             <div class="col-sm-6">
-              <input type="text" class="form-control" name="email" value="{{old('email', '')}}" placeholder="email" data-rule-required="true" data-rule-email="true">
+              <input type="text" class="form-control" name="email" value="{{userInfo.email}}" placeholder="email" disabled>
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('email'), hasErrorFor('email')) }}</div>
           </div>
           <div class="form-group">
             <label for="password" class="col-sm-2 control-label">密码</label>
             <div class="col-sm-6">
-              <input type="password" id="password" class="form-control" name="password" placeholder="password" data-rule-required="true" data-rule-minlength="8">
+              <input type="password" id="password" class="form-control" name="password" placeholder="password" data-rule-minlength="8">
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('password'), hasErrorFor('password')) }}</div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">重复密码</label>
             <div class="col-sm-6">
-              <input type="password" class="form-control" name="repassword" placeholder="password" data-rule-required="true" data-rule-minlength="8" data-rule-equalto="#password">
+              <input type="password" class="form-control" name="repassword" placeholder="password" data-rule-minlength="8" data-rule-equalto="#password">
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('repassword'), hasErrorFor('repassword')) }}</div>
           </div>
@@ -39,10 +40,10 @@
             <label class="col-sm-2 control-label">状态</label>
             <div class="col-sm-6">
               <label class="radio-inline">
-                <input type="radio" name="status" value="0" {{old('status')?'':'checked'}} {{old('status')==0?'checked':''}}> 禁用
+                <input type="radio" name="status" value="0" {{userInfo.status==0?'checked':''}}> 禁用
               </label>
               <label class="radio-inline">
-                <input type="radio" name="status" value="1" {{old('status')==1?'checked':''}}> 开启
+                <input type="radio" name="status" value="1" {{userInfo.status==1?'checked':''}}> 开启
               </label>
             </div>
             <div class="col-sm-4 error-container"></div>
@@ -50,7 +51,7 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">手机</label>
             <div class="col-sm-6">
-              <input type="number" class="form-control" name="mobile" value="{{old('mobile', '')}}" placeholder="mobile">
+              <input type="number" class="form-control" name="mobile" value="{{userInfo.mobile||''}}" placeholder="mobile">
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('mobile'), hasErrorFor('mobile')) }}</div>
           </div>
@@ -58,10 +59,10 @@
             <label class="col-sm-2 control-label">性别</label>
             <div class="col-sm-6">
               <label class="radio-inline">
-                <input type="radio" name="user_sex" value="0" {{old('user_sex')?'':'checked'}} {{old('user_sex')==0?'checked':''}}> 男
+                <input type="radio" name="user_sex" value="0" {{userInfo.user_sex==0?'checked':''}}> 男
               </label>
               <label class="radio-inline">
-                <input type="radio" name="user_sex" value="1" {{old('user_sex')==1?'checked':''}}> 女
+                <input type="radio" name="user_sex" value="1" {{userInfo.user_sex==1?'checked':''}}> 女
               </label>
             </div>
             <div class="col-sm-4 error-container"></div>
@@ -69,7 +70,7 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">生日</label>
             <div class="col-sm-6">
-              <input type="text" name="birthday" class="form-control" placeholder="输入日期" data-toggle="datepicker" data-date-start-date='1980-01-01'/>
+              <input type="text" name="birthday" class="form-control" placeholder="输入日期" v-model="birthday" data-toggle="datepicker" data-date-start-date='1980-01-01'/>
             </div>
             <div class="col-sm-4 error-container"></div>
           </div>
@@ -80,7 +81,7 @@
               <select class="form-control input-lg" name="user_level" v-model="level" @change="selectRole">
                 <option value="0">选择角色</option>
                 @each(role in roleData)
-                <option value="{{role.ni_id}}">{{role.role_name}}</option>
+                <option value="{{role.ni_id}}" {{userInfo.user_level==role.ni_id?'selected':''}}>{{role.role_name}}</option>
                 @endeach
               </select>
             </div>
@@ -124,9 +125,10 @@
       new Vue({
         el: '#app-page',
         data:{
-          level: 0,
+          birthday: "{{userInfo.birthday}}",
+          level: {{userInfo.user_level}},
           roleSel: {{{toJSON(roleData)}}},
-          rendersole: []
+          rendersole: '{{{userInfo.auth}}}'
         },
         methods:{
           selectRole: function(){
@@ -151,6 +153,7 @@
           }
         },
         mounted: function () {
+          this.renderSel();
 
           //选择/取消 主项目时 操作子项
           $('.selMenu .menu_row').click(function () {

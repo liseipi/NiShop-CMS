@@ -6,7 +6,9 @@ const GlobalFn = use('App/Helpers/GlobalFn')
 class RoleController {
 
   async add({view}){
-    return view.render('role.add')
+    const menusData = await Database.select('*').from('ni_menus')
+    const formatData = await GlobalFn.treeSort(menusData)
+    return view.render('role.add', {menusData: formatData})
   }
 
   async addSave({request, response, session}){
@@ -30,7 +32,9 @@ class RoleController {
 
   async edit({request, response, view, params}){
     const roleInfo = await Database.table('ni_auth_roles').where('ni_id', params.id).first()
-    return view.render('role.edit', {roleInfo})
+    const menusData = await Database.select('*').from('ni_menus')
+    const formatData = await GlobalFn.treeSort(menusData)
+    return view.render('role.edit', {roleInfo, menusData: formatData})
   }
 
   async editSave({request, response, view, params, session}){

@@ -54,6 +54,26 @@ class MenuController {
     }
   }
 
+  async destroy({response, params, session}){
+    const menusData = await Database.select('ni_id', 'parent_id').from('ni_menus')
+    const formatSubData = await GlobalFn.findSubData([...menusData], params.id)
+
+    if(formatSubData.length>0){
+      session.flash({notification: '删除失败，当前项包含子菜单！'})
+      response.redirect('back')
+      return
+    }
+
+    try{
+      await Database.table('ni_menus').where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/menu/list')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('/menu/list')
+    }
+  }
+
 }
 
 module.exports = MenuController

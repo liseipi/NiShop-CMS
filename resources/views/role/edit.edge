@@ -26,22 +26,18 @@
             <label for="password" class="col-sm-2 control-label">选择权限</label>
             <div class="col-sm-6">
               <table class="table table-bordered">
-                <tr>
-                  <td width="15%"><label><input type="checkbox"> 商品管理</label></td>
+                @each(menu in menusData)
+                <tr class="selMenu">
+                  <td width="20%"><label><input type="checkbox" name="role_auth[]" value="{{menu.ni_id}}" class="menu_row" {{roleInfo.role_auth.indexOf(menu.ni_id)>=0?'checked':''}}> {{menu.menuname}}</label></td>
                   <td>
-                    <label><input type="checkbox" name="role_auth[]" value="7"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="8"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="9"> 新品</label>
+                    @if(menu.children)
+                    @each(subMenu in menu.children)
+                    <label><input type="checkbox" name="role_auth[]" value="{{subMenu.ni_id}}" class="menu_item" {{roleInfo.role_auth.indexOf(subMenu.ni_id)>=0?'checked':''}}> {{subMenu.menuname}}</label>
+                    @endeach
+                    @endif
                   </td>
                 </tr>
-                <tr>
-                  <td width="15%"><label><input type="checkbox"> 商品管理</label></td>
-                  <td>
-                    <label><input type="checkbox" name="role_auth[]" value="2"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="3"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="4"> 新品</label>
-                  </td>
-                </tr>
+                @endeach
               </table>
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_auth'), hasErrorFor('role_auth')) }}</div>

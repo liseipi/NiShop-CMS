@@ -1,0 +1,22 @@
+@layout('layout')
+@section('content')
+<div id="page-wrapper">
+  <div id="app-page">
+    <div class="container-fluid">
+      @include('notification')
+      <h5 class="page-header">控制台中心</h5>
+      <div class="main">
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /#page-wrapper -->
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {
+
+    });
+  });
+</script>
+@endsection

@@ -26,22 +26,18 @@
             <label for="password" class="col-sm-2 control-label">选择权限</label>
             <div class="col-sm-6">
               <table class="table table-bordered">
-                <tr>
-                  <td width="15%"><label><input type="checkbox"> 商品管理</label></td>
+                @each(menu in menusData)
+                <tr class="selMenu">
+                  <td width="20%"><label><input type="checkbox" name="role_auth[]" value="{{menu.ni_id}}" class="menu_row"> {{menu.menuname}}</label></td>
                   <td>
-                    <label><input type="checkbox" name="role_auth[]" value="7"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="8"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="9"> 新品</label>
+                    @if(menu.children)
+                    @each(subMenu in menu.children)
+                    <label><input type="checkbox" name="role_auth[]" value="{{subMenu.ni_id}}" class="menu_item"> {{subMenu.menuname}}</label>
+                    @endeach
+                    @endif
                   </td>
                 </tr>
-                <tr>
-                  <td width="15%"><label><input type="checkbox"> 商品管理</label></td>
-                  <td>
-                    <label><input type="checkbox" name="role_auth[]" value="2"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="3"> 新品</label>
-                    <label><input type="checkbox" name="role_auth[]" value="4"> 新品</label>
-                  </td>
-                </tr>
+                @endeach
               </table>
             </div>
             <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_auth'), hasErrorFor('role_auth')) }}</div>
@@ -61,6 +57,23 @@
 <script type="text/javascript">
   requirejs(['/js/config.js'], function () {
     requirejs(['cmsui'], function (cmsui) {
+
+      //选择/取消 主项目时 操作子项
+      $('.selMenu .menu_row').click(function () {
+        if($(this).is(':checked')){
+          $(this).parents('.selMenu').find("input[type='checkbox']").prop("checked", true);
+        }else {
+          $(this).parents('.selMenu').find("input[type='checkbox']").prop("checked", false);
+        }
+      });
+
+      // 选择子项是，默认选中上级项
+      $('.selMenu .menu_item').click(function () {
+        if($(this).is(':checked')){
+          $(this).parents('.selMenu').find("input[type='checkbox'].menu_row").prop("checked", true);
+        }
+      });
+
     });
   });
 </script>

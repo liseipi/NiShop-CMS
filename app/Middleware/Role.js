@@ -14,17 +14,19 @@ class Role {
         acturl = '/'+urlArr[1]+'/'+urlArr[2]
       }
 
-      session.get('menusData').forEach((item, index)=>{
-        if(item.controller==acturl){
-          LicitUrl = false
-          AuthCode = item.ni_id
-        }
-      })
+      if(session.get('menusData')){
+        session.get('menusData').forEach((item, index)=>{
+          if(item.controller==acturl){
+            LicitUrl = false
+            AuthCode = item.ni_id
+          }
+        })
+      }
 
       //指定URL不做全局权限认证
       const no_Auth = [
         '/',
-        '/'
+        '/dashboard'
       ]
       if(no_Auth.indexOf(acturl)<0){
         if(LicitUrl){

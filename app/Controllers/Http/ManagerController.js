@@ -95,6 +95,17 @@ class ManagerController {
     }
   }
 
+  async destroy({response, params, session}){
+    try{
+      await Database.table('ni_admin_user').where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/manager/list')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('/manager/list')
+    }
+  }
+
 }
 
 module.exports = ManagerController

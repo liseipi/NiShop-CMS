@@ -21,10 +21,10 @@
           <td>{{user.email}}</td>
           <td>{{user.lastdate||''}}</td>
           <td>
-            <a href="/manager/edit/{{user.ni_id}}"><span class="fa fa-edit"></span> 编辑权限</a> |
+            <a href="/manager/edit/{{user.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑权限</a> |
             <!--<a href="#"><span class="fa fa-edit"></span> 日志</a> |-->
             <!--<a href="#"><span class="fa fa-edit"></span> 用户信息</a> |-->
-            <a href="/manager/destroy/{{user.ni_id}}"><span class="fa fa-times"></span> 删除</a>
+            <a href="/manager/destroy/{{user.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
           </td>
         </tr>
         @endeach

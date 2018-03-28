@@ -39,6 +39,7 @@ Route.group(()=>{
   Route.get('/manager/list', 'ManagerController.list')
   Route.get('/manager/edit/:id', 'ManagerController.edit')
   Route.post('/manager/edit/:id', 'ManagerController.editSave').validator('manager_edit')
+  Route.get('/manager/destroy/:id', 'ManagerController.destroy')
 
   Route.get('/role/add', 'RoleController.add')
   Route.post('/role/add', 'RoleController.addSave').validator('role')

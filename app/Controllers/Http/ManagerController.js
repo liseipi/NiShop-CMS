@@ -35,7 +35,7 @@ class ManagerController {
     }else{
       saveData.auth = ''
     }
-    console.log(saveData)
+    //console.log(saveData)
     try{
       await User.create(saveData)
       session.flash({notification: '增加成功！'})
@@ -84,7 +84,7 @@ class ManagerController {
     }else{
       saveData.auth = ''
     }
-    console.log(saveData)
+    //console.log(saveData)
     try{
       await User.query().where('ni_id', params.id).update(saveData)
       session.flash({notification: '修改成功！'})

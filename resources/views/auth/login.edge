@@ -9,7 +9,7 @@
   {{ css('css/common') }}
   {{ script('js/require') }}
 </head>
-<body>
+<body style="background-color: #f8f8f8;">
 <div id="wrapper">
   <div class="container">
     <div class="row">
@@ -32,11 +32,11 @@
                          value="{{old('password', '')}}}" data-rule-required="true">
                   <span class="error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('password'), hasErrorFor('password')) }}</span>
                 </div>
-                <div class="checkbox">
-                  <label>
-                    <input name="remember" type="checkbox" value="Remember Me">Remember Me
-                  </label>
-                </div>
+                <!--<div class="checkbox">-->
+                  <!--<label>-->
+                    <!--<input name="remember" type="checkbox" value="Remember Me">Remember Me-->
+                  <!--</label>-->
+                <!--</div>-->
                 <button type="submit" class="btn btn-xl btn-success btn-block">Login</button>
               </fieldset>
             </form>

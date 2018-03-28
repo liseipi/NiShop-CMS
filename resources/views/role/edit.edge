@@ -1,61 +1,79 @@
 @layout('layout')
 @section('content')
-<div id="page-wrapper">
-  <div id="app-page">
-    <div class="container-fluid">
-      @include('notification')
-      <h5 class="page-header">修改管理角色</h5>
-      <div class="main">
-        <form class="form-horizontal" action="/role/edit/{{roleInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
-          {{ csrfField() }}
-          <div class="form-group">
-            <label class="col-sm-2 control-label">角色名称</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control" name="role_name" value="{{roleInfo.role_name}}" data-rule-required="true">
-            </div>
-            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_name'), hasErrorFor('role_name')) }}</div>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">修改管理角色</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/role/edit/{{roleInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">角色名称</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="role_name" value="{{roleInfo.role_name}}" data-rule-required="true">
           </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label">角色描述</label>
-            <div class="col-sm-6">
-              <textarea class="form-control" name="role_desc" rows="3">{{roleInfo.role_desc}}</textarea>
-            </div>
-            <div class="col-sm-4 error-container"></div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_name'), hasErrorFor('role_name')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">角色描述</label>
+          <div class="col-sm-6">
+            <textarea class="form-control" name="role_desc" rows="3">{{roleInfo.role_desc}}</textarea>
           </div>
-          <div class="form-group">
-            <label for="password" class="col-sm-2 control-label">选择权限</label>
-            <div class="col-sm-6">
-              <table class="table table-bordered">
-                @each(menu in menusData)
-                <tr class="selMenu">
-                  <td width="20%"><label><input type="checkbox" name="role_auth[]" value="{{menu.ni_id}}" class="menu_row" {{roleInfo.role_auth.indexOf(menu.ni_id)>=0?'checked':''}}> {{menu.menuname}}</label></td>
-                  <td>
-                    @if(menu.children)
-                    @each(subMenu in menu.children)
-                    <label><input type="checkbox" name="role_auth[]" value="{{subMenu.ni_id}}" class="menu_item" {{roleInfo.role_auth.indexOf(subMenu.ni_id)>=0?'checked':''}}> {{subMenu.menuname}}</label>
-                    @endeach
-                    @endif
-                  </td>
-                </tr>
-                @endeach
-              </table>
-            </div>
-            <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_auth'), hasErrorFor('role_auth')) }}</div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label for="password" class="col-sm-2 control-label">选择权限</label>
+          <div class="col-sm-6">
+            <table class="table table-bordered">
+              @each(menu in menusData)
+              <tr class="selMenu">
+                <td width="20%"><label><input type="checkbox" name="role_auth[]" value="{{menu.ni_id}}" class="menu_row" {{roleInfo.role_auth.indexOf(menu.ni_id)>=0?'checked':''}}> {{menu.menuname}}</label></td>
+                <td>
+                  @if(menu.children)
+                  @each(subMenu in menu.children)
+                  <label><input type="checkbox" name="role_auth[]" value="{{subMenu.ni_id}}" class="menu_item" {{roleInfo.role_auth.indexOf(subMenu.ni_id)>=0?'checked':''}}> {{subMenu.menuname}}</label>
+                  @endeach
+                  @endif
+                </td>
+              </tr>
+              @endeach
+            </table>
           </div>
-          <div class="form-group">
-            <div class="col-sm-6 col-sm-offset-2">
-              <input type="submit" value="提交" class="btn btn-xl btn-primary">
-            </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('role_auth'), hasErrorFor('role_auth')) }}</div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-<!-- /#page-wrapper -->
+
 <script type="text/javascript">
   requirejs(['/js/config.js'], function () {
-    requirejs(['cmsui'], function (cmsui) {});
+    requirejs(['cmsui'], function (cmsui) {
+
+      $(function () {
+        //选择/取消 主项目时 操作子项
+        $('.selMenu .menu_row').click(function () {
+          if($(this).is(':checked')){
+            $(this).parents('.selMenu').find("input[type='checkbox']").prop("checked", true);
+          }else {
+            $(this).parents('.selMenu').find("input[type='checkbox']").prop("checked", false);
+          }
+        });
+
+        // 选择子项是，默认选中上级项
+        $('.selMenu .menu_item').click(function () {
+          if($(this).is(':checked')){
+            $(this).parents('.selMenu').find("input[type='checkbox'].menu_row").prop("checked", true);
+          }
+        });
+      });
+
+    });
   });
 </script>
 @endsection

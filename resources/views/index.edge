@@ -1,12 +1,9 @@
 @layout('layout')
 @section('content')
-<div id="app-page">
-  <div class="container-fluid">
-    @include('notification')
-    <h5 class="page-header">控制台中心</h5>
-    <div class="main">
-
-    </div>
+<div id="wrapper">
+  @include('nav')
+  <div id="page-wrapper">
+    <iframe src="/dashboard" frameborder="0" id="iframe-wrapper" name="iframe-wrapper" style="width:100%;"></iframe>
   </div>
 </div>
 <!-- /#page-wrapper -->

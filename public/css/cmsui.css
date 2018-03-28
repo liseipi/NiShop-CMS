@@ -23,11 +23,10 @@ nav .navbar-brand{
 }
 /*---- menu ----*/
 
-body {
-  background-color: #f8f8f8;
-}
+
 #wrapper {
-    width: 100%
+  width: 100%;
+  background-color: #f8f8f8;
 }
 
 #page-wrapper {
@@ -136,7 +135,7 @@ body {
 }
 
 .sidebar .nav-second-level li a {
-    padding-left: 37px
+    padding-left: 28px
 }
 
 .sidebar .nav-third-level li a {

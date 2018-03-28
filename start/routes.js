@@ -19,12 +19,12 @@ Route.on('/login').render('auth.login')
 Route.post('/login', 'AuthController.signIn')
 Route.get('/logout', async ({auth, response})=>{
   await auth.logout()
-  return response.redirect('/dashboard')
+  return response.redirect('/')
 })
 
 Route.group(()=>{
 
-  Route.get('/', ({response})=>response.redirect('/dashboard'))
+  Route.get('/', 'HomeController.store')
   Route.get('/dashboard', 'HomeController.dashboard')
 
   Route.get('/menu/add', 'MenuController.add')
@@ -47,4 +47,4 @@ Route.group(()=>{
   Route.post('/role/edit/:id', 'RoleController.editSave').validator('role')
   Route.get('/role/destroy/:id', 'RoleController.destroy')
 
-})//.middleware(['auth', 'role'])
+}).middleware(['auth', 'role'])

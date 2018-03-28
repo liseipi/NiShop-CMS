@@ -16,3 +16,7 @@ database/development.sqlite
 
 # webstorm dev file
 .idea
+
+# all .DS_Store
+.DS_Store
+*/.DS_Store

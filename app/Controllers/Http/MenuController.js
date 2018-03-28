@@ -27,7 +27,7 @@ class MenuController {
   async list({view}){
     const menusData = await Database.select('*').from('ni_menus')
     const formatData = await GlobalFn.soleTreeSort(menusData)
-    return view.render('/menu.list', {menusData: formatData})
+    return view.render('menu.list', {menusData: formatData})
   }
 
   async edit({request, response, view, params}){

@@ -57,7 +57,7 @@ class AuthController {
         session.put('menusData', menusData)
 
         session.flash({notification: '登录成功！'+upMsg})
-        return response.redirect('/dashboard')
+        return response.redirect('/')
       }catch(error){
         //console.log(error)
         session.flash({notification: '登录失败！'})

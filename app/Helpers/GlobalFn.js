@@ -3,6 +3,8 @@
 const Database = use('Database')
 
 class GlobalFnClass {
+
+  //格式化时间返回
   static timestampToTime(timestamp, type="YMDHMS") {
     let date = new Date(parseInt(timestamp))
     let Y = date.getFullYear() + '-'

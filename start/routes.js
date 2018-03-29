@@ -48,4 +48,12 @@ Route.group(()=>{
   Route.post('/role/edit/:id', 'RoleController.editSave').validator('role')
   Route.get('/role/destroy/:id', 'RoleController.destroy')
 
+  Route.get('/article/category', 'ArticleController.category')
+  Route.get('/article/categoryAdd', 'ArticleController.categoryAdd')
+  Route.post('/article/categoryAdd', 'ArticleController.categorySave').validator('article_category')
+  Route.get('/article/categoryEdit/:id', 'ArticleController.categoryEdit')
+  Route.post('/article/categoryEdit/:id', 'ArticleController.categoryEditSave').validator('article_category')
+  Route.get('/article/categoryDestroy/:id', 'ArticleController.categoryDestroy')
+  Route.get('/article/add', 'ArticleController.add')
+
 }).middleware(['auth', 'role'])

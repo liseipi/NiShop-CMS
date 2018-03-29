@@ -5,7 +5,9 @@ requirejs.config({
     sui: 'vendor/sui3/js/sui.min',
     metisMenu: 'lib/metisMenu',
     vue: 'lib/vue.min',
-    cmsui: 'lib/cmsui'
+    cmsui: 'lib/cmsui',
+    ckedit: 'vendor/ckeditor/ckeditor',
+    holder: 'lib/holder'
   },
   shim: {
     sui: {

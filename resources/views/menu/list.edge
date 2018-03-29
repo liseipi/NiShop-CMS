@@ -82,7 +82,7 @@
               @else
               <tbody>
               <tr>
-                <td width="15%">|{{{ '&minus;'.repeat(menu.level_id) }}}</td>
+                <td width="15%">{{{'&nbsp;&nbsp;'.repeat(menu.level_id)}}}&brvbar;&ndash;</td>
                 <td width="25%">{{menu.menuname}}</td>
                 <td width="25%">{{menu.controller}}</td>
                 <td width="15%">{{menu.runStatus==0?'前台显示':'后台处理'}}</td>

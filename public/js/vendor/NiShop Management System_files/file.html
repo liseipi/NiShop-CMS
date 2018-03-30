@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- saved from url=(0026)http://127.0.0.1:3333/file -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    NiShop Management System
+  </title>
+  <link rel="stylesheet" href="./common.css">
+  <script type="text/javascript" src="./require.js"></script>
+<script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="/js/config.js" src="./config.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="lib/css.min" src="./css.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="jquery" src="./jquery.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="zyFile" src="./zyFile.js"></script><link type="text/css" rel="stylesheet" href="./zyUpload.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="sui" src="./sui.min.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="metisMenu" src="./metisMenu.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="zyUpload" src="./zyUpload.js"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="cmsui" src="./cmsui.js"></script></head>
+<body>
+<div id="app-page">
+    <div class="">
+      <div class="bs-example bs-example-tabs" role="tabpanel" data-example-id="togglable-tabs">
+        <ul id="myTab" class="nav nav-tabs nav-xl" role="tablist">
+          <li role="presentation" class="active"><a href="http://127.0.0.1:3333/file#home" id="home-tab" role="tab" data-toggle="tab" aria-controls="home" aria-expanded="true">上传</a></li>
+          <li role="presentation" class=""><a href="http://127.0.0.1:3333/file#profile" role="tab" id="profile-tab" data-toggle="tab" aria-controls="profile" aria-expanded="false">浏览</a></li>
+        </ul>
+        <div id="myTabContent" class="tab-content">
+          <div role="tabpanel" class="tab-pane fade active in" id="home" aria-labelledby="home-tab">
+            <div id="demo" class="demo" style="width: 650px; height: 400px;"><form id="uploadForm" action="http://127.0.0.1:3333/upload/UploadAction" method="post" enctype="multipart/form-data">	<div class="upload_box">		<div class="upload_main">			<div class="upload_choose">				<div class="convent_choice">					<div class="andArea">						<div class="filePicker">点击选择文件</div>						<input id="fileImage" type="file" size="30" name="fileselect[]" multiple="">					</div>				</div>				<span id="fileDragArea" class="upload_drag_area">或者将文件拖到此处</span>			</div>			<div class="status_bar">				<div id="status_info" class="info">选中0张文件，共0B。</div>				<div class="btns">					<div class="webuploader_pick">继续选择</div>					<div class="upload_btn">开始上传</div>				</div>			</div>			<div id="preview" class="upload_preview"></div>		</div>		<div class="upload_submit">			<button type="button" id="fileSubmit" class="upload_submit_btn">确认上传文件</button>		</div>		<div id="uploadInf" class="upload_inf"></div>	</div></form></div>
+            <style>
+              #demo{height:auto!important;}
+            </style>
+          </div>
+          <div role="tabpanel" class="tab-pane fade" id="profile" aria-labelledby="profile-tab">
+            <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    requirejs(['/js/config.js'], function () {
+      requirejs(['cmsui', 'zyUpload'], function (cmsui) {
+      
+        $(function(){
+          // 初始化插件
+          $("#demo").zyUpload({
+            width            :   "650px",                 // 宽度
+            height           :   "400px",                 // 宽度
+            itemWidth        :   "120px",                 // 文件项的宽度
+            itemHeight       :   "100px",                 // 文件项的高度
+            url              :   "/upload/UploadAction",  // 上传文件的路径
+            multiple         :   true,                    // 是否可以多个文件上传
+            dragDrop         :   true,                    // 是否可以拖动上传文件
+            del              :   true,                    // 是否可以删除文件
+            finishDel        :   false,  				  // 是否在上传文件完成后删除预览
+            /* 外部获得的回调接口 */
+            onSelect: function(files, allFiles){                    // 选择文件的回调方法
+              console.info("当前选择了以下文件：");
+              console.info(files);
+              console.info("之前没上传的文件：");
+              console.info(allFiles);
+            },
+            onDelete: function(file, surplusFiles){                     // 删除一个文件的回调方法
+              console.info("当前删除了此文件：");
+              console.info(file);
+              console.info("当前剩余的文件：");
+              console.info(surplusFiles);
+            },
+            onSuccess: function(file){                    // 文件上传成功的回调方法
+              console.info("此文件上传成功：");
+              console.info(file);
+            },
+            onFailure: function(file){                    // 文件上传失败的回调方法
+              console.info("此文件上传失败：");
+              console.info(file);
+            },
+            onComplete: function(responseInfo){           // 上传完成的回调方法
+              console.info("文件上传完成");
+              console.info(responseInfo);
+            }
+          });
+        });
+
+      });
+    });
+  </script>
+
+
+</body></html>

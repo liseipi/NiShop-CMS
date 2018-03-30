@@ -12,6 +12,7 @@ class ArticlesSchema extends Schema {
       table.integer('article_author', 6)
       table.integer('status', 6)
       table.integer('sort', 6)
+      table.integer('article_type', 6)
       table.string('thumb_img', 64)
       table.string('keywords', 128)
       table.string('summary_content', 255)

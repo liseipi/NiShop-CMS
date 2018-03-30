@@ -56,4 +56,7 @@ Route.group(()=>{
   Route.get('/article/categoryDestroy/:id', 'ArticleController.categoryDestroy')
   Route.get('/article/add', 'ArticleController.add')
 
+  Route.get('/file', 'FileController.store')
+  Route.post('/file/save', 'FileController.save')
+
 }).middleware(['auth', 'role'])

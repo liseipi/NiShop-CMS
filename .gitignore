@@ -20,3 +20,5 @@ database/development.sqlite
 # all .DS_Store
 .DS_Store
 */.DS_Store
+
+config/database.js

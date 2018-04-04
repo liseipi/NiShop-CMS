@@ -75,9 +75,75 @@ class ArticleController {
   }
 
   async add({view}){
-    return view.render('article.add')
+    const categoryData = await Database.select('ni_id', 'parent_id', 'column_name').from('ni_article_categories')
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+    return view.render('article.add', {categoryData: formatData})
   }
 
+  async addSave({request, response, session, auth}){
+    const saveData = await GlobalFn.formatSubmitData('ni_articles', request.all())
+    saveData.article_author = auth.user.ni_id
+    saveData.create_at = new Date().getTime()
+
+    try{
+      await Database.from('ni_articles').insert(saveData)
+      session.flash({notification: '增加成功！'})
+      response.redirect('/article/list')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async list({view, request}){
+    const query = request.get()
+    const page = query.page || 1
+    const perPage = 20
+    const categoty_id = query.category || 0
+    const keywords = query.keywords || ''
+
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from('ni_article_categories')
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+
+    const formatSubData = await GlobalFn.findSubData([...categoryData], categoty_id)
+    let whereCategoty = []
+    if(categoty_id!=0){
+      whereCategoty = [].concat([parseInt(categoty_id)], formatSubData)
+    }
+
+    const articleData = await Database.select('ni_articles.*', 'ni_article_categories.column_name').from('ni_articles')
+    .leftJoin('ni_article_categories', 'ni_articles.categoty_id', 'ni_article_categories.ni_id')
+    .where(function(){
+      if(categoty_id!=0){
+        this.whereIn('ni_articles.categoty_id', whereCategoty)
+      }
+    })
+    .where('ni_articles.article_title', 'like', `%${keywords}%`)
+    .paginate(page, perPage)
+    return view.render('article.list', {categoryData: formatData, articleData, query: query})
+  }
+
+  async edit({view, params, session}){
+    const categoryData = await Database.select('ni_id', 'parent_id', 'column_name').from('ni_article_categories')
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+
+    const articleData = await Database.select('*').from('ni_articles').where('ni_id', params.id).first()
+
+    return view.render('article.edit', {categoryData: formatData, articleData})
+  }
+
+  async editSave({request, response, session, params, auth}){
+    const saveData = await GlobalFn.formatSubmitData('ni_articles', request.all())
+
+    try{
+      await Database.table('ni_articles').where('ni_id', params.id).update(saveData)
+      session.flash({notification: '修改成功！'})
+      response.redirect('/article/list')
+    }catch(error){
+      session.flash({notification: '修改失败！'+error})
+      response.redirect('back')
+    }
+  }
 
 }
 

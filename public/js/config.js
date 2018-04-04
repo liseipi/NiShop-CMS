@@ -8,8 +8,7 @@ requirejs.config({
     cmsui: 'lib/cmsui',
     ckedit: 'vendor/ckeditor/ckeditor',
     holder: 'lib/holder',
-    zyFile: 'vendor/zyUploads/zyFile',
-    zyUpload: 'vendor/zyUploads/zyUpload',
+    zyUpload: 'vendor/zyUploads/js/zyupload-1.0.0.min'
   },
   map: {
     '*': {
@@ -35,10 +34,9 @@ requirejs.config({
     },
     zyUpload: {
       deps: [
-        'css!vendor/zyUploads/zyUpload.css',
-        'jquery',
-        'zyFile'
+        'css!vendor/zyUploads/css/zyupload-1.0.0.min.css',
+        'jquery'
       ]
-    }
+    },
   }
 });

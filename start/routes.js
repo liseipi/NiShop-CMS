@@ -15,6 +15,8 @@
 
 const Route = use('Route')
 
+Route.on('/test').render('test')
+
 Route.on('/login').render('auth.login')
 Route.post('/login', 'AuthController.signIn')
 Route.get('/logout', async ({auth, response})=>{
@@ -55,6 +57,10 @@ Route.group(()=>{
   Route.post('/article/categoryEdit/:id', 'ArticleController.categoryEditSave').validator('article_category')
   Route.get('/article/categoryDestroy/:id', 'ArticleController.categoryDestroy')
   Route.get('/article/add', 'ArticleController.add')
+  Route.post('/article/add', 'ArticleController.addSave').validator('article')
+  Route.get('/article/list', 'ArticleController.list')
+  Route.get('/article/edit/:id', 'ArticleController.edit')
+  Route.post('/article/edit/:id', 'ArticleController.editSave')
 
   Route.get('/file', 'FileController.store')
   Route.post('/file/save', 'FileController.save')

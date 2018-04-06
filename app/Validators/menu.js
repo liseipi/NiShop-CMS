@@ -3,7 +3,7 @@
 class menu {
   get rules () {
     return {
-      //'parent_id': 'integer',
+      'parent_id': 'required',
       'menuname': 'required',
       'controller': 'required',
       'runStatus': 'required',

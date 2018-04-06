@@ -9,7 +9,7 @@ class UserSchema extends Schema {
       table.string('username', 64).notNullable().unique()
       table.string('email', 64).notNullable().unique()
       table.string('password', 64).notNullable()
-      table.bigInteger('mobile', 11)
+      table.string('mobile', 11)
       table.integer('user_level', 1)
       table.boolean('user_sex')
       table.bigInteger('birthday', 14)

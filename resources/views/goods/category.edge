@@ -52,17 +52,18 @@
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
-    <h5 class="page-header">菜单列表</h5>
+    <h5 class="page-header">商品分类列表</h5>
     <div class="main">
       <table class="table table-striped">
         <tr>
           <th width="15%">#</th>
-          <th width="25%">菜单名称</th>
-          <th width="25%">控制器名称</th>
+          <th width="15%">分类名称</th>
+          <th width="20%">SKU/控制器</th>
+          <th width="15%">关键字</th>
           <th width="15%">显示状态</th>
           <th>操作</th>
         </tr>
-        @each(menu in menusData)
+        @each(menu in categoryData)
         <tr>
           <td colspan="6" class="sub-table">
             <table class="table table-striped table-hover">
@@ -70,12 +71,17 @@
               <thead class="parent">
               <tr>
                 <th width="15%">&nbsp;&nbsp;<span class="fa fa-list-alt"></span></th>
-                <th width="25%">{{menu.menuname}}</th>
-                <th width="25%">{{menu.controller}}</th>
-                <th width="15%">{{menu.runStatus==0?'前台显示':'后台处理'}}</th>
+                <th width="15%">{{menu.column_name}}</th>
+                <th width="20%">
+                  SKU: {{menu.column_sku}}
+                  <br>
+                  控制器: {{menu.controller}}
+                </th>
+                <th width="15%">{{menu.column_keywords}}</th>
+                <th width="15%">{{menu.column_status==0?'使用':'关闭'}}</th>
                 <th>
-                  <a href="/menu/edit/{{menu.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
-                  <a href="/menu/destroy/{{menu.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+                  <a href="/goods/categoryEdit/{{menu.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
+                  <a href="/goods/categoryDestroy/{{menu.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
                 </th>
               </tr>
               </thead>
@@ -83,12 +89,17 @@
               <tbody>
               <tr>
                 <td width="15%">{{{'&nbsp;&nbsp;'.repeat(menu.level_id)}}}&brvbar;&ndash;</td>
-                <td width="25%">{{menu.menuname}}</td>
-                <td width="25%">{{menu.controller}}</td>
-                <td width="15%">{{menu.runStatus==0?'前台显示':'后台处理'}}</td>
+                <th width="15%">{{menu.column_name}}</th>
+                <th width="20%">
+                  SKU: {{menu.column_sku}}
+                  <br>
+                  控制器: {{menu.controller}}
+                </th>
+                <th width="15%">{{menu.column_keywords}}</th>
+                <td width="15%">{{menu.column_status==0?'使用':'关闭'}}</td>
                 <td>
-                  <a href="/menu/edit/{{menu.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
-                  <a href="/menu/destroy/{{menu.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+                  <a href="/goods/categoryEdit/{{menu.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
+                  <a href="/goods/categoryDestroy/{{menu.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
                 </td>
               </tr>
               </tbody>

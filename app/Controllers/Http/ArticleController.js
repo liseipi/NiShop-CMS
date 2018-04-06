@@ -38,7 +38,7 @@ class ArticleController {
 
     const formatSubData = await GlobalFn.findSubData([...columnData], columnInfo.ni_id)
 
-    return view.render('article.category_edit', {columnInfo, columnData:formatData, subData:[].concat([columnInfo.ni_id], formatSubData)})
+    return view.render('article.category_edit', {columnInfo, columnData:formatData, subData:formatSubData})
   }
 
   async categoryEditSave({request, response, view, params, session}){

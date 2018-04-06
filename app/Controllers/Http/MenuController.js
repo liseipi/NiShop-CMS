@@ -38,7 +38,7 @@ class MenuController {
 
     const formatSubData = await GlobalFn.findSubData([...menusData], menuInfo.ni_id)
 
-    return view.render('menu.edit', {menuInfo, menusData:formatData, subData:[].concat([menuInfo.ni_id], formatSubData)})
+    return view.render('menu.edit', {menuInfo, menusData:formatData, subData:formatSubData})
   }
 
   async editSave({request, response, view, params, session}){

@@ -62,6 +62,13 @@ Route.group(()=>{
   Route.get('/article/edit/:id', 'ArticleController.edit')
   Route.post('/article/edit/:id', 'ArticleController.editSave')
 
+  Route.get('/goods/category', 'GoodsController.category')
+  Route.get('/goods/categoryAdd', 'GoodsController.categoryAdd')
+  Route.post('/goods/categoryAdd', 'GoodsController.categorySave').validator('goods_category')
+  Route.get('/goods/categoryEdit/:id', 'GoodsController.categoryEdit')
+  Route.post('/goods/categoryEdit/:id', 'GoodsController.categoryEditSave').validator('goods_category')
+  Route.get('/goods/categoryDestroy/:id', 'GoodsController.categoryDestroy')
+
   Route.get('/file', 'FileController.store')
   Route.post('/file/save', 'FileController.save')
 

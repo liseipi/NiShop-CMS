@@ -72,6 +72,7 @@ class ManagerController {
   }
 
   async editSave({request, response, view, params, session}){
+    console.log(request.all())
     const saveData = await GlobalFn.formatSubmitData('ni_admin_user', request.all())
     if(saveData.password==''){
       delete saveData.password

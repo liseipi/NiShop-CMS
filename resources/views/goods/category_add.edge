@@ -3,17 +3,17 @@
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
-    <h5 class="page-header">修改文章栏目</h5>
+    <h5 class="page-header">增加商品分类</h5>
     <div class="main">
-      <form class="form-horizontal" action="/article/categoryEdit/{{columnInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/categoryAdd" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
           <label class="col-sm-2 control-label">选择分类</label>
           <div class="col-sm-6">
             <select class="form-control input-lg" name="parent_id">
               <option value="0">根级分类</option>
-              @each(menu in columnData)
-              <option value="{{columnInfo.ni_id==menu.ni_id?menu.parent_id:menu.ni_id}}" {{columnInfo.ni_id==menu.ni_id?'selected':''}} {{ subData.indexOf(menu.ni_id)>=0?'disabled':'' }}>{{{ '&nbsp;&nbsp;'.repeat(menu.level_id) }}}{{{ '├'.repeat(menu.level_id>0?1:0) }}}{{menu.column_name}}</option>
+              @each(category in categoryData)
+              <option value="{{category.ni_id}}">{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
               @endeach
             </select>
           </div>
@@ -22,25 +22,39 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">栏目名称</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="column_name" value="{{columnInfo.column_name}}" data-rule-required="true">
+            <input type="text" class="form-control" name="column_name" value="{{old('column_name', '')}}" data-rule-required="true">
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('column_name'), hasErrorFor('column_name')) }}</div>
         </div>
         <div class="form-group">
+          <label class="col-sm-2 control-label">栏目SKU</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="column_sku" value="{{old('column_sku', '')}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('column_sku'), hasErrorFor('column_sku')) }}</div>
+        </div>
+        <div class="form-group">
           <label class="col-sm-2 control-label">控制器名称</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="controller" value="{{columnInfo.controller}}" data-rule-required="true">
+            <input type="text" class="form-control" name="controller" value="{{old('controller', '')}}" data-rule-required="true">
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('controller'), hasErrorFor('controller')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">关键词</label>
+          <div class="col-sm-6">
+            <textarea class="form-control" name="column_keywords" rows="3">{{old('column_keywords', '')}}</textarea>
+          </div>
+          <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">显示状态</label>
           <div class="col-sm-6">
             <label class="radio-inline">
-              <input type="radio" name="column_status" value="0" {{columnInfo.column_status==0?'checked':''}}> 显示
+              <input type="radio" name="column_status" value="0" {{old('column_status')?'':'checked'}} {{old('column_status')==0?'checked':''}}> 显示
             </label>
             <label class="radio-inline">
-              <input type="radio" name="column_status" value="1" {{columnInfo.column_status==1?'checked':''}}> 隐藏
+              <input type="radio" name="column_status" value="1" {{old('column_status')==1?'checked':''}}> 隐藏
             </label>
           </div>
           <div class="col-sm-4 error-container"></div>
@@ -48,14 +62,14 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">排序</label>
           <div class="col-sm-6">
-            <input type="number" class="form-control" name="column_sort" value="{{columnInfo.column_sort}}">
+            <input type="number" class="form-control" name="column_sort" value="{{old('column_sort', 100)}}">
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">分类描述</label>
           <div class="col-sm-6">
-            <textarea class="form-control" name="column_desc" rows="3">{{columnInfo.column_desc}}</textarea>
+            <textarea class="form-control" name="column_desc" rows="3">{{old('column_desc', '')}}</textarea>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>

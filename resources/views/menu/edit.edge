@@ -13,7 +13,7 @@
             <select class="form-control input-lg" name="parent_id">
               <option value="0">根级菜单</option>
               @each(menu in menusData)
-              <option value="{{menu.ni_id}}" {{menuInfo.ni_id==menu.ni_id?'selected':''}} {{ subData.indexOf(menu.ni_id)>=0?'disabled':'' }}>{{{ '&nbsp;&nbsp;'.repeat(menu.level_id) }}}{{{ '├'.repeat(menu.level_id>0?1:0) }}}{{menu.menuname}}</option>
+              <option value="{{menuInfo.ni_id==menu.ni_id?menu.parent_id:menu.ni_id}}" {{menuInfo.ni_id==menu.ni_id?'selected':''}} {{ subData.indexOf(menu.ni_id)>=0?'disabled':'' }}>{{{ '&nbsp;&nbsp;'.repeat(menu.level_id) }}}{{{ '├'.repeat(menu.level_id>0?1:0) }}}{{menu.menuname}}</option>
               @endeach
             </select>
           </div>

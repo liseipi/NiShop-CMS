@@ -5,7 +5,7 @@
     @include('notification')
     <h5 class="page-header">修改文章栏目</h5>
     <div class="main">
-      <form class="form-horizontal" action="/article/categoryEdit/{{columnInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/categoryEdit/{{columnInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
           <label class="col-sm-2 control-label">选择分类</label>
@@ -27,11 +27,25 @@
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('column_name'), hasErrorFor('column_name')) }}</div>
         </div>
         <div class="form-group">
+          <label class="col-sm-2 control-label">栏目SKU</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="column_sku" value="{{columnInfo.column_sku}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('column_sku'), hasErrorFor('column_sku')) }}</div>
+        </div>
+        <div class="form-group">
           <label class="col-sm-2 control-label">控制器名称</label>
           <div class="col-sm-6">
             <input type="text" class="form-control" name="controller" value="{{columnInfo.controller}}" data-rule-required="true">
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('controller'), hasErrorFor('controller')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">关键词</label>
+          <div class="col-sm-6">
+            <textarea class="form-control" name="column_keywords" rows="3">{{columnInfo.column_keywords}}</textarea>
+          </div>
+          <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">显示状态</label>

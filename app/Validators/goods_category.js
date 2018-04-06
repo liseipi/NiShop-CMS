@@ -5,6 +5,7 @@ class manager {
     return {
       'parent_id': 'required',
       'column_name': 'required',
+      'column_sku': 'required',
       'controller': 'required'
     }
   }

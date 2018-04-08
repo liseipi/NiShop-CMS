@@ -1,11 +1,10 @@
 'use strict'
 
-class manager {
+class brands {
   get rules () {
     return {
-      'parent_id': 'required',
-      'column_name': 'required',
-      'controller': 'required'
+      'brands_name': 'required',
+      'brands_link': 'required'
     }
   }
   get messages(){
@@ -19,4 +18,4 @@ class manager {
   }
 }
 
-module.exports = manager
+module.exports = brands

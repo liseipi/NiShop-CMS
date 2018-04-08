@@ -1,6 +1,6 @@
 'use strict'
 
-class manager {
+class managerEdit {
   get rules () {
     return {
       'password': 'required_if:needs_delivery|min:8|max:64',
@@ -19,4 +19,4 @@ class manager {
   }
 }
 
-module.exports = manager
+module.exports = managerEdit

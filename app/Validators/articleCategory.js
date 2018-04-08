@@ -1,10 +1,11 @@
 'use strict'
 
-class article {
+class articleCategory {
   get rules () {
     return {
-      'categoty_id': 'required',
-      'article_title': 'required'
+      'parent_id': 'required',
+      'column_name': 'required',
+      'controller': 'required'
     }
   }
   get messages(){
@@ -18,4 +19,4 @@ class article {
   }
 }
 
-module.exports = article
+module.exports = articleCategory

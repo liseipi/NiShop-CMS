@@ -41,7 +41,7 @@ class ArticleController {
     return view.render('article.category_edit', {columnInfo, columnData:formatData, subData:formatSubData})
   }
 
-  async categoryEditSave({request, response, view, params, session}){
+  async categoryEditSave({request, response, params, session}){
     const saveData = await GlobalFn.formatSubmitData('ni_article_categories', request.all())
 
     try{
@@ -70,7 +70,7 @@ class ArticleController {
       response.redirect('/article/category')
     }catch(error){
       session.flash({notification: '删除失败！'+error})
-      response.redirect('/article/category')
+      response.redirect('back')
     }
   }
 
@@ -141,6 +141,17 @@ class ArticleController {
       response.redirect('/article/list')
     }catch(error){
       session.flash({notification: '修改失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async destroy({response, params, session}){
+    try{
+      await Database.table('ni_articles').where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/article/list')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
       response.redirect('back')
     }
   }

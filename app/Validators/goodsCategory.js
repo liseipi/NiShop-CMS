@@ -1,6 +1,6 @@
 'use strict'
 
-class manager {
+class goodsCategory {
   get rules () {
     return {
       'parent_id': 'required',
@@ -20,4 +20,4 @@ class manager {
   }
 }
 
-module.exports = manager
+module.exports = goodsCategory

@@ -1,0 +1,114 @@
+@layout('layout')
+@section('content')
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">增加品牌</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/goods/brandsEdit/{{brandsInfo.ni_id}}" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">品牌名称</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="brands_name" value="{{brandsInfo.brands_name}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_name'), hasErrorFor('brands_name')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">品牌英文缩写</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="brands_link" value="{{brandsInfo.brands_link}}" data-rule-required="true">
+            <div class="help-block color-danger">用于地址栏名称：sony.xxx.com, (sony) 表示默认的品牌名称</div>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_link'), hasErrorFor('brands_link')) }}</div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">品牌LOGO</label>
+          <div class="col-sm-6">
+            <div class="clearfix">
+              <div class="pull-left">
+                <input type="file" name="brands_logo" accept="image/*" @change="selectImg" id="picFile">
+                <hr>
+                <div class="help-block color-danger">图像尺寸/大小指定为： 280*280 像素，不超过1M</div>
+              </div>
+              <div class="pull-right"><img id="previewPic" width="100" src="{{ assetsUrl('/uploads/'+brandsInfo.brands_logo) }}" class="img-thumbnail"></div>
+            </div>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_logo'), hasErrorFor('brands_logo')) }}</div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">官网链接</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="brands_url" value="{{brandsInfo.brands_url}}" data-rule-url="true">
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">商家电话</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="brands_tel" value="{{brandsInfo.brands_tel}}" data-rule-digits="true">
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">品牌状态</label>
+          <div class="col-sm-6">
+            <label class="radio-inline">
+              <input type="radio" name="status" value="0" {{brandsInfo.status==0?'checked':''}}> 上线
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="status" value="1" {{brandsInfo.status==1?'checked':''}}> 下线
+            </label>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">排序</label>
+          <div class="col-sm-6">
+            <input type="number" class="form-control" name="sort" value="{{brandsInfo.sort}}">
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">品牌介绍</label>
+          <div class="col-sm-6">
+            <textarea class="form-control" name="brands_desc" rows="10">{{brandsInfo.brands_desc}}</textarea>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui', 'vue', 'holder'], function (cmsui, Vue) {
+
+      new Vue({
+        el: '#app-page',
+        data: {},
+        methods: {
+          selectImg: function () {
+            var file = $('#picFile')[0].files[0];
+            var img = new Image();
+            var imgUrl = window.URL.createObjectURL(file);
+            $('#previewPic').attr('src', imgUrl);
+          }
+        },
+        mounted: function () {
+
+        }
+      });
+
+    });
+  });
+</script>
+@endsection

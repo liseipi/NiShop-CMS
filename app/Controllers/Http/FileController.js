@@ -1,6 +1,7 @@
 'use strict'
 
 const Helpers = use('Helpers')
+const Drive = use('Drive')
 
 class FileController {
 
@@ -8,6 +9,14 @@ class FileController {
 
       return 'aaa'
 
+    }
+
+    async pictures({view, request, response, params}){
+      const oldPic = Helpers.appRoot('uploads')+'/'+params[0]
+      const exists = await Drive.exists(oldPic)
+      if(exists){
+        return response.download(oldPic)
+      }
     }
 
 }

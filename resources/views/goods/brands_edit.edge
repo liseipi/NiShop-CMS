@@ -32,7 +32,7 @@
                 <hr>
                 <div class="help-block color-danger">图像尺寸/大小指定为： 280*280 像素，不超过1M</div>
               </div>
-              <div class="pull-right"><img id="previewPic" width="100" src="{{ assetsUrl('/uploads/'+brandsInfo.brands_logo) }}" class="img-thumbnail"></div>
+              <div class="pull-right"><img id="previewPic" width="100" src="{{'/file/pictures/'+brandsInfo.brands_logo}}" class="img-thumbnail"></div>
             </div>
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_logo'), hasErrorFor('brands_logo')) }}</div>

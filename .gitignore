@@ -3,9 +3,11 @@ node_modules
 
 # Adonis directory for storing tmp files
 tmp
+uploads
 
 # Environment variables, never commit this file
 .env
+config/database.js
 
 # Lock files
 package-lock.json
@@ -20,5 +22,3 @@ database/development.sqlite
 # all .DS_Store
 .DS_Store
 */.DS_Store
-
-config/database.js

@@ -96,7 +96,7 @@ class GoodsController {
     })
     if(profilePic.clientName){
       //Helpers.appRoot('uploads')
-      await profilePic.move(Helpers.publicPath('uploads'), {
+      await profilePic.move(Helpers.appRoot('uploads'), {
         name: `${new Date().getTime()}.${profilePic.clientName.replace(/^.+\./,'')}`
       })
       if (!profilePic.moved()) {
@@ -133,7 +133,7 @@ class GoodsController {
     })
     if(profilePic.clientName){
       //Helpers.appRoot('uploads')
-      await profilePic.move(Helpers.publicPath('uploads'), {
+      await profilePic.move(Helpers.appRoot('uploads'), {
         name: `${new Date().getTime()}.${profilePic.clientName.replace(/^.+\./,'')}`
       })
       if (!profilePic.moved()) {
@@ -148,7 +148,7 @@ class GoodsController {
       saveData.brands_logo = profilePic.fileName
 
       const brandsInfo = await Database.select('brands_logo').table(brandsTable).where('ni_id', params.id).first()
-      const oldPic = Helpers.publicPath('uploads')+'/'+brandsInfo.brands_logo
+      const oldPic = Helpers.appRoot('uploads')+'/'+brandsInfo.brands_logo
       const exists = await Drive.exists(oldPic)
       if(exists){
         await Drive.delete(oldPic)

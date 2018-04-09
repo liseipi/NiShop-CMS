@@ -53,8 +53,8 @@ class AuthController {
           upMsg = '用户信息更新失败。'
         }
 
-        const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
-        session.put('menusData', menusData)
+        //const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
+        //session.put('menusData', menusData)
 
         session.flash({notification: '登录成功！'+upMsg})
         return response.redirect('/')

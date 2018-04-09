@@ -14,8 +14,12 @@ class Role {
         acturl = '/'+urlArr[1]+'/'+urlArr[2]
       }
 
-      if(session.get('menusData')){
-        session.get('menusData').forEach((item, index)=>{
+      const Database = use('Database')
+      const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
+      //if(session.get('menusData')){
+        //session.get('menusData').forEach((item, index)=>{
+      if(menusData){
+        menusData.forEach((item, index)=>{
           if(item.controller==acturl){
             LicitUrl = false
             AuthCode = item.ni_id
@@ -26,7 +30,8 @@ class Role {
       //指定URL不做全局权限认证
       const no_Auth = [
         '/',
-        '/dashboard'
+        '/dashboard',
+        '/file/pictures'
       ]
       if(no_Auth.indexOf(acturl)<0){
         if(LicitUrl){

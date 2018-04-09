@@ -78,6 +78,7 @@ Route.group(()=>{
 
   Route.get('/file', 'FileController.store')
   Route.get('/file/destroy', 'FileController.destroy')
+  Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
   Route.post('/file/save', 'FileController.save')
 
 }).middleware(['auth', 'role'])

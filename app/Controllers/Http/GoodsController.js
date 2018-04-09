@@ -7,6 +7,7 @@ const Drive = use('Drive')
 
 const categoryTable = 'ni_goods_categories'
 const brandsTable = 'ni_brands'
+const attrTable = 'ni_attrs'
 const goodsTable = 'ni_goods'
 
 class GoodsController {
@@ -179,6 +180,35 @@ class GoodsController {
       response.redirect('/goods/brands')
     }catch(error){
       session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async attr({view}){
+    const brandsData = await Database.select('ni_id', 'brands_name').from(brandsTable)
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+
+    return view.render('goods.attr', {brandsData, categoryData:formatData})
+  }
+
+  async attrAdd({view}){
+    const brandsData = await Database.select('ni_id', 'brands_name').from(brandsTable)
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+
+    return view.render('goods.attr_add', {brandsData, categoryData:formatData})
+  }
+
+  async attrSave({request, response, session}){
+    const saveData = await GlobalFn.formatSubmitData(attrTable, request.all())
+
+    try{
+      await Database.from(attrTable).insert(saveData)
+      session.flash({notification: '增加成功！'})
+      response.redirect('/goods/attr')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
       response.redirect('back')
     }
   }

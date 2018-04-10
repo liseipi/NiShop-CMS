@@ -3,7 +3,7 @@
 class article {
   get rules () {
     return {
-      'categoty_id': 'required',
+      'category_id': 'required',
       'article_title': 'required'
     }
   }

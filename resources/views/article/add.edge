@@ -37,13 +37,13 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">选择分类</label>
           <div class="col-sm-6">
-            <select class="form-control input-lg" name="categoty_id" data-rule-required="true">
+            <select class="form-control input-lg" name="category_id" data-rule-required="true">
               @each(category in categoryData)
-              <option value="{{category.ni_id}}" {{old('categoty_id')==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
+              <option value="{{category.ni_id}}" {{old('category_id')==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
               @endeach
             </select>
           </div>
-          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('categoty_id'), hasErrorFor('categoty_id')) }}</div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('category_id'), hasErrorFor('category_id')) }}</div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">文章标题</label>

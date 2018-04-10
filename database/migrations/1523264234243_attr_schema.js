@@ -5,7 +5,7 @@ const Schema = use('Schema')
 class AttrSchema extends Schema {
   up () {
     this.create('ni_attrs', (table) => {
-      table.increments('in_id')
+      table.increments('ni_id')
       table.integer('brands_id', 8)
       table.integer('category_id', 8)
       table.string('attr_name', 32)

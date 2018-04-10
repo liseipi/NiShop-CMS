@@ -81,6 +81,12 @@ Route.group(()=>{
   Route.get('/goods/attrEdit/:id', 'GoodsController.attrEdit')
   Route.post('/goods/attrEdit/:id', 'GoodsController.attrEditSave').validator('attr')
   Route.get('/goods/attrDestroy/:id', 'GoodsController.attrDestroy')
+  Route.get('/goods/list', 'GoodsController.list')
+  Route.get('/goods/add', 'GoodsController.add')
+  Route.post('/goods/add', 'GoodsController.addSave').validator('goods')
+  Route.get('/goods/edit/:id', 'GoodsController.edit')
+  Route.post('/goods/edit/:id', 'GoodsController.editSave').validator('goods')
+  Route.get('/goods/destroy/:id', 'GoodsController.destroy')
 
   Route.get('/file', 'FileController.store')
   Route.get('/file/destroy', 'FileController.destroy')

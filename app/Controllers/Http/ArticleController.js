@@ -99,23 +99,23 @@ class ArticleController {
     const query = request.get()
     const page = query.page || 1
     const perPage = 20
-    const categoty_id = query.category || 0
+    const category_id = query.category || 0
     const keywords = query.keywords || ''
 
     const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from('ni_article_categories')
     const formatData = await GlobalFn.soleTreeSort(categoryData)
 
-    const formatSubData = await GlobalFn.findSubData([...categoryData], categoty_id)
+    const formatSubData = await GlobalFn.findSubData([...categoryData], category_id)
     let whereCategoty = []
-    if(categoty_id!=0){
-      whereCategoty = [].concat([parseInt(categoty_id)], formatSubData)
+    if(category_id!=0){
+      whereCategoty = [].concat([parseInt(category_id)], formatSubData)
     }
 
     const articleData = await Database.select('ni_articles.*', 'ni_article_categories.column_name').from('ni_articles')
-    .leftJoin('ni_article_categories', 'ni_articles.categoty_id', 'ni_article_categories.ni_id')
+    .leftJoin('ni_article_categories', 'ni_articles.category_id', 'ni_article_categories.ni_id')
     .where(function(){
-      if(categoty_id!=0){
-        this.whereIn('ni_articles.categoty_id', whereCategoty)
+      if(category_id!=0){
+        this.whereIn('ni_articles.category_id', whereCategoty)
       }
     })
     .where('ni_articles.article_title', 'like', `%${keywords}%`)

@@ -6,7 +6,7 @@ class ArticlesSchema extends Schema {
   up () {
     this.create('ni_articles', (table) => {
       table.increments('ni_id')
-      table.integer('categoty_id', 6)
+      table.integer('category_id', 6)
       table.string('article_title', 128)
       table.string('article_vice_title', 128)
       table.integer('article_author', 6)

@@ -5,38 +5,39 @@
     @include('notification')
     <h5 class="page-header">增加商品</h5>
     <div class="main">
-      <form class="form-horizontal" action="/goods/attrAdd" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/add" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
           <label class="col-sm-2 control-label">商品分类</label>
           <div class="col-sm-8">
-            <select class="form-control input-lg" name="category_id" data-rule-required="true">
-              <option>选择分类</option>
+            <select class="form-control input-lg" name="category_id" @change="changeCategory" v-model="selectCID" data-rule-required="true">
+              <option value="0">选择分类</option>
               @each(category in categoryData)
-              <option value="{{category.ni_id}}" {{old('category_id')==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
+              <option value="{{category.ni_id}}" data-sku="{{category.column_sku}}" {{old('category_id')==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
               @endeach
             </select>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('category_id'), hasErrorFor('category_id')) }}</div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">SKU</label>
+          <label class="col-sm-2 control-label">SKU/货号</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="attr_name" value="{{old('attr_name', '')}}" data-rule-required="true">
+            <input type="text" class="form-control" name="goods_sku" v-model="goodsSku" data-rule-required="true" data-rule-minlength="4">
           </div>
-          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('attr_name'), hasErrorFor('attr_name')) }}</div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('goods_sku'), hasErrorFor('goods_sku')) }}</div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">属性名称</label>
+          <label class="col-sm-2 control-label">商品名称</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="attr_name" value="{{old('attr_name', '')}}" data-rule-required="true">
+            <input type="text" class="form-control" name="goods_name" value="{{old('goods_name', '')}}" data-rule-required="true" data-rule-minlength="4">
           </div>
-          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('attr_name'), hasErrorFor('attr_name')) }}</div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('goods_name'), hasErrorFor('goods_name')) }}</div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">关键词</label>
           <div class="col-sm-8">
-            <textarea class="form-control" name="attr_value" rows="3">{{old('column_keywords', '')}}</textarea>
+            <textarea class="form-control" name="goods_keywords" rows="3">{{old('goods_keywords', '')}}</textarea>
+            <div class="help-block color-danger">(用逗号' , '分开关键字)</div>
           </div>
           <div class="col-sm-2 error-container"></div>
         </div>
@@ -44,10 +45,10 @@
           <label class="col-sm-2 control-label">状态</label>
           <div class="col-sm-8">
             <label class="radio-inline">
-              <input type="radio" name="attr_only" value="0" {{old('attr_only')?'':'checked'}} {{old('attr_only')==0?'checked':''}}> 上线
+              <input type="radio" name="status" value="0" {{old('status')?'':'checked'}} {{old('status')==0?'checked':''}}> 上架
             </label>
             <label class="radio-inline">
-              <input type="radio" name="attr_only" value="1" {{old('attr_only')==1?'checked':''}}> 下线
+              <input type="radio" name="status" value="1" {{old('status')==1?'checked':''}}> 下架
             </label>
           </div>
           <div class="col-sm-2 error-container"></div>
@@ -55,14 +56,14 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">排序</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="attr_name" value="{{old('attr_name', 100)}}">
+            <input type="text" class="form-control" name="sort" value="{{old('sort', 100)}}">
           </div>
           <div class="col-sm-2 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">库存</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="attr_name" value="{{old('attr_name', 100)}}">
+            <input type="text" class="form-control" name="goods_instock" value="{{old('goods_instock', 0)}}">
           </div>
           <div class="col-sm-2 error-container"></div>
         </div>
@@ -71,7 +72,7 @@
           <div class="col-sm-8">
             <div class="input-group">
               <span class="input-group-addon">$</span>
-              <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+              <input type="text" class="form-control" name="goods_price" value="{{old('goods_price', '')}}" placeholder="0.0">
             </div>
           </div>
           <div class="col-sm-2 error-container"></div>
@@ -81,27 +82,48 @@
           <div class="col-sm-8">
             <div class="input-group">
               <span class="input-group-addon">$</span>
-              <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+              <input type="text" class="form-control" name="goods_original_price" value="{{old('goods_original_price', '')}}" placeholder="0.0">
             </div>
           </div>
           <div class="col-sm-2 error-container"></div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">销售状态</label>
+          <label class="col-sm-2 control-label">包装重量</label>
+          <div class="col-sm-8">
+            <div class="input-group">
+              <input type="text" class="form-control" name="goods_weight" value="{{old('goods_weight', '')}}" placeholder="0">
+              <span class="input-group-addon">千克</span>
+            </div>
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">包装体积</label>
+          <div class="col-sm-8">
+            <div class="input-group">
+              <input type="text" class="form-control" name="goods_volume" value="{{old('goods_volume', '')}}" disabled placeholder="0*0*0">
+              <span class="input-group-addon">长*宽*高</span>
+            </div>
+            <div class="help-block color-danger">(已禁用)</div>
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">推荐销售</label>
           <div class="col-sm-8">
             <label class="checkbox-inline">
-              <input type="checkbox" name="attr_only" value="0" {{old('attr_only')?'':'checked'}} {{old('attr_only')==0?'checked':''}}> 新品
+              <input type="checkbox" name="goods_recommend" value="new" {{old('goods_recommend')=='new'?'checked':''}}> 新品
             </label>
             <label class="checkbox-inline">
-              <input type="checkbox" name="attr_only" value="1" {{old('attr_only')==1?'checked':''}}> 热销
+              <input type="checkbox" name="goods_recommend" value="hot" {{old('goods_recommend')=='hot'?'checked':''}}> 热销
             </label>
             <label class="checkbox-inline">
-              <input type="checkbox" name="attr_only" value="1" {{old('attr_only')==1?'checked':''}}> 推荐
+              <input type="checkbox" name="goods_recommend" value="best" {{old('goods_recommend')=='best'?'checked':''}}> 精品
             </label>
             <label class="checkbox-inline">
-              <input type="checkbox" name="attr_only" value="1" {{old('attr_only')==1?'checked':''}}> 促销
+              <input type="checkbox" name="goods_recommend" value="promotions" @change="selectRecommend" {{old('goods_recommend')=='promotions'?'checked':''}}> 促销
             </label>
-            <div class="form-inline">
+            <div class="form-inline" v-show="!pageStatus.is_sales">
               <hr>
               <table class="table table-bordered">
                 <tr>
@@ -109,7 +131,7 @@
                   <td>
                     <div class="input-group">
                       <span class="input-group-addon">$</span>
-                      <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                      <input type="text" class="form-control" name="goods_promotions_price" value="{{old('goods_promotions_price', '')}}" :disabled="pageStatus.is_sales" placeholder="0.0">
                     </div>
                   </td>
                 </tr>
@@ -117,8 +139,8 @@
                   <td>促销时间: </td>
                   <td>
                     <div class="input-daterange" data-toggle="datepicker" data-date-start-date='2015-01-01' data-date-end-date='2015-01-31'>
-                      <input type="text" class="form-control input-date" placeholder="开始日期" value=''/> -
-                      <input type="text" class="form-control input-date" placeholder="结束日期" value=''/>
+                      <input type="text" class="form-control input-date" placeholder="开始日期" name="goods_promotions_time_start" value="{{old('goods_promotions_time_start', '')}}" :disabled="pageStatus.is_sales" /> -
+                      <input type="text" class="form-control input-date" placeholder="结束日期" name="goods_promotions_time_end" value="{{old('goods_promotions_time_end', '')}}" :disabled="pageStatus.is_sales" />
                     </div>
                   </td>
                 </tr>
@@ -129,17 +151,17 @@
         </div>
         <hr>
         <div class="form-group">
-          <label class="col-sm-2 control-label">邮费</label>
+          <label class="col-sm-2 control-label">设置邮费</label>
           <div class="col-sm-8 form-inline">
-            <label class="radio-inline"><input type="radio" name="attr_only" value="0" checked="checked"> 免邮</label>
+            <label class="radio-inline"><input type="radio" name="goods_postage" value="0" @change="selectPostage(0)" {{old('goods_postage')?'':'checked'}} {{old('goods_postage')==0?'checked':''}}> 免邮</label>
             <hr>
             <table class="table table-bordered">
               <tr>
-                <td width="20%"><label class="radio-inline"><input type="radio" name="attr_only" value="1"> 邮费</label> </td>
+                <td width="20%"><label class="radio-inline"><input type="radio" name="goods_postage" value="1" @change="selectPostage(1)" {{old('goods_postage')==1?'checked':''}}> 邮费</label> </td>
                 <td>
                   <div class="input-group">
                     <span class="input-group-addon">$</span>
-                    <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                    <input type="text" class="form-control" name="goods_postage_price" value="{{old('goods_postage_price', '')}}" :disabled="!pageStatus.is_postage" placeholder="0.0">
                   </div>
                 </td>
               </tr>
@@ -152,40 +174,53 @@
           <label class="col-sm-2 control-label">组商品</label>
           <div class="col-sm-8">
             <label class="checkbox-inline">
-              <input type="checkbox" name="attr_only" value="1" {{old('attr_only')==1?'checked':''}}> 开启组商品
+              <input type="checkbox" name="goods_is_group" value="0" @change="selectGroup" {{old('goods_is_group')==0?'checked':''}}> 开启组商品
             </label>
-            <hr>
-            <table class="table table-bordered">
-              <tr>
-                <th width="20%"><a href="#" class="btn btn-default btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
-                <th>内容</th>
-              </tr>
-              <tr>
-                <td width="20%">
-                  <a href="#" class="btn btn-default btn-xs"><span class="fa fa-minus"></span> 增加</a>
-                </td>
-                <td>
-                  <table class="table table-bordered">
-                    <tr>
-                      <td>描述：</td>
-                      <td><input type="text" class="form-control"></td>
-                    </tr>
-                    <tr>
-                      <td>图片：</td>
-                      <td><input type="file"></td>
-                    </tr>
-                    <tr>
-                      <td>价格：</td>
-                      <td><input type="text" class="form-control"></td>
-                    </tr>
-                    <tr>
-                      <td>库存：</td>
-                      <td><input type="text" class="form-control"></td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
+            <div class="form-inline" v-show="pageStatus.is_group">
+              <hr>
+              <table class="table table-bordered">
+                <tr>
+                  <th width="20%" class="text-center" align="center" valign="middle"><a href="#" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
+                  <th>内容</th>
+                </tr>
+                <tr>
+                  <td width="20%" align="center" valign="middle" style="vertical-align: middle;">
+                    <a href="#" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 减少</a>
+                  </td>
+                  <td>
+                    <table class="table table-bordered table-condensed">
+                      <tbody>
+                      <tr>
+                        <td width="80px">描述：</td>
+                        <td><input type="text" class="form-control"></td>
+                      </tr>
+                      <tr>
+                        <td>价格：</td>
+                        <td><input type="text" class="form-control"></td>
+                      </tr>
+                      <tr>
+                        <td>库存：</td>
+                        <td><input type="text" class="form-control"></td>
+                      </tr>
+                      <tr>
+                        <td>图片：</td>
+                        <td>
+                          <div class="clearfix">
+                            <div class="pull-left">
+                              <input type="file">
+                              <hr>
+                              <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
+                            </div>
+                            <div class="pull-right"><img data-src="holder.js/100x100" src="" class="img-thumbnail"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
           <div class="col-sm-2 error-container"></div>
         </div>
@@ -193,31 +228,58 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">属性列表</label>
           <div class="col-sm-8">
-            <select class="form-control input-lg" name="brands_id" data-rule-required="true">
-              <option>选择品牌</option>
+            <select class="form-control input-lg" name="brands_id" @change="selectBrands" v-model="brandsID" data-rule-required="true">
+              <option value="0">选择品牌</option>
               @each(brands in brandsData)
               <option value="{{brands.ni_id}}" {{old('brands_id')==brands.ni_id?'selected':''}}>{{brands.brands_name}}</option>
               @endeach
             </select>
-            <hr>
-            <table class="table table-bordered">
-              <tr>
-                <th width="35%">属性</th>
-                <th>值</th>
-              </hr>
-              <tr>
-                <td width="35%">aa</td>
-                <td>aa</td>
-              </tr>
-            </table>
+            <div v-show="pageStatus.is_attr">
+              <hr>
+              <table class="table table-bordered">
+                <thead>
+                <tr>
+                  <th width="35%">属性</th>
+                  <th>值</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(val, key) in attrData">
+                  <td width="35%">@{{val.attr_name}}</td>
+                  <td>
+                    <input type="text" v-if="val.attr_type==0" v-bind:name="val.ni_id" value="" class="form-control">
+                    <select v-if="val.attr_type==1" v-bind:name="val.ni_id" class="form-control">
+                      <option v-for="optV in val.attr_value.split('\\r\\n')">@{{ optV }}</option>
+                    </select>
+                    <textarea v-if="val.attr_type==2" v-bind:name="val.ni_id" rows="3" class="form-control"></textarea>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_id'), hasErrorFor('brands_id')) }}</div>
         </div>
         <hr>
         <div class="form-group">
+          <label class="col-sm-2 control-label">商品主图</label>
+          <div class="col-sm-8">
+            <div class="clearfix">
+              <div class="pull-left">
+                <input type="file" name="goods_thumb" accept="image/*" @change="selectImg" id="picFile">
+                <hr>
+                <div class="help-block color-danger">图像尺寸/大小指定为： 450*450 像素，不超过2M</div>
+              </div>
+              <div class="pull-right"><img data-src="holder.js/100x100" id="previewPic" src="" class="img-thumbnail"></div>
+            </div>
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
           <label class="col-sm-2 control-label">详细内容</label>
           <div class="col-sm-9">
-            <textarea class="form-control" name="content" rows="5">{{old('column_keywords', '')}}</textarea>
+            <textarea class="form-control" name="content" rows="5">{{old('content', '')}}</textarea>
           </div>
         </div>
         <hr>
@@ -236,8 +298,76 @@
 
       new Vue({
         el: '#app-page',
-        data: {},
+        data: {
+          selectCID: "{{old('category_id', '0')}}",
+          goodsSku: "{{old('goods_sku', '')}}",
+          brandsID: "{{old('brands_id', '0')}}",
+          pageStatus: {
+            is_sales: true,
+            is_postage: false,
+            is_group: false,
+            is_attr: false
+          },
+          attrData: []
+        },
         methods: {
+          changeCategory: function(){
+            var index = event.currentTarget.selectedIndex;
+            var sku = event.currentTarget.options[index].getAttribute('data-sku');
+            this.goodsSku = sku||'';
+            if(sku){
+              this.brandsID = 0;
+              this.pageStatus.is_attr = false;
+            }
+          },
+          selectRecommend: function(){
+            if(event.currentTarget.checked){
+              this.pageStatus.is_sales = false;
+            }else{
+              this.pageStatus.is_sales = true;
+            }
+          },
+          selectPostage: function(type){
+            if(type){
+              this.pageStatus.is_postage = true;
+            }else{
+              this.pageStatus.is_postage = false;
+            }
+          },
+          selectGroup: function(){
+            if(event.currentTarget.checked){
+              this.pageStatus.is_group = true;
+            }else{
+              this.pageStatus.is_group = false;
+            }
+          },
+          selectBrands: function(){
+            if(parseInt(this.brandsID)!=0){
+              if(parseInt(this.selectCID)==0){
+                alert('请先选择商品分类!');
+                this.brandsID = 0;
+                return;
+              }
+              this.pageStatus.is_attr = true;
+              this.getAttr();
+            }else{
+              this.pageStatus.is_attr = false;
+            }
+          },
+          getAttr:function(){
+            var _this = this;
+            $.ajax({
+              url: '/goods/getAttr',
+              data: {
+                category: this.selectCID,
+                brands: this.brandsID
+              },
+              type: 'get',
+              success: function (result) {
+                _this.attrData = result;
+              }
+            })
+          },
           selectImg: function () {
             var file = $('#picFile')[0].files[0];
             var img = new Image();

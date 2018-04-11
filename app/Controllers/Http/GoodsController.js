@@ -278,14 +278,50 @@ class GoodsController {
     }
   }
 
+  async getAttr({view, request}){
+    const query = request.get()
+    const category_id = query.category || 0
+    const brands_id = query.brands || 0
+
+    if(category_id==0 || brands_id==0) {
+      return []
+    }
+
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatSubData = await GlobalFn.findSubData([...categoryData], category_id)
+    let whereCategoty = []
+    if(category_id!=0){
+      whereCategoty = [].concat([parseInt(category_id)], formatSubData)
+    }
+
+    const attrsData = await Database.select("*").from(attrTable)
+      .where(function(){
+        if(category_id!=0){
+          this.whereIn(attrTable+'.category_id', whereCategoty)
+        }
+      })
+      .where(function(){
+        if(brands_id!=0){
+          this.where(attrTable+'.brands_id', '=', brands_id)
+        }
+      })
+
+    return attrsData
+  }
+
   // 商品
   async add({view}){
     const brandsData = await Database.select('ni_id', 'brands_name').from(brandsTable)
-    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id', 'column_sku').from(categoryTable)
     const formatData = await GlobalFn.soleTreeSort(categoryData)
 
     return view.render('goods.add', {brandsData, categoryData:formatData})
   }
+
+  async addSave({request}){
+    console.log(request.all())
+  }
+
 }
 
 module.exports = GoodsController

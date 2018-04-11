@@ -17,7 +17,7 @@ class ArticlesSchema extends Schema {
       table.string('keywords', 128)
       table.string('summary_content', 255)
       table.text('content')
-      table.integer('tour_number', 128)
+      table.integer('view_number', 128)
       table.bigInteger('create_at', 14)
       table.bigInteger('update_at', 14)
     })

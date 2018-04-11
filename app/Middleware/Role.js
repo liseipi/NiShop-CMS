@@ -31,7 +31,8 @@ class Role {
       const no_Auth = [
         '/',
         '/dashboard',
-        '/file/pictures'
+        '/file/pictures',
+        '/goods/getAttr'
       ]
       if(no_Auth.indexOf(acturl)<0){
         if(LicitUrl){

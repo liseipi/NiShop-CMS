@@ -1,6 +1,8 @@
 'use strict'
 
 const Database = use('Database')
+const Helpers = use('Helpers')
+const sharp = use('sharp')
 
 class GlobalFnClass {
 
@@ -76,6 +78,32 @@ class GlobalFnClass {
       result.push(item[field])
     })
     return [...result]
+  }
+
+  //图片上传处理
+  static async uploadPic(requestFile, picFile, {width=450, height=450, upSize=2}, path="uploads"){
+
+    const profilePic = requestFile.file(picFile, {
+      types: ['image'],
+      size: upSize+'mb'
+    })
+
+    if(profilePic && profilePic.clientName){
+      await profilePic.move(Helpers.appRoot('uploads'), {
+        name: `${new Date().getTime()}.${profilePic.clientName.replace(/^.+\./,'')}`
+      })
+      if (!profilePic.moved()) {
+        session.flash({notification: '图片上传失败！Error:'+ profilePic.error().message})
+        response.redirect('back')
+        return ''
+      }
+
+      //let picPath = Helpers.appRoot('uploads/'+profilePic.fileName)
+      //const transformer = sharp(picPath).rotate().resize(200, 200)
+
+      return profilePic.fileName
+    }
+    return ''
   }
 
 }

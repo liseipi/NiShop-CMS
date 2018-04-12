@@ -13,7 +13,9 @@ class goods {
     return {
       'required': '这个 {{field}} 字段不为空.',
       'category_id.not_in': '请选择商品分类.',
-      'min': '请至少输入4个字符.'
+      'goods_sku.unique': '已经存在相同的sku',
+      'min': '请至少输入4个字符.',
+      'brands_id.not_in': '请选择对应的品牌.'
     }
   }
   async fails (errorMessages){

@@ -1,11 +1,17 @@
 @layout('layout')
 @section('content')
+<style>
+  .td-center{
+    vertical-align: middle!important;
+    text-align: center;
+  }
+</style>
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
     <h5 class="page-header">增加商品</h5>
     <div class="main">
-      <form class="form-horizontal" action="/goods/add" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/add" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
           <label class="col-sm-2 control-label">商品分类</label>
@@ -88,6 +94,23 @@
           <div class="col-sm-2 error-container"></div>
         </div>
         <div class="form-group">
+          <label class="col-sm-2 control-label">购买积分</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="goods_integral" value="{{old('goods_integral', '')}}" placeholder="0">
+            <div class="help-block color-danger">(积分为整数)</div>
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">实体/虚拟物品</label>
+          <div class="col-sm-8">
+            <label class="checkbox-inline">
+              <input type="checkbox" name="goods_is_real" value="0" checked {{old('goods_is_real')==0?'checked':''}}> 实体商品
+            </label>
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <div class="form-group">
           <label class="col-sm-2 control-label">包装重量</label>
           <div class="col-sm-8">
             <div class="input-group">
@@ -127,7 +150,7 @@
               <hr>
               <table class="table table-bordered">
                 <tr>
-                  <td width="20%">促销价格: </td>
+                  <td width="20%" class="td-center">促销价格: </td>
                   <td>
                     <div class="input-group">
                       <span class="input-group-addon">$</span>
@@ -136,7 +159,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>促销时间: </td>
+                  <td class="td-center">促销时间: </td>
                   <td>
                     <div class="input-daterange" data-toggle="datepicker" data-date-start-date='2015-01-01' data-date-end-date='2015-01-31'>
                       <input type="text" class="form-control input-date" placeholder="开始日期" name="goods_promotions_time_start" value="{{old('goods_promotions_time_start', '')}}" :disabled="pageStatus.is_sales" /> -
@@ -176,42 +199,58 @@
             <label class="checkbox-inline">
               <input type="checkbox" name="goods_is_group" value="0" @change="selectGroup" {{old('goods_is_group')==0?'checked':''}}> 开启组商品
             </label>
-            <div class="form-inline" v-show="pageStatus.is_group">
+            <div class="form-group" v-show="pageStatus.is_group">
               <hr>
               <table class="table table-bordered">
+                <thead>
                 <tr>
-                  <th width="20%" class="text-center" align="center" valign="middle"><a href="#" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
+                  <th width="20%" class="td-center"><a @click="groupData.push(groupData.length+1)" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
                   <th>内容</th>
                 </tr>
-                <tr>
-                  <td width="20%" align="center" valign="middle" style="vertical-align: middle;">
-                    <a href="#" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 减少</a>
+                </thead>
+                <tbody>
+                <tr v-for="(num, index) in groupData">
+                  <td width="20%" class="td-center">
+                    <a @click="groupData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 减少</a>
                   </td>
                   <td>
-                    <table class="table table-bordered table-condensed">
+                    <table class="table table-bordered table-condensed" style="margin:0;">
                       <tbody>
                       <tr>
-                        <td width="80px">描述：</td>
-                        <td><input type="text" class="form-control"></td>
+                        <td width="80px" class="td-center">描述：</td>
+                        <td><input type="text" name="group_depict[]" class="form-control"></td>
                       </tr>
                       <tr>
-                        <td>价格：</td>
-                        <td><input type="text" class="form-control"></td>
+                        <td class="td-center">价格：</td>
+                        <td><input type="text" name="group_price[]" class="form-control"></td>
                       </tr>
                       <tr>
-                        <td>库存：</td>
-                        <td><input type="text" class="form-control"></td>
+                        <td class="td-center">库存：</td>
+                        <td><input type="text" name="group_instock[]" class="form-control"></td>
                       </tr>
                       <tr>
-                        <td>图片：</td>
+                        <td class="td-center">状态：</td>
+                        <td style="padding: 10px;">
+                          <label class="radio-inline">
+                            <input type="radio" :name="'group_status['+index+']'" value="0" checked {{old('group_status')==0?'checked':''}}> 上架
+                          </label>
+                          <label class="radio-inline">
+                            <input type="radio" :name="'group_status['+index+']'" value="1" {{old('group_status')==1?'checked':''}}> 下架
+                          </label>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="td-center">图片：</td>
                         <td>
-                          <div class="clearfix">
-                            <div class="pull-left">
-                              <input type="file">
+                          <div class="row" style="margin-top: 10px;">
+                            <div class="col-sm-8">
+                              <input type="file" name="group_thumb[]" @change="selectImg('previewPic'+index)">
                               <hr>
                               <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                             </div>
-                            <div class="pull-right"><img data-src="holder.js/100x100" src="" class="img-thumbnail"></div>
+                            <div class="col-sm-4">
+                              <img data-src="holder.js/100x100" src="" :id="'previewPic'+index" class="img-thumbnail">
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -219,6 +258,7 @@
                     </table>
                   </td>
                 </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -245,13 +285,13 @@
                 </thead>
                 <tbody>
                 <tr v-for="(val, key) in attrData">
-                  <td width="35%">@{{val.attr_name}}</td>
+                  <td class="td-center" width="35%">@{{val.attr_name}}</td>
                   <td>
-                    <input type="text" v-if="val.attr_type==0" v-bind:name="val.ni_id" value="" class="form-control">
-                    <select v-if="val.attr_type==1" v-bind:name="val.ni_id" class="form-control">
+                    <input type="text" v-if="val.attr_type==0" name="attr_list[]" value="" class="form-control">
+                    <select v-if="val.attr_type==1" name="attr_list[]" class="form-control">
                       <option v-for="optV in val.attr_value.split('\\r\\n')">@{{ optV }}</option>
                     </select>
-                    <textarea v-if="val.attr_type==2" v-bind:name="val.ni_id" rows="3" class="form-control"></textarea>
+                    <textarea v-if="val.attr_type==2" name="attr_list[]" rows="3" class="form-control"></textarea>
                   </td>
                 </tr>
                 </tbody>
@@ -266,7 +306,7 @@
           <div class="col-sm-8">
             <div class="clearfix">
               <div class="pull-left">
-                <input type="file" name="goods_thumb" accept="image/*" @change="selectImg" id="picFile">
+                <input type="file" name="goods_thumb" accept="image/*" @change="selectImg('previewPic')" id="picFile">
                 <hr>
                 <div class="help-block color-danger">图像尺寸/大小指定为： 450*450 像素，不超过2M</div>
               </div>
@@ -294,7 +334,7 @@
 </div>
 <script type="text/javascript">
   requirejs(['/js/config.js'], function () {
-    requirejs(['cmsui', 'vue', 'ckedit', 'holder'], function (cmsui, Vue) {
+    requirejs(['cmsui', 'vue', 'holder', 'ckedit'], function (cmsui, Vue, Holder) {
 
       new Vue({
         el: '#app-page',
@@ -308,7 +348,8 @@
             is_group: false,
             is_attr: false
           },
-          attrData: []
+          attrData: [],
+          groupData: []
         },
         methods: {
           changeCategory: function(){
@@ -368,15 +409,31 @@
               }
             })
           },
-          selectImg: function () {
-            var file = $('#picFile')[0].files[0];
-            var img = new Image();
-            var imgUrl = window.URL.createObjectURL(file);
-            $('#previewPic').attr('src', imgUrl);
+          selectImg: function (picTag) {
+            // var file = $('#picFile')[0].files[0];
+            // var img = new Image();
+            // var imgUrl = window.URL.createObjectURL(file);
+            // $('#previewPic').attr('src', imgUrl);
+
+            var file =  event.currentTarget.files[0];
+            if(file){
+              var img = new Image();
+              var imgUrl = window.URL.createObjectURL(file);
+              $('#'+picTag).attr('src', imgUrl);
+            }
+          }
+        },
+        watch:{
+          groupData: function () {
+            this.$nextTick(function () {
+              // 监听当 groupData 数组发生变化，而且在页面元素渲染完成之后($nextTick)的处理
+              Holder.addImage("holder.js/100x100", ".img-thumbnail").run()
+            })
           }
         },
         mounted: function () {
           CKEDITOR.replace('content');
+
         }
       });
 

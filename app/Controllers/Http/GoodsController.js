@@ -318,8 +318,84 @@ class GoodsController {
     return view.render('goods.add', {brandsData, categoryData:formatData})
   }
 
-  async addSave({request}){
-    console.log(request.all())
+  async addSave({request, response, session, auth}){
+    //console.log(request.all())
+
+    const saveData = await GlobalFn.formatSubmitData(goodsTable, request.all())
+    //console.log(saveData)
+    const query = request.all()
+
+    saveData.goods_is_new = 1
+    saveData.goods_is_hot = 1
+    saveData.goods_is_best = 1
+    saveData.goods_is_promotions = 1
+    saveData.goods_is_group = 1
+    saveData.goods_is_real = 1
+
+    if(query.goods_recommend){
+      if((typeof query.goods_recommend) === 'string'){
+        // 单个值
+        switch (query.goods_recommend){
+          case 'new':
+            saveData.goods_is_new = 0
+            break;
+          case 'hot':
+            saveData.goods_is_hot = 0
+            break;
+          case 'best':
+            saveData.goods_is_best = 0
+            break;
+          case 'promotions':
+            saveData.goods_is_promotions = 0
+            break;
+          default:
+        }
+      }
+      if((typeof query.goods_recommend) === 'object'){
+        // 多个值
+        if(query.goods_recommend.indexOf('new')>=0){
+          saveData.goods_is_new = 0
+        }
+        if(query.goods_recommend.indexOf('hot')>=0){
+          saveData.goods_is_hot = 0
+        }
+        if(query.goods_recommend.indexOf('best')>=0){
+          saveData.goods_is_best = 0
+        }
+        if(query.goods_recommend.indexOf('promotions')>=0){
+          saveData.goods_is_promotions = 0
+        }
+      }
+    }
+
+    if(query.goods_is_group){
+      saveData.goods_is_group = 0
+    }
+
+    if(query.goods_is_real){
+      saveData.goods_is_real = 0
+    }
+
+    const goods_thumb =  await GlobalFn.uploadPic(request, 'goods_thumb', {width:100, height:100, size:2}, 'uploads')
+    if(goods_thumb){
+      saveData.goods_thumb = goods_thumb
+    }
+
+    saveData.created_at = new Date()
+    saveData.updated_at = new Date()
+    saveData.goods_created_admin = auth.user.ni_id
+
+    //console.log(saveData)
+
+    try{
+      await Database.from(goodsTable).insert(saveData)
+      session.flash({notification: '增加成功！'})
+      response.redirect('/goods/attr')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
+    }
+
   }
 
 }

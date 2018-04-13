@@ -14,9 +14,9 @@
       <form class="form-horizontal" action="/goods/add" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
-          <label class="col-sm-2 control-label">商品分类</label>
+          <label class="col-sm-2 control-label">商品分类<span class="text-success">(*)</span></label>
           <div class="col-sm-8">
-            <select class="form-control input-lg" name="category_id" @change="changeCategory" v-model="selectCID" data-rule-required="true">
+            <select class="form-control input-lg" name="category_id" id="category_id" @change="changeCategory" v-model="selectCID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择分类">
               <option value="0">选择分类</option>
               @each(category in categoryData)
               <option value="{{category.ni_id}}" data-sku="{{category.column_sku}}" {{old('category_id')==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
@@ -26,14 +26,14 @@
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('category_id'), hasErrorFor('category_id')) }}</div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">SKU/货号</label>
+          <label class="col-sm-2 control-label">SKU/货号<span class="text-success">(*)</span></label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="goods_sku" v-model="goodsSku" data-rule-required="true" data-rule-minlength="4">
+            <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" data-rule-required="true" data-rule-minlength="4" @blur="checkSku('goods_sku')">
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('goods_sku'), hasErrorFor('goods_sku')) }}</div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">商品名称</label>
+          <label class="col-sm-2 control-label">商品名称<span class="text-success">(*)</span></label>
           <div class="col-sm-8">
             <input type="text" class="form-control" name="goods_name" value="{{old('goods_name', '')}}" data-rule-required="true" data-rule-minlength="4">
           </div>
@@ -197,7 +197,7 @@
           <label class="col-sm-2 control-label">组商品</label>
           <div class="col-sm-8">
             <label class="checkbox-inline">
-              <input type="checkbox" name="goods_is_group" value="0" @change="selectGroup" {{old('goods_is_group')==0?'checked':''}}> 开启组商品
+              <input type="checkbox" name="goods_is_group" :value="groupData.length" @change="selectGroup" {{old('goods_is_group')?'checked':''}}> 开启组商品
             </label>
             <div class="form-group" v-show="pageStatus.is_group">
               <hr>
@@ -217,25 +217,31 @@
                     <table class="table table-bordered table-condensed" style="margin:0;">
                       <tbody>
                       <tr>
-                        <td width="80px" class="td-center">描述：</td>
-                        <td><input type="text" name="group_depict[]" class="form-control"></td>
+                        <td width="80px" class="td-center">标题：</td>
+                        <td>
+                          <input type="text" name="group_depict[]" value="" class="form-control">
+                        </td>
                       </tr>
                       <tr>
                         <td class="td-center">价格：</td>
-                        <td><input type="text" name="group_price[]" class="form-control"></td>
+                        <td>
+                          <input type="text" name="group_price[]" class="form-control">
+                        </td>
                       </tr>
                       <tr>
                         <td class="td-center">库存：</td>
-                        <td><input type="text" name="group_instock[]" class="form-control"></td>
+                        <td>
+                          <input type="text" name="group_instock[]" class="form-control">
+                        </td>
                       </tr>
                       <tr>
                         <td class="td-center">状态：</td>
                         <td style="padding: 10px;">
                           <label class="radio-inline">
-                            <input type="radio" :name="'group_status['+index+']'" value="0" checked {{old('group_status')==0?'checked':''}}> 上架
+                            <input type="radio" :name="'group_status['+index+']'" value="0" :checked="!{{old('group_status['+index+']')}}" > 上架
                           </label>
                           <label class="radio-inline">
-                            <input type="radio" :name="'group_status['+index+']'" value="1" {{old('group_status')==1?'checked':''}}> 下架
+                            <input type="radio" :name="'group_status['+index+']'" value="1" v-bind:data-ss="{{old('group_status['+index+']')}}"> 下架
                           </label>
                         </td>
                       </tr>
@@ -266,9 +272,9 @@
         </div>
         <hr>
         <div class="form-group">
-          <label class="col-sm-2 control-label">属性列表</label>
+          <label class="col-sm-2 control-label">属性列表<span class="text-success">(*)</span></label>
           <div class="col-sm-8">
-            <select class="form-control input-lg" name="brands_id" @change="selectBrands" v-model="brandsID" data-rule-required="true">
+            <select class="form-control input-lg" name="brands_id" @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
               <option value="0">选择品牌</option>
               @each(brands in brandsData)
               <option value="{{brands.ni_id}}" {{old('brands_id')==brands.ni_id?'selected':''}}>{{brands.brands_name}}</option>
@@ -287,11 +293,12 @@
                 <tr v-for="(val, key) in attrData">
                   <td class="td-center" width="35%">@{{val.attr_name}}</td>
                   <td>
-                    <input type="text" v-if="val.attr_type==0" name="attr_list[]" value="" class="form-control">
-                    <select v-if="val.attr_type==1" name="attr_list[]" class="form-control">
+                    <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" value="" class="form-control">
+                    <select v-if="val.attr_type==1" name="goods_attr_value[]" class="form-control">
+                      <option value="">请选择</option>
                       <option v-for="optV in val.attr_value.split('\\r\\n')">@{{ optV }}</option>
                     </select>
-                    <textarea v-if="val.attr_type==2" name="attr_list[]" rows="3" class="form-control"></textarea>
+                    <textarea v-if="val.attr_type==2" name="goods_attr_value[]" rows="3" class="form-control"></textarea>
                   </td>
                 </tr>
                 </tbody>
@@ -355,7 +362,8 @@
           changeCategory: function(){
             var index = event.currentTarget.selectedIndex;
             var sku = event.currentTarget.options[index].getAttribute('data-sku');
-            this.goodsSku = sku||'';
+            this.goodsSku = sku+Math.random().toString(16).substr(6)||'';
+            $('#goods_sku').focus();
             if(sku){
               this.brandsID = 0;
               this.pageStatus.is_attr = false;
@@ -386,6 +394,7 @@
             if(parseInt(this.brandsID)!=0){
               if(parseInt(this.selectCID)==0){
                 alert('请先选择商品分类!');
+                $('#category_id').focus();
                 this.brandsID = 0;
                 return;
               }
@@ -421,6 +430,23 @@
               var imgUrl = window.URL.createObjectURL(file);
               $('#'+picTag).attr('src', imgUrl);
             }
+          },
+          checkSku: function (name) {
+            var _this = this;
+            if(this.goodsSku.length>0){
+              $.ajax({
+                url: '/goods/checkSku',
+                data: {
+                  sku: _this.goodsSku
+                },
+                type: 'get',
+                success: function (result) {
+                  if(result.length>0){
+                    $("input[name="+name+"]").parent().parent(".form-group").addClass("has-error").children(".error-container").html('<span class="text-danger">已经存在相同的sku</span>');
+                  }
+                }
+              })
+            }
           }
         },
         watch:{
@@ -434,6 +460,10 @@
         mounted: function () {
           CKEDITOR.replace('content');
 
+          if({{old('goods_is_group')}}){
+            this.pageStatus.is_group = true;
+            this.groupData = new Array({{old('goods_is_group')}});
+          }
         }
       });
 

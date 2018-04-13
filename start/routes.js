@@ -88,6 +88,7 @@ Route.group(()=>{
   Route.get('/goods/edit/:id', 'GoodsController.edit')
   Route.post('/goods/edit/:id', 'GoodsController.editSave').validator('goods')
   Route.get('/goods/destroy/:id', 'GoodsController.destroy')
+  Route.get('/goods/checkSku', 'GoodsController.checkSku')
 
   Route.get('/file', 'FileController.store')
   Route.get('/file/destroy', 'FileController.destroy')

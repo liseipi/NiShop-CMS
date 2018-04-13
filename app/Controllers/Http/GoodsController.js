@@ -9,6 +9,7 @@ const categoryTable = 'ni_goods_categories'
 const brandsTable = 'ni_brands'
 const attrTable = 'ni_attrs'
 const goodsTable = 'ni_goods'
+const goodsAttrTable = 'ni_goods_attrs'
 
 class GoodsController {
 
@@ -318,12 +319,11 @@ class GoodsController {
     return view.render('goods.add', {brandsData, categoryData:formatData})
   }
 
-  async addSave({request, response, session, auth}){
-    //console.log(request.all())
+  async addSave({view, request, response, session, auth}){
 
     const saveData = await GlobalFn.formatSubmitData(goodsTable, request.all())
-    //console.log(saveData)
     const query = request.all()
+    console.log(query)
 
     saveData.goods_is_new = 1
     saveData.goods_is_hot = 1
@@ -376,6 +376,21 @@ class GoodsController {
       saveData.goods_is_real = 0
     }
 
+    if(query.group_depict){
+
+    }
+
+    let attrsData = []
+    if(query.goods_attr_value){
+      request._qs = {category:query.category_id, brands:query.brands_id}  //模拟传参
+      const attrIdData = await this.getAttr({view, request})
+      let attrId = []
+      attrIdData.forEach(val=>attrId.push(val.ni_id))
+      query.attr_id = attrId
+      attrsData = request.collect(['goods_attr_value', 'attr_id'])
+      //console.log(attrsData)
+    }
+
     const goods_thumb =  await GlobalFn.uploadPic(request, 'goods_thumb', {width:100, height:100, size:2}, 'uploads')
     if(goods_thumb){
       saveData.goods_thumb = goods_thumb
@@ -386,11 +401,36 @@ class GoodsController {
     saveData.goods_created_admin = auth.user.ni_id
 
     //console.log(saveData)
+    return
 
     try{
-      await Database.from(goodsTable).insert(saveData)
-      session.flash({notification: '增加成功！'})
-      response.redirect('/goods/attr')
+      const goodID = await Database.from(goodsTable).insert(saveData)
+
+      //保存attr
+      let attrMsg = ''
+      if(attrsData){
+        let attrs = []
+        attrsData.forEach(val=>{
+          val.goods_id=goodID[0]
+          attrs.push(val)
+        })
+        var newAttrs = attrs.filter(val=>{
+          if(val.goods_attr_value){
+            return val
+          }
+        })
+        if(newAttrs.length>0){
+          try{
+            await Database.from(goodsAttrTable).insert(newAttrs)
+            attrMsg = '商品属性保存成功！'
+          }catch(error){
+            attrMsg = '商品属性保存失败.'
+          }
+        }
+      }
+
+      session.flash({notification: '商品增加成功！'+ attrMsg})
+      response.redirect('/goods/list')
     }catch(error){
       session.flash({notification: '增加失败！'+error})
       response.redirect('back')
@@ -398,6 +438,15 @@ class GoodsController {
 
   }
 
+  async checkSku({request}){
+    const query = request.get()
+    const sku = query.sku || ''
+    const attrInfo = await Database.select('ni_id').table(goodsTable).where('goods_sku', sku).first()
+    if(attrInfo){
+      return [attrInfo.ni_id]
+    }
+    return []
+  }
 }
 
 module.exports = GoodsController

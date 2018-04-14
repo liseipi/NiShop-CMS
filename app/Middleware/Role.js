@@ -16,10 +16,11 @@ class Role {
 
       const Database = use('Database')
       const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
+
       //if(session.get('menusData')){
         //session.get('menusData').forEach((item, index)=>{
       if(menusData){
-        menusData.forEach((item, index)=>{
+        menusData.forEach((item)=>{
           if(item.controller==acturl){
             LicitUrl = false
             AuthCode = item.ni_id
@@ -40,7 +41,7 @@ class Role {
           session.flash({notification: '请求出错！'})
           return response.redirect('/dashboard')
         }
-        if(AuthCode && auth.user.auth.indexOf(AuthCode)<0){
+        if(AuthCode && (auth.user.auth.split(',')).indexOf(AuthCode+'')<0){
           session.flash({notification: '权限出错！'})
           return response.redirect('/dashboard')
         }

@@ -78,7 +78,7 @@
           <div class="col-sm-8">
             <div class="input-group">
               <span class="input-group-addon">$</span>
-              <input type="text" class="form-control" name="goods_price" value="{{old('goods_price', '')}}" placeholder="0.0">
+              <input type="text" class="form-control" name="goods_price" value="{{old('goods_price', 0)}}" placeholder="0.0">
             </div>
           </div>
           <div class="col-sm-2 error-container"></div>
@@ -88,7 +88,7 @@
           <div class="col-sm-8">
             <div class="input-group">
               <span class="input-group-addon">$</span>
-              <input type="text" class="form-control" name="goods_original_price" value="{{old('goods_original_price', '')}}" placeholder="0.0">
+              <input type="text" class="form-control" name="goods_original_price" value="{{old('goods_original_price', 0)}}" placeholder="0.0">
             </div>
           </div>
           <div class="col-sm-2 error-container"></div>
@@ -96,7 +96,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">购买积分</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="goods_integral" value="{{old('goods_integral', '')}}" placeholder="0">
+            <input type="text" class="form-control" name="goods_calculus" value="{{old('goods_calculus', 0)}}" placeholder="0">
             <div class="help-block color-danger">(积分为整数)</div>
           </div>
           <div class="col-sm-2 error-container"></div>
@@ -114,7 +114,7 @@
           <label class="col-sm-2 control-label">包装重量</label>
           <div class="col-sm-8">
             <div class="input-group">
-              <input type="text" class="form-control" name="goods_weight" value="{{old('goods_weight', '')}}" placeholder="0">
+              <input type="text" class="form-control" name="goods_weight" value="{{old('goods_weight', 0)}}" placeholder="0">
               <span class="input-group-addon">千克</span>
             </div>
           </div>
@@ -219,29 +219,29 @@
                       <tr>
                         <td width="80px" class="td-center">标题：</td>
                         <td>
-                          <input type="text" name="group_depict[]" value="" class="form-control">
+                          <input type="text" name="group_depict[]" :value="group_depictData[index]" class="form-control">
                         </td>
                       </tr>
                       <tr>
                         <td class="td-center">价格：</td>
                         <td>
-                          <input type="text" name="group_price[]" class="form-control">
+                          <input type="text" name="group_price[]" :value="group_priceData[index]" class="form-control">
                         </td>
                       </tr>
                       <tr>
                         <td class="td-center">库存：</td>
                         <td>
-                          <input type="text" name="group_instock[]" class="form-control">
+                          <input type="text" name="group_instock[]" :value="group_instockData[index]" class="form-control">
                         </td>
                       </tr>
                       <tr>
                         <td class="td-center">状态：</td>
                         <td style="padding: 10px;">
                           <label class="radio-inline">
-                            <input type="radio" :name="'group_status['+index+']'" value="0" :checked="!{{old('group_status['+index+']')}}" > 上架
+                            <input type="radio" :name="'group_status['+index+']'" value="0" :checked="group_statusData[index]==0||group_statusData.length==0" > 上架
                           </label>
                           <label class="radio-inline">
-                            <input type="radio" :name="'group_status['+index+']'" value="1" v-bind:data-ss="{{old('group_status['+index+']')}}"> 下架
+                            <input type="radio" :name="'group_status['+index+']'" value="1" :checked="group_statusData[index]==1"> 下架
                           </label>
                         </td>
                       </tr>
@@ -356,18 +356,25 @@
             is_attr: false
           },
           attrData: [],
-          groupData: []
+          groupData: [],
+          group_depictData: {{{ toJSON(batch(old('group_depict', []))) }}},
+          group_priceData: {{{ toJSON(batch(old('group_price', []))) }}},
+          group_instockData: {{{ toJSON(batch(old('group_instock', []))) }}},
+          group_statusData: {{{ toJSON(old('group_status', [])) }}}
         },
         methods: {
           changeCategory: function(){
             var index = event.currentTarget.selectedIndex;
             var sku = event.currentTarget.options[index].getAttribute('data-sku');
-            this.goodsSku = sku+Math.random().toString(16).substr(6)||'';
-            $('#goods_sku').focus();
             if(sku){
+              this.goodsSku = sku+Math.random().toString(16).substr(6)||'';
               this.brandsID = 0;
               this.pageStatus.is_attr = false;
+              $('#goods_sku').focus();
+            }else{
+              this.goodsSku = '';
             }
+
           },
           selectRecommend: function(){
             if(event.currentTarget.checked){
@@ -406,17 +413,19 @@
           },
           getAttr:function(){
             var _this = this;
-            $.ajax({
-              url: '/goods/getAttr',
-              data: {
-                category: this.selectCID,
-                brands: this.brandsID
-              },
-              type: 'get',
-              success: function (result) {
-                _this.attrData = result;
-              }
-            })
+            if(this.selectCID!=0 && this.brandsID!=0){
+              $.ajax({
+                url: '/goods/getAttr',
+                data: {
+                  category: this.selectCID,
+                  brands: this.brandsID
+                },
+                type: 'get',
+                success: function (result) {
+                  _this.attrData = result;
+                }
+              })
+            }
           },
           selectImg: function (picTag) {
             // var file = $('#picFile')[0].files[0];
@@ -464,6 +473,8 @@
             this.pageStatus.is_group = true;
             this.groupData = new Array({{old('goods_is_group')}});
           }
+
+
         }
       });
 

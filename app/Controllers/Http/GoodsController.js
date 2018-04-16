@@ -10,6 +10,7 @@ const brandsTable = 'ni_brands'
 const attrTable = 'ni_attrs'
 const goodsTable = 'ni_goods'
 const goodsAttrTable = 'ni_goods_attrs'
+const goodsGroupTable = 'ni_goods_groups'
 
 class GoodsController {
 
@@ -153,6 +154,7 @@ class GoodsController {
 
       const brandsInfo = await Database.select('brands_logo').table(brandsTable).where('ni_id', params.id).first()
       const oldPic = Helpers.appRoot('uploads')+'/'+brandsInfo.brands_logo
+      //console.log(oldPic)
       const exists = await Drive.exists(oldPic)
       if(exists){
         await Drive.delete(oldPic)
@@ -323,7 +325,7 @@ class GoodsController {
 
     const saveData = await GlobalFn.formatSubmitData(goodsTable, request.all())
     const query = request.all()
-    console.log(query)
+    //console.log(query)
 
     saveData.goods_is_new = 1
     saveData.goods_is_hot = 1
@@ -376,24 +378,43 @@ class GoodsController {
       saveData.goods_is_real = 0
     }
 
-    if(query.group_depict){
+    let goodsMsg = '商品增加成功。'
 
+    //上传商品主图片
+    const goodsThumbInfo =  await GlobalFn.uploadPic(request, 'goods_thumb', {width:100, height:100, size:2})
+    if(goodsThumbInfo && goodsThumbInfo.status=='error'){
+      goodsMsg += '<br>商品主图上传出错, Error: ' + JSON.stringify(goodsThumbInfo.error)
+    }
+    if(goodsThumbInfo && goodsThumbInfo.status=='moved'){
+      saveData.goods_thumb = goodsThumbInfo.fileName
+      goodsMsg += '<br>商品主图上传成功。'
     }
 
+    //处理组商品和组图片信息
+    let groupGoodsData = []
+    let groupThumbData = []
+    if(query.group_depict){
+      groupGoodsData = request.collect(['group_depict', 'group_price', 'group_instock', 'group_status'])
+      const groupGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'group_thumb', {width:100, height:100, size:2})
+      let errorThumbMsg =  groupGoods_thumb.filter(item=>item.status=='error')
+      if(errorThumbMsg.length>0){
+        goodsMsg += '<br>组产品图上传出错！Error: '+ JSON.stringify(errorThumbMsg)
+      }else{
+        goodsMsg += '<br>组产品图上传成功。'
+      }
+
+      groupThumbData = groupGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
+    }
+
+    //处理属性信息
     let attrsData = []
     if(query.goods_attr_value){
-      request._qs = {category:query.category_id, brands:query.brands_id}  //模拟传参
+      request._qs = {category: query.category_id, brands: query.brands_id}  //模拟传参
       const attrIdData = await this.getAttr({view, request})
       let attrId = []
-      attrIdData.forEach(val=>attrId.push(val.ni_id))
+      attrIdData.forEach(item=>attrId.push(item.ni_id))
       query.attr_id = attrId
       attrsData = request.collect(['goods_attr_value', 'attr_id'])
-      //console.log(attrsData)
-    }
-
-    const goods_thumb =  await GlobalFn.uploadPic(request, 'goods_thumb', {width:100, height:100, size:2}, 'uploads')
-    if(goods_thumb){
-      saveData.goods_thumb = goods_thumb
     }
 
     saveData.created_at = new Date()
@@ -401,41 +422,58 @@ class GoodsController {
     saveData.goods_created_admin = auth.user.ni_id
 
     //console.log(saveData)
-    return
+    //return
 
     try{
       const goodID = await Database.from(goodsTable).insert(saveData)
 
-      //保存attr
-      let attrMsg = ''
-      if(attrsData){
-        let attrs = []
-        attrsData.forEach(val=>{
-          val.goods_id=goodID[0]
-          attrs.push(val)
+      //保存组商品信息
+      if(groupGoodsData.length>0){
+        let newGroupData =  groupGoodsData.map((item, index)=>{
+          item.goods_id = goodID[0]
+          item.group_thumb = groupThumbData[index]||''
+          return item
         })
-        var newAttrs = attrs.filter(val=>{
-          if(val.goods_attr_value){
-            return val
-          }
-        })
-        if(newAttrs.length>0){
+        console.log(newGroupData)
+        if(newGroupData.length>0){
           try{
-            await Database.from(goodsAttrTable).insert(newAttrs)
-            attrMsg = '商品属性保存成功！'
+            await Database.from(goodsGroupTable).insert(newGroupData)
+            goodsMsg += '<br>组商品信息保存成功！'
           }catch(error){
-            attrMsg = '商品属性保存失败.'
+            goodsMsg += '<br>组商品信息保存失败.'+error
           }
         }
       }
 
-      session.flash({notification: '商品增加成功！'+ attrMsg})
+      //保存属性
+      if(attrsData){
+        let attrs = []
+        attrsData.forEach(item=>{
+          item.goods_id=goodID[0]
+          attrs.push(item)
+        })
+        let newAttrs = attrs.filter(item=>item.goods_attr_value)
+        if(newAttrs.length>0){
+          try{
+            await Database.from(goodsAttrTable).insert(newAttrs)
+            goodsMsg += '<br>商品属性保存成功！'
+          }catch(error){
+            goodsMsg += '<br>商品属性保存失败.'+error
+          }
+        }
+      }
+
+      session.flash({notification: goodsMsg})
       response.redirect('/goods/list')
     }catch(error){
       session.flash({notification: '增加失败！'+error})
       response.redirect('back')
     }
 
+  }
+
+  async list({view, response}){
+    return view.render('goods.attr')
   }
 
   async checkSku({request}){

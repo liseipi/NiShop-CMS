@@ -2,6 +2,7 @@
 
 const Database = use('Database')
 const Helpers = use('Helpers')
+const Drive = use('Drive')
 const sharp = use('sharp')
 
 class GlobalFnClass {
@@ -80,7 +81,7 @@ class GlobalFnClass {
     return [...result]
   }
 
-  //图片上传处理
+  //单个图片上传处理
   static async uploadPic(requestFile, picFile, {width=450, height=450, upSize=2}, path="uploads"){
 
     const profilePic = requestFile.file(picFile, {
@@ -89,21 +90,53 @@ class GlobalFnClass {
     })
 
     if(profilePic && profilePic.clientName){
-      await profilePic.move(Helpers.appRoot('uploads'), {
-        name: `${new Date().getTime()}.${profilePic.clientName.replace(/^.+\./,'')}`
+      await profilePic.move(Helpers.appRoot(path), {
+        name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${profilePic.clientName.replace(/^.+\./,'')}`
       })
       if (!profilePic.moved()) {
-        session.flash({notification: '图片上传失败！Error:'+ profilePic.error().message})
-        response.redirect('back')
-        return ''
+        //session.flash({notification: '图片上传失败！Error:'+ profilePic.error().message})
+        return {fileName: '', status: 'error', error: profilePic.error()}
       }
 
       //let picPath = Helpers.appRoot('uploads/'+profilePic.fileName)
       //const transformer = sharp(picPath).rotate().resize(200, 200)
 
-      return profilePic.fileName
+      return {fileName: profilePic.fileName, status: 'moved', error: {}}
     }
-    return ''
+    return
+  }
+
+  //多个图片上传处理
+  static async uploadMultiplePic(requestFile, picFile, {width=450, height=450, upSize=2}, path="uploads"){
+
+    const profilePics = requestFile.file(picFile, {
+      types: ['image'],
+      size: upSize+'mb'
+    })
+
+    await profilePics.moveAll(Helpers.appRoot(path), (file) => {
+      return {
+        //name: `${new Date().getTime()}.${file.clientName.replace(/^.+\./,'')}`
+        name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${file.clientName.replace(/^.+\./,'')}`
+      }
+    })
+
+    if(!profilePics.movedAll()){
+      profilePics._files.forEach(item=>{
+        if(item.status=='error') {
+          if(Drive.exists(item.tmpPath)){
+             Drive.delete(item.tmpPath)
+          }
+        }
+      })
+    }
+
+    let proData = []
+    proData = profilePics._files.map(item=>{
+      return {fileName: item.fileName, status: item.status, error: item._error}
+    })
+
+    return proData
   }
 
 }

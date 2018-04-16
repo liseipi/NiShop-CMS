@@ -205,7 +205,7 @@
                 <thead>
                 <tr>
                   <th width="20%" class="td-center"><a @click="groupData.push(groupData.length+1)" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
-                  <th>内容@{{groupData}}</th>
+                  <th>内容</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -220,36 +220,26 @@
                         <td width="80px" class="td-center">标题：</td>
                         <td>
                           <input type="text" class="form-control" name="group_depict[]" v-if="group_depictData.length>0" :value="group_depictData[index]">
-                          <input type="text" class="form-control" name="group_depict[]" v-else>
+                          <input type="text" class="form-control" name="group_depict[]" value="" placeholder="商品不同属性的名称" v-else>
                         </td>
                       </tr>
                       <tr>
                         <td class="td-center">价格：</td>
                         <td>
                           <input type="text" class="form-control" name="group_price[]" v-if="group_priceData.length>0" :value="group_priceData[index]">
-                          <input type="text" class="form-control" name="group_price[]" v-else>
+                          <input type="text" class="form-control" name="group_price[]" value="0" v-else>
                         </td>
                       </tr>
                       <tr>
                         <td class="td-center">库存：</td>
                         <td>
                           <input type="text" class="form-control" name="group_instock[]" v-if="group_instockData.length>0" :value="group_instockData[index]">
-                          <input type="text" class="form-control" name="group_instock[]" v-else>
+                          <input type="text" class="form-control" name="group_instock[]" value="0" v-else>
                         </td>
                       </tr>
                       <tr>
                         <td class="td-center">状态：</td>
                         <td style="padding: 10px;">
-                          <!--
-                          <label class="radio-inline">
-                            <input type="radio" class="form-control" :name="'group_status['+index+']'" value="0" v-if="group_statusData.length>0" :checked="group_statusData[index]==0||group_statusData.length==0">上架
-                            <input type="radio" class="form-control" :name="'group_status['+index+']'" value="0" v-else>上架
-                          </label>
-                          <label class="radio-inline">
-                            <input type="radio" class="form-control" :name="'group_status['+index+']'" value="1" v-if="group_statusData.length>0" :checked="group_statusData[index]==1">下架
-                            <input type="radio" class="form-control" :name="'group_status['+index+']'" value="1" v-else>下架
-                          </label>
-                          -->
                           <span v-if="group_statusData.length>0">
                             <label class="radio-inline">
                               <input type="radio" :name="'group_status['+index+']'" value="0" :checked="group_statusData[index]==0||group_statusData.length==0">上架
@@ -260,7 +250,7 @@
                           </span>
                           <span v-else>
                             <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" value="0">上架
+                              <input type="radio" :name="'group_status['+index+']'" checked value="0">上架
                             </label>
                             <label class="radio-inline">
                               <input type="radio" :name="'group_status['+index+']'" value="1">下架
@@ -273,7 +263,7 @@
                         <td>
                           <div class="row" style="margin-top: 10px;">
                             <div class="col-sm-8">
-                              <input type="file" name="group_thumb[]" @change="selectImg('previewPic'+index)">
+                              <input type="file" name="group_thumb[]" multiple @change="selectImg('previewPic'+index)">
                               <hr>
                               <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                             </div>

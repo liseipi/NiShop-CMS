@@ -1,0 +1,143 @@
+@layout('layout')
+@section('content')
+<style>
+  .goodsInfo p{
+    margin-bottom: 2px;
+  }
+  .goodsName{
+    margin-top: 5px;
+    border-top:1px solid #ddd;
+    line-height: 24px;
+  }
+</style>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">商品列表</h5>
+    <div class="main">
+      <table class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline">
+        <caption>
+          <form action="/goods/list" method="get" class="form-inline text-center">
+            <div class="form-group">
+              <p class="form-control-static">品牌</p>
+            </div>
+            <div class="form-group">
+              <select class="form-control" name="brands">
+                <option value="0" {{query.brands==0?'selected':''}}>全部</option>
+                @each(brands in brandsData)
+                <option value="{{brands.ni_id}}" {{query.brands==brands.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(brands.level_id) }}}{{{ '├'.repeat(brands.level_id>0?1:0) }}}{{brands.brands_name}}</option>
+                @endeach
+              </select>
+            </div>
+            <div class="form-group">
+              <p class="form-control-static">分类</p>
+            </div>
+            <div class="form-group">
+              <select class="form-control" name="category">
+                <option value="0" {{query.category==0?'selected':''}}>全部</option>
+                @each(category in categoryData)
+                <option value="{{category.ni_id}}" {{query.category==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
+                @endeach
+              </select>
+            </div>
+            <div class="form-group">
+              <p class="form-control-static">属性</p>
+            </div>
+            <div class="form-group">
+              <select class="form-control" name="attr">
+                <option value="all" {{query.attr=='all'?'selected':''}}>全部</option>
+                <option value="id" {{query.attr=='id'?'selected':''}}>ID</option>
+                <option value="sku" {{query.attr=='sku'?'selected':''}}>Sku</option>
+                <option value="name" {{query.attr=='name'?'selected':''}}>名称</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <input type="text" name="keywords" class="form-control" value="{{query.attr=='all'?'':query.keywords||''}}" placeholder="关键字">
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-xl btn-default">搜索</button>
+            </div>
+          </form>
+          <hr>
+        </caption>
+        <thead>
+        <tr>
+          <th>排序</th>
+          <th>分类</th>
+          <th>品牌</th>
+          <th>商品信息</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        @each(goods in goodsData.data)
+        <tr>
+          <td width="5%">{{goods.sort}}</td>
+          <td width="10%">{{goods.column_name}}</td>
+          <td width="20%">{{goods.brands_name}}</td>
+          <td width="40%">
+            <div class="row">
+              <div class="col-sm-4">
+                @if(goods.goods_thumb)
+                <img src="{{'/file/pictures/'+goods.goods_thumb}}" width="100" height="100" class="img-thumbnail">
+                @else
+                <img src="" width="100" height="100" title="缺少图片" class="img-thumbnail">
+                @endif
+              </div>
+              <div class="col-sm-8">
+                <div class="goodsInfo">
+                  <p>PID：{{goods.ni_id}}</p>
+                  <p>SKU：{{goods.goods_sku}}</p>
+                  <p>库存：{{goods.goods_instock}}</p>
+                  <p>价格：{{goods.goods_price}}</p>
+                  <p>促销：{{{goods.goods_is_promotions==0?'<label class="tag tag-success">YES</label>':'No'}}}</p>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix goodsName">
+              <p>商品名称：{{goods.goods_name}}</p>
+            </div>
+          </td>
+          <td width="8%">{{{goods.status==0?'<label class="tag tag-success">上线</label>':'<label class="tag tag-warning">下线</label>'}}}</td>
+          <td width="25%">
+            <a href="/article/edit/{{article.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
+            <a href="/article/destroy/{{article.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+          </td>
+        </tr>
+        @endeach
+        </tbody>
+      </table>
+      <hr>
+      <div class="pager">
+        <nav id="page"></nav>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['../js/config.js'], function () {
+    requirejs(['cmsui'], function () {
+
+      $('#page').pagination({
+        pages: {{goodsData.lastPage}},
+        styleClass: ['pagination-xl'],
+        showCtrl: true,
+        displayPage: 6,
+        currentPage: {{goodsData.page}},
+        onSelect: function (num) {
+          var query = {{{toJSON(query)}}};
+          query.page = num;
+          var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
+          location.href = '/goods/list?'+url
+        }
+      });
+
+      $(function(){
+        $('.pagination').prepend('<div><span>共有 {{goodsData.total}} 个商品</span></div>');
+      });
+
+    });
+  });
+</script>
+@endsection

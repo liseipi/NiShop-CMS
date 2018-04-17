@@ -225,9 +225,7 @@
                       <tr>
                         <td width="80px" class="td-center">标题：<span class="text-success">(*)</span></td>
                         <td class="form-group">
-                          <!--<input type="text" class="form-control" name="group_depict[]" v-if="group_depictData.length>0" :value="group_depictData[index]" required>-->
-                          <!--<input type="text" class="form-control" name="group_depict[]" v-else value="" placeholder="商品不同属性的名称" required>-->
-                          <textarea class="form-control" name="group_depict[]" rows="2" v-if="group_depictData.length>0" v-html="group_depictData[index]" data-rule-required='true'></textarea>
+                          <textarea class="form-control" name="group_depict[]" rows="2" v-if="group_depictData.length>0" v-html="group_depictData[index][0]" data-rule-required='true'></textarea>
                           <textarea class="form-control" name="group_depict[]" rows="2" v-else placeholder="商品不同属性的名称" data-rule-required='true'></textarea>
                           <span class="error-container"></span>
                         </td>

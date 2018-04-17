@@ -473,8 +473,53 @@ class GoodsController {
 
   }
 
-  async list({view, response}){
-    return view.render('goods.attr')
+  async list({view, request}){
+    const brandsData = await Database.select('ni_id', 'brands_name').from(brandsTable)
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+
+    const query = request.get()
+    const page = query.page || 1
+    const perPage = 20
+    const category_id = query.category || 0
+    const brands_id = query.brands || 0
+    const attrs = query.attr || 'all'
+    console.log(attrs)
+    const keywords = query.keywords || ''
+
+    const formatSubData = await GlobalFn.findSubData([...categoryData], category_id)
+    let whereCategoty = []
+    if(category_id!=0){
+      whereCategoty = [].concat([parseInt(category_id)], formatSubData)
+    }
+
+    const goodsData = await Database.select(goodsTable+'.*', categoryTable+'.column_name', brandsTable+'.brands_name').from(goodsTable)
+      .leftJoin(categoryTable, goodsTable+'.category_id', categoryTable+'.ni_id')
+      .leftJoin(brandsTable, goodsTable+'.brands_id', brandsTable+'.ni_id')
+      .where(function(){
+        if(category_id!=0){
+          this.whereIn(goodsTable+'.category_id', whereCategoty)
+        }
+      })
+      .where(function(){
+        if(brands_id!=0){
+          this.where(goodsTable+'.brands_id', '=', brands_id)
+        }
+      })
+      .where(function(){
+        if(attrs=='id'){
+          this.where(goodsTable+'.ni_id', '=', keywords)
+        }
+        if(attrs=='sku'){
+          this.where(goodsTable+'.goods_sku', '=', keywords)
+        }
+        if(attrs=='name'){
+          this.where(goodsTable+'.goods_name', 'like', `%${keywords}%`)
+        }
+      })
+      .paginate(page, perPage)
+
+    return view.render('goods.list', {brandsData, categoryData:formatData, goodsData, query: query})
   }
 
   async checkSku({request}){

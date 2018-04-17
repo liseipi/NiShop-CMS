@@ -102,16 +102,16 @@
 
       $('#page').pagination({
         pages: {{attrsData.lastPage}},
-      styleClass: ['pagination-xl'],
+        styleClass: ['pagination-xl'],
         showCtrl: true,
         displayPage: 6,
         currentPage: {{attrsData.page}},
-      onSelect: function (num) {
-        var query = {{{toJSON(query)}};
-        query.page = num;
-        var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
-        location.href = '/article/list?'+url
-      }
+        onSelect: function (num) {
+          var query = {{{toJSON(query)}}};
+          query.page = num;
+          var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
+          location.href = '/article/list?'+url
+        }
       });
 
       $(function(){

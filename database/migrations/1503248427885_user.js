@@ -3,7 +3,7 @@
 const Schema = use('Schema')
 
 class UserSchema extends Schema {
-  up () {
+  up() {
     this.create('ni_admin_user', table => {
       table.increments('ni_id')
       table.string('username', 64).notNullable().unique()
@@ -23,7 +23,7 @@ class UserSchema extends Schema {
     })
   }
 
-  down () {
+  down() {
     this.drop('ni_admin_user')
   }
 }

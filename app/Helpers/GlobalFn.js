@@ -116,7 +116,6 @@ class GlobalFnClass {
 
     await profilePics.moveAll(Helpers.appRoot(path), (file) => {
       return {
-        //name: `${new Date().getTime()}.${file.clientName.replace(/^.+\./,'')}`
         name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${file.clientName.replace(/^.+\./,'')}`
       }
     })
@@ -131,8 +130,7 @@ class GlobalFnClass {
       })
     }
 
-    let proData = []
-    proData = profilePics._files.map(item=>{
+    let proData = profilePics._files.map(item=>{
       return {fileName: item.fileName, status: item.status, error: item._error}
     })
 

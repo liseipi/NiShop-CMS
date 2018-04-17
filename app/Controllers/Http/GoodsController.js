@@ -378,16 +378,16 @@ class GoodsController {
       saveData.goods_is_real = 0
     }
 
-    let goodsMsg = '商品增加成功。'
+    let goodsMsg = '<p>商品增加成功。</p>'
 
     //上传商品主图片
     const goodsThumbInfo =  await GlobalFn.uploadPic(request, 'goods_thumb', {width:100, height:100, size:2})
     if(goodsThumbInfo && goodsThumbInfo.status=='error'){
-      goodsMsg += '<br>商品主图上传出错, Error: ' + JSON.stringify(goodsThumbInfo.error)
+      goodsMsg += '<p>商品主图上传出错！Error: <pre><code>' + JSON.stringify(goodsThumbInfo.error) +'</code></pre></p>'
     }
     if(goodsThumbInfo && goodsThumbInfo.status=='moved'){
       saveData.goods_thumb = goodsThumbInfo.fileName
-      goodsMsg += '<br>商品主图上传成功。'
+      goodsMsg += '<p>商品主图上传成功。</p>'
     }
 
     //处理组商品和组图片信息
@@ -396,14 +396,16 @@ class GoodsController {
     if(query.group_depict){
       groupGoodsData = request.collect(['group_depict', 'group_price', 'group_instock', 'group_status'])
       const groupGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'group_thumb', {width:100, height:100, size:2})
-      let errorThumbMsg =  groupGoods_thumb.filter(item=>item.status=='error')
-      if(errorThumbMsg.length>0){
-        goodsMsg += '<br>组产品图上传出错！Error: '+ JSON.stringify(errorThumbMsg)
-      }else{
-        goodsMsg += '<br>组产品图上传成功。'
+      if(groupGoods_thumb){
+        let errorThumbMsg = groupGoods_thumb.filter(item=>item.status=='error'&&item.error.clientName!='')
+        if(errorThumbMsg.length>0){
+          goodsMsg += '<p>组产品图上传出错！Error: <pre><code>'+ JSON.stringify(errorThumbMsg) +'</code></pre></p>'
+        }
+        if(groupGoods_thumb.filter(item=>item.status=='error').length==0){
+          goodsMsg += '<p>组产品图上传成功。</p>'
+        }
+        groupThumbData = groupGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
       }
-
-      groupThumbData = groupGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
     }
 
     //处理属性信息
@@ -434,13 +436,12 @@ class GoodsController {
           item.group_thumb = groupThumbData[index]||''
           return item
         })
-        console.log(newGroupData)
         if(newGroupData.length>0){
           try{
             await Database.from(goodsGroupTable).insert(newGroupData)
-            goodsMsg += '<br>组商品信息保存成功！'
+            goodsMsg += '<p>组商品信息保存成功。</p>'
           }catch(error){
-            goodsMsg += '<br>组商品信息保存失败.'+error
+            goodsMsg += '<p>组商品信息保存失败！'+ error +'</p>'
           }
         }
       }
@@ -456,9 +457,9 @@ class GoodsController {
         if(newAttrs.length>0){
           try{
             await Database.from(goodsAttrTable).insert(newAttrs)
-            goodsMsg += '<br>商品属性保存成功！'
+            goodsMsg += '<p>商品属性保存成功。</p>'
           }catch(error){
-            goodsMsg += '<br>商品属性保存失败.'+error
+            goodsMsg += '<p>商品属性保存失败！'+error +'</p>'
           }
         }
       }

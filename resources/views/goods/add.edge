@@ -111,7 +111,7 @@
           <label class="col-sm-2 control-label">实体/虚拟物品</label>
           <div class="col-sm-8">
             <label class="checkbox-inline">
-              <input type="checkbox" name="goods_is_real" value="0" checked {{old('goods_is_real')==0?'checked':''}}> 实体商品
+              <input type="checkbox" name="goods_is_real" value="0" {{old('goods_is_real')?'':'checked'}} {{old('goods_is_real')==0?'checked':''}}> 实体商品
             </label>
           </div>
           <div class="col-sm-2 error-container"></div>
@@ -167,9 +167,9 @@
                 <tr>
                   <td class="td-center">促销时间: </td>
                   <td>
-                    <div class="input-daterange" data-toggle="datepicker" data-date-start-date='2015-01-01' data-date-end-date='2015-01-31'>
-                      <input type="text" class="form-control input-date" placeholder="开始日期" name="goods_promotions_time_start" value="{{old('goods_promotions_time_start', '')}}" :disabled="pageStatus.is_sales" /> -
-                      <input type="text" class="form-control input-date" placeholder="结束日期" name="goods_promotions_time_end" value="{{old('goods_promotions_time_end', '')}}" :disabled="pageStatus.is_sales" />
+                    <div class="input-daterange" data-toggle="datepicker" data-date-start-date='{{date.startDate}}' data-date-end-date='{{date.endDate}}'>
+                      <input type="text" class="form-control input-date" placeholder="开始日期" name="goods_promotions_time_start" value="{{old('goods_promotions_time_start', date.startDate)}}" :disabled="pageStatus.is_sales" /> -
+                      <input type="text" class="form-control input-date" placeholder="结束日期" name="goods_promotions_time_end" value="{{old('goods_promotions_time_end', date.startDate)}}" :disabled="pageStatus.is_sales" />
                     </div>
                   </td>
                 </tr>
@@ -272,7 +272,7 @@
                         <td>
                           <div class="row" style="margin-top: 10px;">
                             <div class="col-sm-8">
-                              <input type="file" name="group_thumb[]" :id="'selPreviewPic'+index" multiple @change="selectImg('previewPic'+index)">
+                              <input type="file" name="group_thumb[]" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
                               <hr>
                               <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                             </div>
@@ -294,7 +294,7 @@
         </div>
         <hr>
         <div class="form-group">
-          <label class="col-sm-2 control-label">属性列表<span class="text-success">(*)</span></label>
+          <label class="col-sm-2 control-label">品牌属性<span class="text-success">(*)</span></label>
           <div class="col-sm-8">
             <select class="form-control input-lg" name="brands_id" @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
               <option value="0">选择品牌</option>
@@ -359,7 +359,7 @@
         <hr>
         <div class="form-group">
           <div class="col-sm-8 col-sm-offset-2">
-            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+            <input type="submit" value="提交" class="btn btn-block btn-xl btn-primary">
           </div>
         </div>
       </form>

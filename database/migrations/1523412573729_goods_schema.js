@@ -32,7 +32,7 @@ class GoodsSchema extends Schema {
       table.integer('brands_id', 8).comment('品牌ID')
       table.string('goods_thumb', 64).comment('商品主图')
       table.text('content').comment('商品详细')
-      table.integer('view_number', 128).comment('查看次数')
+      table.integer('view_number', 128).defaultTo(0).comment('查看次数')
       table.integer('goods_created_admin', 8).comment('商品发布者')
       table.timestamps()
     })

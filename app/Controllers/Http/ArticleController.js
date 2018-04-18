@@ -119,6 +119,7 @@ class ArticleController {
       }
     })
     .where('ni_articles.article_title', 'like', `%${keywords}%`)
+    .orderBy('ni_id', 'desc')
     .paginate(page, perPage)
     return view.render('article.list', {categoryData: formatData, articleData, query: query})
   }

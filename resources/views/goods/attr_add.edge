@@ -42,11 +42,11 @@
             <label class="radio-inline">
               <input type="radio" name="attr_only" value="0" {{old('attr_only')?'':'checked'}} {{old('attr_only')==0?'checked':''}}> 唯一属性
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="attr_only" value="1" {{old('attr_only')==1?'checked':''}}> 单选属性
+            <label class="radio-inline disabled">
+              <input type="radio" name="attr_only" value="1" disabled {{old('attr_only')==1?'checked':''}}> 单选属性
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="attr_only" value="2" {{old('attr_only')==2?'checked':''}}> 复选属性
+            <label class="radio-inline disabled">
+              <input type="radio" name="attr_only" value="2" disabled {{old('attr_only')==2?'checked':''}}> 复选属性
             </label>
             <div class="help-block color-danger">(单选/复选，可以对商品属性设置多个值，同时对不同属性值指定不同的商品价格)</div>
           </div>

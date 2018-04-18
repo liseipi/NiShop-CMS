@@ -9,6 +9,9 @@
     border-top:1px solid #ddd;
     line-height: 24px;
   }
+  .img-thumbnail{
+    height: 100px;
+  }
 </style>
 <div id="app-page">
   <div class="container-fluid">
@@ -101,8 +104,8 @@
           </td>
           <td width="8%">{{{goods.status==0?'<label class="tag tag-success">上线</label>':'<label class="tag tag-warning">下线</label>'}}}</td>
           <td width="25%">
-            <a href="/article/edit/{{article.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
-            <a href="/article/destroy/{{article.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+            <a href="/goods/edit/{{goods.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
+            <a href="/goods/destroy/{{goods.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
           </td>
         </tr>
         @endeach

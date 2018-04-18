@@ -11,6 +11,9 @@ const attrTable = 'ni_attrs'
 const goodsTable = 'ni_goods'
 const goodsAttrTable = 'ni_goods_attrs'
 const goodsGroupTable = 'ni_goods_groups'
+const goodsGalleryTable = 'ni_goods_galleries'
+
+const moment = use('moment')
 
 class GoodsController {
 
@@ -318,7 +321,7 @@ class GoodsController {
     const categoryData = await Database.select('ni_id', 'column_name', 'parent_id', 'column_sku').from(categoryTable)
     const formatData = await GlobalFn.soleTreeSort(categoryData)
 
-    return view.render('goods.add', {brandsData, categoryData:formatData})
+    return view.render('goods.add', {brandsData, categoryData:formatData, date: {startDate: moment().format('YYYY-MM-DD'), endDate: moment().add(1, 'year').format('YYYY-MM-DD')}})
   }
 
   async addSave({view, request, response, session, auth}){
@@ -484,7 +487,6 @@ class GoodsController {
     const category_id = query.category || 0
     const brands_id = query.brands || 0
     const attrs = query.attr || 'all'
-    console.log(attrs)
     const keywords = query.keywords || ''
 
     const formatSubData = await GlobalFn.findSubData([...categoryData], category_id)
@@ -517,9 +519,25 @@ class GoodsController {
           this.where(goodsTable+'.goods_name', 'like', `%${keywords}%`)
         }
       })
+      .orderBy('ni_id', 'desc')
       .paginate(page, perPage)
 
     return view.render('goods.list', {brandsData, categoryData:formatData, goodsData, query: query})
+  }
+
+  async edit({view, params}){
+    const goodsData = await Database.table(goodsTable).where('ni_id', params.id).first()
+    const attrData = await Database.select(goodsAttrTable+'.*', attrTable+'.attr_name', attrTable+'.attr_type').from(goodsAttrTable)
+      .leftJoin(attrTable, goodsAttrTable+'.attr_id', attrTable+'.ni_id')
+      .where('goods_id', params.id)
+    const groupData = await Database.table(goodsGroupTable).where('goods_id', params.id)
+    const galleryData = await Database.table(goodsGalleryTable).where('goods_id', params.id)
+
+    const brandsData = await Database.select('ni_id', 'brands_name').from(brandsTable)
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+
+    return view.render('goods.edit', {goodsData, attrData, groupData, galleryData, brandsData, categoryData: formatData, date: {startDate:moment().format('YYYY-MM-DD'), endDate: moment().add(1, 'year').format('YYYY-MM-DD')}})
   }
 
   async checkSku({request}){

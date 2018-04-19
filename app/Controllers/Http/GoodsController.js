@@ -396,7 +396,7 @@ class GoodsController {
     //处理组商品和组图片信息
     let groupGoodsData = []
     let groupThumbData = []
-    if(query.group_depict){
+    if(query.goods_is_group && query.group_depict){
       groupGoodsData = request.collect(['group_depict', 'group_price', 'group_instock', 'group_status'])
       const groupGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'group_thumb', {width:100, height:100, size:2})
       if(groupGoods_thumb){
@@ -527,14 +527,16 @@ class GoodsController {
 
   async edit({view, params}){
     const goodsData = await Database.table(goodsTable).where('ni_id', params.id).first()
-    const attrData = await Database.select(goodsAttrTable+'.*', attrTable+'.attr_name', attrTable+'.attr_type').from(goodsAttrTable)
-      .leftJoin(attrTable, goodsAttrTable+'.attr_id', attrTable+'.ni_id')
-      .where('goods_id', params.id)
+    const attrData = await Database.select(attrTable+'.*', goodsAttrTable+'.goods_attr_value', goodsAttrTable+'.goods_id').from(attrTable)
+      .leftJoin(goodsAttrTable, function () {
+        this.on(attrTable+'.ni_id', '=', goodsAttrTable+'.attr_id').onIn(goodsAttrTable+'.goods_id', params.id)
+      })
+      .where({brands_id: goodsData.brands_id, category_id: goodsData.category_id})
     const groupData = await Database.table(goodsGroupTable).where('goods_id', params.id)
     const galleryData = await Database.table(goodsGalleryTable).where('goods_id', params.id)
 
     const brandsData = await Database.select('ni_id', 'brands_name').from(brandsTable)
-    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const categoryData = await Database.select('ni_id', 'column_name', 'column_sku', 'parent_id').from(categoryTable)
     const formatData = await GlobalFn.soleTreeSort(categoryData)
 
     return view.render('goods.edit', {goodsData, attrData, groupData, galleryData, brandsData, categoryData: formatData, date: {startDate:moment().format('YYYY-MM-DD'), endDate: moment().add(1, 'year').format('YYYY-MM-DD')}})

@@ -7,9 +7,9 @@ class GoodsGallerySchema extends Schema {
     this.create('ni_goods_galleries', (table) => {
       table.increments('ni_id')
       table.integer('goods_id', 16)
-      table.string('depict', 255)
-      table.integer('sort', 8)
-      table.string('galleries_thumb', 64)
+      table.string('gallery_depict', 255)
+      table.integer('gallery_sort', 8)
+      table.string('gallery_thumb', 64)
     })
   }
 

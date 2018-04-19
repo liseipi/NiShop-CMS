@@ -13,6 +13,8 @@
     padding:5px;
     border-radius: 2px;
     cursor: pointer;
+    width: 100px;
+    height: 100px;
   }
   .nav-tabs.nav-primary li>a{
     padding: 10px;
@@ -24,24 +26,24 @@
     @include('notification')
     <h5 class="page-header">编辑商品</h5>
     <div class="main">
-      <pre>
-        {{ toJSON(goodsData) }}
-      </pre>
-      <pre>
-        {{ toJSON(attrData) }}
-      </pre>
-      <pre>
-        {{ toJSON(groupData) }}
-      </pre>
-      <pre>
-        {{ toJSON(galleryData) }}
-      </pre>
-      <pre>
-        {{ toJSON(brandsData) }}
-      </pre>
-      <pre>
-        {{ toJSON(categoryData) }}
-      </pre>
+      <!--<pre>-->
+        <!--{{ toJSON(goodsData) }}-->
+      <!--</pre>-->
+      <!--<pre>-->
+        <!--{{ toJSON(attrData) }}-->
+      <!--</pre>-->
+      <!--<pre>-->
+        <!--{{ toJSON(groupData) }}-->
+      <!--</pre>-->
+      <!--<pre>-->
+        <!--{{ toJSON(galleryData) }}-->
+      <!--</pre>-->
+      <!--<pre>-->
+        <!--{{ toJSON(brandsData) }}-->
+      <!--</pre>-->
+      <!--<pre>-->
+        <!--{{ toJSON(categoryData) }}-->
+      <!--</pre>-->
       <form class="form-horizontal" action="/goods/attrAdd" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="bs-example bs-example-tabs">
@@ -248,7 +250,7 @@
               <div class="clearfix">
                 <label class="col-sm-1 control-label">相册列表</label>
                 <div class="col-sm-10">
-                  <a @click="groupData.push({ni_id: '', goods_id: ''})" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a>
+                  <a @click="galleryAddData" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a>
                   <div class="clearfix">
                     <hr>
                     <table class="table table-bordered">
@@ -256,9 +258,9 @@
                       <tr v-show="galleryData.length==0">
                         <td>暂时无相册图片</td>
                       </tr>
-                      <tr v-show="galleryData.length>0" v-for="(num, index) in galleryData">
+                      <tr v-show="galleryData.length>0" v-for="(gallery, index) in galleryData">
                         <td width="80px" class="td-center">
-                          <a @click="groupData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
+                          <a @click="galleryData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
                         </td>
                         <td>
                           <table class="table table-bordered table-condensed" style="margin:0;">
@@ -266,16 +268,14 @@
                             <tr>
                               <td width="80px" class="td-center">描述：<span class="text-success">(*)</span></td>
                               <td class="form-group">
-                                <textarea class="form-control" name="group_depict[]" rows="2" v-if="group_depictData.length>0" v-html="group_depictData[index][0]" data-rule-required='true'></textarea>
-                                <textarea class="form-control" name="group_depict[]" rows="2" v-else placeholder="图片描述文字" data-rule-required='true'></textarea>
+                                <textarea class="form-control" name="gallery_depict[]" v-model="gallery.gallery_depict" rows="2" placeholder="图片描述文字" data-rule-required='true'></textarea>
                                 <span class="error-container"></span>
                               </td>
                             </tr>
                             <tr>
                               <td class="td-center">排序：<span class="text-success">(*)</span></td>
                               <td class="form-group">
-                                <input type="text" class="form-control" name="group_instock[]" v-if="group_instockData.length>0" :value="group_instockData[index]" data-rule-required='true'>
-                                <input type="text" class="form-control" name="group_instock[]" v-else :value="index+1" data-rule-required='true' data-rule-digits='true'>
+                                <input type="text" class="form-control" name="gallery_sort[]" v-model="gallery.gallery_sort" data-rule-required='true' data-rule-digits='true'>
                                 <span class="error-container"></span>
                               </td>
                             </tr>
@@ -284,12 +284,12 @@
                               <td>
                                 <div class="row" style="margin-top: 10px;">
                                   <div class="col-sm-8">
-                                    <input type="file" name="group_thumb[]" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
+                                    <input type="file" name="gallery_thumb[]" :id="'selGalleryPic'+index" @change="selectImg('galleryPic'+index)">
                                     <hr>
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 700*700 像素，不超过1M</div>
                                   </div>
                                   <div class="col-sm-4">
-                                    <img data-src="holder.js/100x100" src="" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                                    <img data-src="holder.js/100x100" :src="gallery.gallery_thumb" :id="'galleryPic'+index" @click="document.getElementById('selGalleryPic'+index).click()" class="img-thumbnail-border">
                                   </div>
                                 </div>
                               </td>
@@ -312,7 +312,7 @@
                   <select class="form-control input-lg" name="category_id" id="category_id" @change="changeCategory" v-model="selectCID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择分类">
                     <option value="0">选择分类</option>
                     @each(category in categoryData)
-                    <option value="{{category.ni_id}}" data-sku="{{category.column_sku}}" {{old('category_id')==category.ni_id?'selected':''}}>{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
+                    <option value="{{category.ni_id}}" data-sku="{{category.column_sku}}">{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
                     @endeach
                   </select>
                 </div>
@@ -321,7 +321,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">SKU/货号<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" data-rule-required="true" data-rule-minlength="4" @blur="checkSku('goods_sku')">
+                  <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" @blur="checkSku('goods_sku')" :disabled="swSku" data-rule-required="true" data-rule-minlength="4">
                 </div>
                 <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('goods_sku'), hasErrorFor('goods_sku')) }}</div>
               </div>
@@ -331,7 +331,7 @@
                   <select class="form-control input-lg" name="brands_id" @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
                     <option value="0">品牌</option>
                     @each(brands in brandsData)
-                    <option value="{{brands.ni_id}}" {{old('brands_id')==brands.ni_id?'selected':''}}>{{brands.brands_name}}</option>
+                    <option value="{{brands.ni_id}}">{{brands.brands_name}}</option>
                     @endeach
                   </select>
                 </div>
@@ -343,6 +343,7 @@
                   <div class="row">
                     <h6 class="text-center">属性列表</h6>
                     <hr>
+                    <button v-show="pageStatus.is_del_attr && isAttrData" type="button" class="btn btn-danger" style="margin-bottom:20px;">删除商品属性</button>
                     <table class="table table-bordered">
                       <thead>
                       <tr>
@@ -354,10 +355,10 @@
                       <tr v-for="(val, key) in attrData">
                         <td class="td-center" width="35%">@{{val.attr_name}}</td>
                         <td>
-                          <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" value="" class="form-control">
+                          <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" :value="val.goods_attr_value" class="form-control">
                           <select v-if="val.attr_type==1" name="goods_attr_value[]" class="form-control">
                             <option value="">请选择</option>
-                            <option v-for="optV in val.attr_value.split('\\r\\n')">@{{ optV }}</option>
+                            <option v-for="optV in val.attr_value.split('\\r\\n')" :selected="val.goods_attr_value==optV">@{{ optV }}</option>
                           </select>
                           <textarea v-if="val.attr_type==2" name="goods_attr_value[]" rows="3" class="form-control"></textarea>
                         </td>
@@ -373,19 +374,19 @@
                 <label class="col-sm-1 control-label">组商品</label>
                 <div class="col-sm-10">
                   <label class="checkbox-inline">
-                    <input type="checkbox" name="goods_is_group" :value="groupData.length" @change="selectGroup" {{old('goods_is_group')?'checked':''}}> 开启组商品
+                    <input type="checkbox" name="goods_is_group" :value="groupData.length" @change="selectGroup" {{goodsData.goods_is_group==0?'checked':''}}> 开启组商品
                   </label>
                   <div class="clearfix" v-show="pageStatus.is_group" style="display: none">
                     <hr>
                     <table class="table table-bordered">
                       <thead>
                       <tr>
-                        <th width="80px" class="td-center"><a @click="groupData.push(groupData.length+1)" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
+                        <th width="80px" class="td-center"><a @click="groupAddData" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
                         <th>内容</th>
                       </tr>
                       </thead>
                       <tbody>
-                      <tr v-for="(num, index) in groupData">
+                      <tr v-for="(group, index) in groupData">
                         <td width="80px" class="td-center">
                           <a @click="groupData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
                         </td>
@@ -395,46 +396,35 @@
                             <tr>
                               <td width="80px" class="td-center">标题：<span class="text-success">(*)</span></td>
                               <td class="form-group">
-                                <textarea class="form-control" name="group_depict[]" rows="2" v-if="group_depictData.length>0" v-html="group_depictData[index][0]" data-rule-required='true'></textarea>
-                                <textarea class="form-control" name="group_depict[]" rows="2" v-else placeholder="商品不同属性的名称" data-rule-required='true'></textarea>
+                                <textarea class="form-control" name="group_depict[]" v-model="group.group_depict" rows="2" placeholder="商品不同属性的名称" data-rule-required='true'></textarea>
                                 <span class="error-container"></span>
                               </td>
                             </tr>
                             <tr>
                               <td class="td-center">价格：<span class="text-success">(*)</span></td>
                               <td class="form-group">
-                                <input type="text" class="form-control" name="group_price[]" v-if="group_priceData.length>0" :value="group_priceData[index]" data-rule-required='true'>
-                                <input type="text" class="form-control" name="group_price[]" v-else value="0" data-rule-required='true' data-rule-number='true'>
+                                <input type="text" class="form-control" name="group_price[]" v-model="group.group_price" data-rule-required='true' data-rule-number='true'>
                                 <span class="error-container"></span>
                               </td>
                             </tr>
                             <tr>
                               <td class="td-center">库存：<span class="text-success">(*)</span></td>
                               <td class="form-group">
-                                <input type="text" class="form-control" name="group_instock[]" v-if="group_instockData.length>0" :value="group_instockData[index]" data-rule-required='true'>
-                                <input type="text" class="form-control" name="group_instock[]" v-else value="0" data-rule-required='true' data-rule-digits='true'>
+                                <input type="text" class="form-control" name="group_instock[]" v-model="group.group_instock" data-rule-required='true' data-rule-digits='true'>
                                 <span class="error-container"></span>
                               </td>
                             </tr>
                             <tr>
                               <td class="td-center">状态：<span class="text-success">(*)</span></td>
                               <td style="padding: 10px;">
-                          <span v-if="group_statusData.length>0">
-                            <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" value="0" :checked="group_statusData[index]==0||group_statusData.length==0">上架
-                            </label>
-                            <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" value="1" :checked="group_statusData[index]==1">下架
-                            </label>
-                          </span>
-                                <span v-else>
-                            <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" checked value="0">上架
-                            </label>
-                            <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" value="1">下架
-                            </label>
-                          </span>
+                                <span>
+                                  <label class="radio-inline">
+                                    <input type="radio" :name="'group_status['+index+']'" value="0" :checked="group.group_status==0" >上架
+                                  </label>
+                                  <label class="radio-inline">
+                                    <input type="radio" :name="'group_status['+index+']'" value="1" :checked="group.group_status==1" >下架
+                                  </label>
+                                </span>
                               </td>
                             </tr>
                             <tr>
@@ -447,7 +437,8 @@
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                                   </div>
                                   <div class="col-sm-4">
-                                    <img data-src="holder.js/100x100" src="" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                                    <img v-if="group.group_thumb" :src="'/file/pictures/'+group.group_thumb" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                                    <img v-else data-src="holder.js/100x100" :src="group.group_thumb" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
                                   </div>
                                 </div>
                               </td>
@@ -481,25 +472,29 @@
       new Vue({
         el: '#app-page',
         data: {
-          selectCID: "{{old('category_id', '0')}}",
-          goodsSku: "{{old('goods_sku', '')}}",
-          brandsID: "{{old('brands_id', '0')}}",
+          selectCID: "{{goodsData.category_id}}",
+          goodsSku: "{{goodsData.goods_sku}}",
+          brandsID: "{{goodsData.brands_id}}",
           pageStatus: {
             is_sales: true,
             is_postage: false,
             is_group: false,
-            is_attr: false
+            is_attr: false,
+            is_del_attr: false
           },
-          attrData: [],
-          groupData: [],
-          galleryData: {{{ toJSON(galleryData) }}},
-          group_depictData: {{{ toJSON(batch(old('group_depict', []))) }}},
-          group_priceData: {{{ toJSON(batch(old('group_price', []))) }}},
-          group_instockData: {{{ toJSON(batch(old('group_instock', []))) }}},
-          group_statusData: {{{ toJSON(old('group_status', [])) }}}
+          attrData: {{{ toJSON(attrData) }}},
+          groupData: {{{ toJSON(groupData) }}},
+          galleryData: {{{ toJSON(galleryData) }}}
     },
       methods: {
         changeCategory: function(){
+          if(this.isAttrData){
+            this.pageStatus.is_del_attr = true;
+            alert('当前商品存在属性值，在改变分类前，请删除下列属性值！')
+            this.selectCID = "{{goodsData.category_id}}";
+            return false;
+          }
+
           var index = event.currentTarget.selectedIndex;
           var sku = event.currentTarget.options[index].getAttribute('data-sku');
           if(sku){
@@ -510,7 +505,6 @@
           }else{
             this.goodsSku = '';
           }
-
         },
         selectRecommend: function(){
           if(event.currentTarget.checked){
@@ -534,6 +528,13 @@
           }
         },
         selectBrands: function(){
+          if(this.isAttrData){
+            this.pageStatus.is_del_attr = true;
+            alert('当前商品存在属性值，在改变品牌前，请删除下列属性值！');
+            this.brandsID = "{{goodsData.brands_id}}";
+            return false;
+          }
+
           if(parseInt(this.brandsID)!=0){
             if(parseInt(this.selectCID)==0){
               alert('请先选择商品分类!');
@@ -565,11 +566,6 @@
           }
         },
         selectImg: function (picTag) {
-          // var file = $('#picFile')[0].files[0];
-          // var img = new Image();
-          // var imgUrl = window.URL.createObjectURL(file);
-          // $('#previewPic').attr('src', imgUrl);
-
           var file =  event.currentTarget.files[0];
           if(file){
             var img = new Image();
@@ -593,6 +589,22 @@
               }
             })
           }
+        },
+        galleryAddData: function(){
+          this.galleryData.push({
+            gallery_depict: '',
+            gallery_sort: this.galleryData.length+1,
+            gallery_thumb: ''
+          });
+        },
+        groupAddData: function(){
+          this.groupData.push({
+            group_depict: '',
+            group_price: 0,
+            group_instock: 0,
+            group_status: 0,
+            group_thumb: ''
+          });
         }
       },
       watch:{
@@ -601,16 +613,46 @@
             // 监听当 groupData 数组发生变化，而且在页面元素渲染完成之后($nextTick)的处理
             Holder.addImage("holder.js/100x100", ".img-thumbnail").run()
           })
+        },
+        galleryData: function () {
+          this.$nextTick(function () {
+            // 监听当 groupData 数组发生变化，而且在页面元素渲染完成之后($nextTick)的处理
+            Holder.addImage("holder.js/100x100", ".img-thumbnail").run()
+          })
+        }
+      },
+      computed:{
+        swSku: function(){
+          if(this.goodsSku=='{{goodsData.goods_sku}}'){
+            return true;
+          }
+          return false;
+        },
+        isAttrData: function(){
+          var flag = false;
+          for(var key in this.attrData){
+            if(this.attrData[key].goods_attr_value){
+              flag = true;
+              break;
+            }
+          }
+          return flag
         }
       },
       mounted: function () {
         CKEDITOR.replace('content');
 
+        //显示组商品
+        if({{goodsData.goods_is_group==0}}){
+          this.pageStatus.is_group = true;
+        }
+
         if({{old('goods_is_group')}}){
           this.pageStatus.is_group = true;
           this.groupData = new Array({{old('goods_is_group')}});
-          this.getAttr();
         }
+
+        //this.getAttr();
 
 
       }

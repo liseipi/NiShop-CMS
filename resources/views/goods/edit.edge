@@ -26,25 +26,7 @@
     @include('notification')
     <h5 class="page-header">编辑商品</h5>
     <div class="main">
-      <!--<pre>-->
-        <!--{{ toJSON(goodsData) }}-->
-      <!--</pre>-->
-      <!--<pre>-->
-        <!--{{ toJSON(attrData) }}-->
-      <!--</pre>-->
-      <!--<pre>-->
-        <!--{{ toJSON(groupData) }}-->
-      <!--</pre>-->
-      <!--<pre>-->
-        <!--{{ toJSON(galleryData) }}-->
-      <!--</pre>-->
-      <!--<pre>-->
-        <!--{{ toJSON(brandsData) }}-->
-      <!--</pre>-->
-      <!--<pre>-->
-        <!--{{ toJSON(categoryData) }}-->
-      <!--</pre>-->
-      <form class="form-horizontal" action="/goods/edit/{{goodsData.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/edit/{{goodsData.ni_id}}" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="bs-example bs-example-tabs">
           <ul class="nav nav-tabs tab-wraped nav-primary text-center">
@@ -268,6 +250,7 @@
                             <tr>
                               <td width="80px" class="td-center">描述：<span class="text-success">(*)</span></td>
                               <td class="form-group">
+                                <input type="hidden" name="gallery_ni_id[]" v-model="gallery.ni_id">
                                 <textarea class="form-control" name="gallery_depict[]" v-model="gallery.gallery_depict" rows="2" placeholder="图片描述文字" data-rule-required='true'></textarea>
                                 <span class="error-container"></span>
                               </td>
@@ -284,7 +267,7 @@
                               <td>
                                 <div class="row" style="margin-top: 10px;">
                                   <div class="col-sm-8">
-                                    <input type="file" name="gallery_thumb[]" :id="'selGalleryPic'+index" @change="selectImg('galleryPic'+index)">
+                                    <input type="file" name="gallery_thumb[]" accept="image/*" :id="'selGalleryPic'+index" @change="selectImg('galleryPic'+index)">
                                     <hr>
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 700*700 像素，不超过1M</div>
                                   </div>
@@ -402,6 +385,7 @@
                             <tr>
                               <td width="80px" class="td-center">标题：<span class="text-success">(*)</span></td>
                               <td class="form-group">
+                                <input type="hidden" name="group_ni_id[]" v-model="group.ni_id">
                                 <textarea class="form-control" name="group_depict[]" v-model="group.group_depict" rows="2" placeholder="商品不同属性的名称" data-rule-required='true'></textarea>
                                 <span class="error-container"></span>
                               </td>
@@ -438,7 +422,7 @@
                               <td>
                                 <div class="row" style="margin-top: 10px;">
                                   <div class="col-sm-8">
-                                    <input type="file" name="group_thumb[]" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
+                                    <input type="file" name="group_thumb[]" accept="image/*" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
                                     <hr>
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                                   </div>
@@ -692,7 +676,7 @@
         },
         galleryData: function () {
           this.$nextTick(function () {
-            // 监听当 groupData 数组发生变化，而且在页面元素渲染完成之后($nextTick)的处理
+            // 监听当 galleryData 数组发生变化，而且在页面元素渲染完成之后($nextTick)的处理
             Holder.addImage("holder.js/100x100", ".img-thumbnail").run()
           })
         }
@@ -722,14 +706,6 @@
         if({{goodsData.goods_is_group==0}}){
           this.pageStatus.is_group = true;
         }
-
-        if({{old('goods_is_group')}}){
-          this.pageStatus.is_group = true;
-          this.groupData = new Array({{old('goods_is_group')}});
-        }
-
-        //this.getAttr();
-
 
       }
     });

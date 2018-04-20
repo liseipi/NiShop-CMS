@@ -272,7 +272,7 @@
                         <td>
                           <div class="row" style="margin-top: 10px;">
                             <div class="col-sm-8">
-                              <input type="file" name="group_thumb[]" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
+                              <input type="file" name="group_thumb[]" accept="image/*" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
                               <hr>
                               <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                             </div>
@@ -321,12 +321,12 @@
                 <tr v-for="(val, key) in attrData">
                   <td class="td-center" width="35%">@{{val.attr_name}}</td>
                   <td>
-                    <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" value="" class="form-control">
+                    <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" :value="goods_attr_valueData[key]||''" class="form-control">
                     <select v-if="val.attr_type==1" name="goods_attr_value[]" class="form-control">
                       <option value="">请选择</option>
-                      <option v-for="optV in val.attr_value.split('\\r\\n')">@{{ optV }}</option>
+                      <option v-for="optV in val.attr_value.split('\\r\\n')" :selected="goods_attr_valueData[key]==optV">@{{ optV }}</option>
                     </select>
-                    <textarea v-if="val.attr_type==2" name="goods_attr_value[]" rows="3" class="form-control"></textarea>
+                    <textarea v-if="val.attr_type==2" name="goods_attr_value[]" rows="3" class="form-control" v-html="goods_attr_valueData[key]||''"></textarea>
                   </td>
                 </tr>
                 </tbody>
@@ -387,7 +387,8 @@
           group_depictData: {{{ toJSON(batch(old('group_depict', []))) }}},
           group_priceData: {{{ toJSON(batch(old('group_price', []))) }}},
           group_instockData: {{{ toJSON(batch(old('group_instock', []))) }}},
-          group_statusData: {{{ toJSON(old('group_status', [])) }}}
+          group_statusData: {{{ toJSON(old('group_status', [])) }}},
+          goods_attr_valueData: {{{ toJSON(old('goods_attr_value', [])) }}}
         },
         methods: {
           changeCategory: function(){
@@ -502,7 +503,9 @@
             this.groupData = new Array({{old('goods_is_group')}});
           }
 
-          this.getAttr();
+          if(this.selectCID!=0 && this.brandsID!=0){
+            this.getAttr();
+          }
 
         }
       });

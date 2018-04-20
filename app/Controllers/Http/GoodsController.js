@@ -542,6 +542,175 @@ class GoodsController {
     return view.render('goods.edit', {goodsData, attrData, groupData, galleryData, brandsData, categoryData: formatData, date: {startDate:moment().format('YYYY-MM-DD'), endDate: moment().add(1, 'year').format('YYYY-MM-DD')}})
   }
 
+  async editSave({view, request, response, params, session}){
+
+    const saveData = await GlobalFn.formatSubmitData(goodsTable, request.all())
+    const query = request.all()
+    console.log(query)
+
+    saveData.goods_is_new = 1
+    saveData.goods_is_hot = 1
+    saveData.goods_is_best = 1
+    saveData.goods_is_promotions = 1
+    saveData.goods_is_group = 1
+    saveData.goods_is_real = 1
+
+    if(query.goods_recommend){
+      if((typeof query.goods_recommend) === 'string'){
+        // 单个值
+        switch (query.goods_recommend){
+          case 'new':
+            saveData.goods_is_new = 0
+            break;
+          case 'hot':
+            saveData.goods_is_hot = 0
+            break;
+          case 'best':
+            saveData.goods_is_best = 0
+            break;
+          case 'promotions':
+            saveData.goods_is_promotions = 0
+            break;
+          default:
+        }
+      }
+      if((typeof query.goods_recommend) === 'object'){
+        // 多个值
+        if(query.goods_recommend.indexOf('new')>=0){
+          saveData.goods_is_new = 0
+        }
+        if(query.goods_recommend.indexOf('hot')>=0){
+          saveData.goods_is_hot = 0
+        }
+        if(query.goods_recommend.indexOf('best')>=0){
+          saveData.goods_is_best = 0
+        }
+        if(query.goods_recommend.indexOf('promotions')>=0){
+          saveData.goods_is_promotions = 0
+        }
+      }
+    }
+
+    if(query.goods_is_group){
+      saveData.goods_is_group = 0
+    }
+
+    if(query.goods_is_real){
+      saveData.goods_is_real = 0
+    }
+
+    let goodsMsg = '<p>商品编辑成功。</p>'
+
+    //上传商品主图片
+    const goodsThumbInfo =  await GlobalFn.uploadPic(request, 'goods_thumb', {width:100, height:100, size:2})
+    if(goodsThumbInfo && goodsThumbInfo.status=='error'){
+      goodsMsg += '<p>商品主图上传出错！Error: <pre><code>' + JSON.stringify(goodsThumbInfo.error) +'</code></pre></p>'
+    }
+    if(goodsThumbInfo && goodsThumbInfo.status=='moved'){
+      saveData.goods_thumb = goodsThumbInfo.fileName
+      goodsMsg += '<p>商品主图上传成功。</p>'
+    }
+
+    //处理组商品和组图片信息
+    let groupGoodsData = []
+    let groupThumbData = []
+    if(query.goods_is_group && query.group_depict){
+      groupGoodsData = request.collect(['group_ni_id', 'group_depict', 'group_price', 'group_instock', 'group_status'])
+      const groupGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'group_thumb', {width:100, height:100, size:2})
+      if(groupGoods_thumb){
+        let errorThumbMsg = groupGoods_thumb.filter(item=>item.status=='error'&&item.error.clientName!='')
+        if(errorThumbMsg.length>0){
+          goodsMsg += '<p>组产品图上传出错！Error: <pre><code>'+ JSON.stringify(errorThumbMsg) +'</code></pre></p>'
+        }
+        if(groupGoods_thumb.filter(item=>item.status=='error').length==0){
+          goodsMsg += '<p>组产品图上传成功。</p>'
+        }
+        groupThumbData = groupGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
+      }
+    }
+
+    //处理相册信息
+    let galleryGoodsData = []
+    let galleryThumbData = []
+    if(query.gallery_ni_id){
+      galleryGoodsData = request.collect(['gallery_ni_id', 'gallery_depict', 'gallery_sort'])
+      const galleryGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'gallery_thumb', {width:100, height:100, size:2})
+      if(galleryGoods_thumb){
+        let galleryErrorThumbMsg = galleryGoods_thumb.filter(item=>item.status=='error'&&item.error.clientName!='')
+        if(galleryErrorThumbMsg.length>0){
+          goodsMsg += '<p>相册图上传出错！Error: <pre><code>'+ JSON.stringify(galleryErrorThumbMsg) +'</code></pre></p>'
+        }
+        if(galleryErrorThumbMsg.filter(item=>item.status=='error').length==0){
+          goodsMsg += '<p>相册图上传成功。</p>'
+        }
+        galleryErrorThumbMsg = galleryGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
+      }
+    }
+
+    //处理属性信息
+    let attrsData = []
+    if(query.goods_attr_value){
+      request._qs = {category: query.category_id, brands: query.brands_id}  //模拟传参
+      const attrIdData = await this.getAttr({view, request})
+      let attrId = []
+      attrIdData.forEach(item=>attrId.push(item.ni_id))
+      query.attr_id = attrId
+      attrsData = request.collect(['goods_attr_value', 'attr_id'])
+    }
+
+    saveData.updated_at = new Date()
+
+    console.log(saveData)
+    //return
+
+    try{
+      //await Database.from(goodsTable).where('ni_id', params.id).update(saveData)
+
+      //保存组商品信息
+      if(groupGoodsData.length>0){
+        let newGroupData =  groupGoodsData.map((item, index)=>{
+          item.goods_id = params.id
+          item.group_thumb = groupThumbData[index]||''
+          return item
+        })
+        console.log(newGroupData)
+        return
+        if(newGroupData.length>0){
+          try{
+            //await Database.from(goodsGroupTable).update(newGroupData)
+            goodsMsg += '<p>组商品信息保存成功。</p>'
+          }catch(error){
+            goodsMsg += '<p>组商品信息保存失败！'+ error +'</p>'
+          }
+        }
+      }
+
+      //保存属性
+      if(attrsData){
+        let attrs = []
+        attrsData.forEach(item=>{
+          item.goods_id=goodID[0]
+          attrs.push(item)
+        })
+        let newAttrs = attrs.filter(item=>item.goods_attr_value)
+        if(newAttrs.length>0){
+          try{
+            await Database.from(goodsAttrTable).update(newAttrs)
+            goodsMsg += '<p>商品属性保存成功。</p>'
+          }catch(error){
+            goodsMsg += '<p>商品属性保存失败！'+error +'</p>'
+          }
+        }
+      }
+
+      session.flash({notification: goodsMsg})
+      response.redirect('/goods/list')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
+    }
+  }
+
   async checkSku({request}){
     const query = request.get()
     const sku = query.sku || ''

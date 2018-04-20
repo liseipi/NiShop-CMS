@@ -551,6 +551,59 @@ class GoodsController {
     }
     return []
   }
+
+  async delAttr({view, request}){
+    const niID = request.get().ni_id
+    try{
+      await Database.table(goodsAttrTable).where('goods_id', niID).delete()
+      return [{status: 0}]
+    }catch(error) {
+      return [{status: 1}]
+    }
+  }
+
+  async delGroup({view, request}){
+    const query = request.get()
+    const niID = query.ni_id
+    const groupData = await Database.table(goodsGroupTable).where('ni_id', niID).first()
+    const groupThumb = groupData.group_thumb
+    if(groupThumb){
+      const oldPic = Helpers.appRoot('uploads')+'/'+groupThumb
+      const exists = await Drive.exists(oldPic)
+      if(exists){
+        await Drive.delete(oldPic)
+      }
+    }
+
+    try{
+      await Database.table(goodsGroupTable).where('ni_id', niID).delete()
+      return [{status: 0}]
+    }catch(error) {
+      return [{status: 1}]
+    }
+  }
+
+  async delGallery({view, request}){
+    const query = request.get()
+    const niID = query.ni_id
+    const galleryData = await Database.table(goodsGalleryTable).where('ni_id', niID).first()
+    const galleryThumb = galleryData.gallery_thumb
+    if(galleryThumb){
+      const oldPic = Helpers.appRoot('uploads')+'/'+galleryThumb
+      const exists = await Drive.exists(oldPic)
+      if(exists){
+        await Drive.delete(oldPic)
+      }
+    }
+
+    try{
+      await Database.table(goodsGalleryTable).where('ni_id', niID).delete()
+      return [{status: 0}]
+    }catch(error) {
+      return [{status: 1}]
+    }
+  }
+
 }
 
 module.exports = GoodsController

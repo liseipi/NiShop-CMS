@@ -44,7 +44,7 @@
       <!--<pre>-->
         <!--{{ toJSON(categoryData) }}-->
       <!--</pre>-->
-      <form class="form-horizontal" action="/goods/attrAdd" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/edit/{{goodsData.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="bs-example bs-example-tabs">
           <ul class="nav nav-tabs tab-wraped nav-primary text-center">
@@ -233,7 +233,7 @@
                       <hr>
                       <div class="help-block color-danger">图像尺寸/大小指定为： 450*450 像素，不超过2M</div>
                     </div>
-                    <div class="pull-right"><img id="previewPic" width="100" height="100" src="{{goodsData.goods_thumb}}" @click="document.getElementById('picFile').click()" class="img-thumbnail-border"></div>
+                    <div class="pull-right"><img id="previewPic" width="100" height="100" src="{{goodsData.goods_thumb||''}}" @click="document.getElementById('picFile').click()" class="img-thumbnail-border"></div>
                   </div>
                 </div>
                 <div class="col-sm-2 error-container"></div>
@@ -260,7 +260,7 @@
                       </tr>
                       <tr v-show="galleryData.length>0" v-for="(gallery, index) in galleryData">
                         <td width="80px" class="td-center">
-                          <a @click="galleryData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
+                          <a @click="galleryRemoveData(index)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
                         </td>
                         <td>
                           <table class="table table-bordered table-condensed" style="margin:0;">
@@ -289,7 +289,8 @@
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 700*700 像素，不超过1M</div>
                                   </div>
                                   <div class="col-sm-4">
-                                    <img data-src="holder.js/100x100" :src="gallery.gallery_thumb" :id="'galleryPic'+index" @click="document.getElementById('selGalleryPic'+index).click()" class="img-thumbnail-border">
+                                    <img data-src="holder.js/100x100" :src="gallery.gallery_thumb?'/file/pictures/'+gallery.gallery_thumb:''" :id="'galleryPic'+index" @click="document.getElementById('selGalleryPic'+index).click()"
+                                         class="img-thumbnail-border">
                                   </div>
                                 </div>
                               </td>
@@ -306,10 +307,15 @@
               </div>
             </div>
             <div id="attr" class="tab-pane">
+              <div class="text-center text-warning {{ goodsData.is_order_exist==1?'':'hidden' }}">
+                当前商品存在订单，分类、SKU、品牌不可以修改。
+                <hr>
+              </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">商品分类<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <select class="form-control input-lg" name="category_id" id="category_id" @change="changeCategory" v-model="selectCID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择分类">
+                  <select class="form-control input-lg" name="category_id" id="category_id" {{ goodsData.is_order_exist==1?'disabled':'' }} @change="changeCategory" v-model="selectCID" data-rule-required="true" data-rule-min="1"
+                          data-msg-min="请选择分类">
                     <option value="0">选择分类</option>
                     @each(category in categoryData)
                     <option value="{{category.ni_id}}" data-sku="{{category.column_sku}}">{{{ '&nbsp;&nbsp;'.repeat(category.level_id) }}}{{{ '├'.repeat(category.level_id>0?1:0) }}}{{category.column_name}}</option>
@@ -321,14 +327,14 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">SKU/货号<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" @blur="checkSku('goods_sku')" :disabled="swSku" data-rule-required="true" data-rule-minlength="4">
+                  <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" @blur="checkSku('goods_sku')" {{ goodsData.is_order_exist==1?'disabled':'' }} :disabled="swSku" data-rule-required="true" data-rule-minlength="4">
                 </div>
                 <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('goods_sku'), hasErrorFor('goods_sku')) }}</div>
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">商品品牌<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <select class="form-control input-lg" name="brands_id" @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
+                  <select class="form-control input-lg" name="brands_id" {{ goodsData.is_order_exist==1?'disabled':'' }} @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
                     <option value="0">品牌</option>
                     @each(brands in brandsData)
                     <option value="{{brands.ni_id}}">{{brands.brands_name}}</option>
@@ -343,7 +349,7 @@
                   <div class="row">
                     <h6 class="text-center">属性列表</h6>
                     <hr>
-                    <button v-show="pageStatus.is_del_attr && isAttrData" type="button" class="btn btn-danger" style="margin-bottom:20px;">删除商品属性</button>
+                    <a v-show="pageStatus.is_del_attr && isAttrData" @click="delAttr" class="btn btn-danger" style="margin-bottom:20px;">删除商品属性</a>
                     <table class="table table-bordered">
                       <thead>
                       <tr>
@@ -388,7 +394,7 @@
                       <tbody>
                       <tr v-for="(group, index) in groupData">
                         <td width="80px" class="td-center">
-                          <a @click="groupData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
+                          <a @click="groupRemoveData(index)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 删除</a>
                         </td>
                         <td>
                           <table class="table table-bordered table-condensed" style="margin:0;">
@@ -437,8 +443,8 @@
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                                   </div>
                                   <div class="col-sm-4">
-                                    <img v-if="group.group_thumb" :src="'/file/pictures/'+group.group_thumb" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
-                                    <img v-else data-src="holder.js/100x100" :src="group.group_thumb" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                                    <img v-if="group.group_thumb" :src="group.group_thumb?'/file/pictures/'+group.group_thumb:''" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                                    <img v-else data-src="holder.js/100x100" :src="group.group_thumb?'/file/pictures/'+group.group_thumb:''" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
                                   </div>
                                 </div>
                               </td>
@@ -565,6 +571,24 @@
             })
           }
         },
+        delAttr: function(){
+          var _this = this;
+          $.ajax({
+            url: '/goods/delAttr',
+            data: {
+              ni_id: '{{goodsData.ni_id}}'
+            },
+            type: 'get',
+            success: function (result) {
+              if(result[0].status==0){
+                alert('删除成功！');
+                _this.getAttr();
+              }else{
+                alert('删除失败！');
+              }
+            }
+          })
+        },
         selectImg: function (picTag) {
           var file =  event.currentTarget.files[0];
           if(file){
@@ -597,6 +621,32 @@
             gallery_thumb: ''
           });
         },
+        galleryRemoveData: function(index){
+          var isDel = confirm("确认删除当前相册信息，删除包含图片。");
+          if(isDel){
+            var niID = this.galleryData[index].ni_id
+            if(niID){
+              var _this = this;
+              $.ajax({
+                url: '/goods/delGallery',
+                data: {
+                  ni_id: niID
+                },
+                type: 'get',
+                success: function (result) {
+                  if(result[0].status==0){
+                    alert('删除成功！');
+                    _this.galleryData.splice(index, 1)
+                  }else{
+                    alert('删除失败！');
+                  }
+                }
+              })
+            }else{
+              this.galleryData.splice(index, 1);
+            }
+          }
+        },
         groupAddData: function(){
           this.groupData.push({
             group_depict: '',
@@ -605,6 +655,32 @@
             group_status: 0,
             group_thumb: ''
           });
+        },
+        groupRemoveData: function(index){
+          var isDel = confirm("确认删除当前组项目，删除包含组图片信息。");
+          if(isDel){
+            var niID = this.groupData[index].ni_id
+            if(niID){
+              var _this = this;
+              $.ajax({
+                url: '/goods/delGroup',
+                data: {
+                  ni_id: niID
+                },
+                type: 'get',
+                success: function (result) {
+                  if(result[0].status==0){
+                    alert('删除成功！');
+                    _this.groupData.splice(index, 1)
+                  }else{
+                    alert('删除失败！');
+                  }
+                }
+              })
+            }else{
+              this.groupData.splice(index, 1);
+            }
+          }
         }
       },
       watch:{

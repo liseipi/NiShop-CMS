@@ -34,6 +34,7 @@ class GoodsSchema extends Schema {
       table.text('content').comment('商品详细')
       table.integer('view_number', 128).defaultTo(0).comment('查看次数')
       table.integer('goods_created_admin', 8).comment('商品发布者')
+      table.integer('is_order_exist', 1).defaultTo(0).comment('是否存在订单，为1时存在订单数据，不可以修改：分类、SKU、品牌')
       table.timestamps()
     })
   }

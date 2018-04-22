@@ -414,11 +414,6 @@ class GoodsController {
     //处理属性信息
     let attrsData = []
     if(query.goods_attr_value){
-      request._qs = {category: query.category_id, brands: query.brands_id}  //模拟传参
-      const attrIdData = await this.getAttr({view, request})
-      let attrId = []
-      attrIdData.forEach(item=>attrId.push(item.ni_id))
-      query.attr_id = attrId
       attrsData = request.collect(['goods_attr_value', 'attr_id'])
     }
 
@@ -527,7 +522,7 @@ class GoodsController {
 
   async edit({view, params}){
     const goodsData = await Database.table(goodsTable).where('ni_id', params.id).first()
-    const attrData = await Database.select(attrTable+'.*', goodsAttrTable+'.goods_attr_value', goodsAttrTable+'.goods_id').from(attrTable)
+    const attrData = await Database.select(attrTable+'.*', goodsAttrTable+'.goods_attr_value', goodsAttrTable+'.goods_id', goodsAttrTable+'.ni_id as goodsAttr_ni_id').from(attrTable)
       .leftJoin(goodsAttrTable, function () {
         this.on(attrTable+'.ni_id', '=', goodsAttrTable+'.attr_id').onIn(goodsAttrTable+'.goods_id', params.id)
       })
@@ -546,7 +541,7 @@ class GoodsController {
 
     const saveData = await GlobalFn.formatSubmitData(goodsTable, request.all())
     const query = request.all()
-    console.log(query)
+    //console.log(query)
 
     saveData.goods_is_new = 1
     saveData.goods_is_hot = 1
@@ -650,17 +645,12 @@ class GoodsController {
     //处理属性信息
     let attrsData = []
     if(query.goods_attr_value){
-      request._qs = {category: query.category_id, brands: query.brands_id}  //模拟传参
-      const attrIdData = await this.getAttr({view, request})
-      let attrId = []
-      attrIdData.forEach(item=>attrId.push(item.ni_id))
-      query.attr_id = attrId
-      attrsData = request.collect(['goods_attr_value', 'attr_id'])
+      attrsData = request.collect(['goods_attr_value', 'attr_id', 'goodsAttr_ni_id'])
     }
 
     saveData.updated_at = new Date()
 
-    console.log(saveData)
+    //console.log(saveData)
     //return
 
     try{
@@ -670,17 +660,73 @@ class GoodsController {
       if(groupGoodsData.length>0){
         let newGroupData =  groupGoodsData.map((item, index)=>{
           item.goods_id = params.id
-          item.group_thumb = groupThumbData[index]||''
+          if(groupThumbData[index]){
+            item.group_thumb = groupThumbData[index]
+          }
           return item
         })
-        console.log(newGroupData)
-        return
+        let upGroupData = []
+        let addGroupData = []
+        newGroupData.forEach(item=>{
+          if(item.group_ni_id){
+            item.ni_id = item.group_ni_id
+            delete item.goods_id
+            delete item.group_ni_id
+            upGroupData.push(item)
+          }else{
+            delete item.group_ni_id
+            addGroupData.push(item)
+          }
+        })
+        console.log(upGroupData)
+        console.log(addGroupData)
         if(newGroupData.length>0){
           try{
-            //await Database.from(goodsGroupTable).update(newGroupData)
+            //await Database.from(goodsGroupTable).update(upGroupData)
+            const dataG = await Database.query("SELECT * from 'ni_goods_groups'")
+            console.log(dataG)
+
+            //await Database.from(goodsGroupTable).insert(addGroupData)
             goodsMsg += '<p>组商品信息保存成功。</p>'
           }catch(error){
             goodsMsg += '<p>组商品信息保存失败！'+ error +'</p>'
+          }
+        }
+      }
+      return
+
+      //保存相册信息
+      if(galleryGoodsData.length>0){
+        let newGalleryData =  galleryGoodsData.map((item, index)=>{
+          item.goods_id = params.id
+          if(galleryThumbData[index]){
+            item.gallery_thumb = galleryThumbData[index]
+          }
+          return item
+        })
+        let upGalleryData = []
+        let addGalleryData = []
+        newGalleryData.forEach(item=>{
+          if(item.gallery_ni_id){
+            item.ni_id = item.gallery_ni_id
+          }
+          if(item.gallery_ni_id){
+            delete item.goods_id
+            delete item.gallery_ni_id
+            upGalleryData.push(item)
+          }else{
+            delete item.gallery_ni_id
+            addGalleryData.push(item)
+          }
+        })
+
+        if(newGalleryData.length>0){
+          try{
+            await Database.from(goodsGroupTable).update(upGalleryData)
+            await Database.from(goodsGroupTable).insert(addGalleryData)
+            goodsMsg += '<p>相册信息保存成功。</p>'
+          }catch(error){
+            goodsMsg += '<p>相册信息保存失败！'+ error +'</p>'
           }
         }
       }
@@ -689,13 +735,27 @@ class GoodsController {
       if(attrsData){
         let attrs = []
         attrsData.forEach(item=>{
-          item.goods_id=goodID[0]
+          item.goods_id=params.id
           attrs.push(item)
         })
         let newAttrs = attrs.filter(item=>item.goods_attr_value)
+        console.log(newAttrs)
+        let upAttrData = []
+        let addAttrData = []
+        newAttrs.forEach(item=>{
+          if(item.goodsAttr_ni_id){
+            item.ni_id = item.goodsAttr_ni_id
+            delete item.goodsAttr_ni_id
+            upAttrData.push(item)
+          }else{
+            delete item.goodsAttr_ni_id
+            addAttrData.push(item)
+          }
+        })
         if(newAttrs.length>0){
           try{
-            await Database.from(goodsAttrTable).update(newAttrs)
+            await Database.from(goodsAttrTable).update(upAttrData)
+            await Database.from(goodsAttrTable).insert(addAttrData)
             goodsMsg += '<p>商品属性保存成功。</p>'
           }catch(error){
             goodsMsg += '<p>商品属性保存失败！'+error +'</p>'

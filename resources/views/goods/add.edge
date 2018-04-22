@@ -319,7 +319,7 @@
                 </thead>
                 <tbody>
                 <tr v-for="(val, key) in attrData">
-                  <td class="td-center" width="35%">@{{val.attr_name}}</td>
+                  <td class="td-center" width="35%">@{{val.attr_name}} <input type="hidden" name="attr_id[]" :value="val.ni_id" ></td>
                   <td>
                     <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" :value="goods_attr_valueData[key]||''" class="form-control">
                     <select v-if="val.attr_type==1" name="goods_attr_value[]" class="form-control">

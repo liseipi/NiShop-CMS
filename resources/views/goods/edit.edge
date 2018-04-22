@@ -342,14 +342,14 @@
                       </thead>
                       <tbody>
                       <tr v-for="(val, key) in attrData">
-                        <td class="td-center" width="35%">@{{val.attr_name}}</td>
+                        <td class="td-center" width="35%">@{{val.attr_name}} <input type="hidden" name="attr_id[]" :value="val.ni_id" > <input type="hidden" name="goodsAttr_ni_id[]" :value="val.goodsAttr_ni_id" ></td>
                         <td>
                           <input type="text" v-if="val.attr_type==0" name="goods_attr_value[]" :value="val.goods_attr_value" class="form-control">
                           <select v-if="val.attr_type==1" name="goods_attr_value[]" class="form-control">
                             <option value="">请选择</option>
                             <option v-for="optV in val.attr_value.split('\\r\\n')" :selected="val.goods_attr_value==optV">@{{ optV }}</option>
                           </select>
-                          <textarea v-if="val.attr_type==2" name="goods_attr_value[]" rows="3" class="form-control"></textarea>
+                          <textarea v-if="val.attr_type==2" name="goods_attr_value[]" rows="3" class="form-control" v-html="val.goods_attr_value"></textarea>
                         </td>
                       </tr>
                       </tbody>

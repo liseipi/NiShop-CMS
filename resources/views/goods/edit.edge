@@ -215,7 +215,7 @@
                       <hr>
                       <div class="help-block color-danger">图像尺寸/大小指定为： 450*450 像素，不超过2M</div>
                     </div>
-                    <div class="pull-right"><img id="previewPic" width="100" height="100" src="{{goodsData.goods_thumb||''}}" @click="document.getElementById('picFile').click()" class="img-thumbnail-border"></div>
+                    <div class="pull-right"><img id="previewPic" width="100" height="100" src="{{'/file/pictures/'+goodsData.goods_thumb||''}}" @click="document.getElementById('picFile').click()" class="img-thumbnail-border"></div>
                   </div>
                 </div>
                 <div class="col-sm-2 error-container"></div>

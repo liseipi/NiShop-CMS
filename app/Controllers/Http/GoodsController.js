@@ -627,7 +627,7 @@ class GoodsController {
     //处理相册信息
     let galleryGoodsData = []
     let galleryThumbData = []
-    if(query.gallery_ni_id){
+    if(query.gallery_depict){
       galleryGoodsData = request.collect(['gallery_ni_id', 'gallery_depict', 'gallery_sort'])
       const galleryGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'gallery_thumb', {width:100, height:100, size:2})
       if(galleryGoods_thumb){
@@ -638,7 +638,7 @@ class GoodsController {
         if(galleryErrorThumbMsg.filter(item=>item.status=='error').length==0){
           goodsMsg += '<p>相册图上传成功。</p>'
         }
-        galleryErrorThumbMsg = galleryGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
+        galleryThumbData = galleryGoods_thumb.map(item=>item.status=='moved'?item.fileName:'')
       }
     }
 
@@ -654,7 +654,7 @@ class GoodsController {
     //return
 
     try{
-      //await Database.from(goodsTable).where('ni_id', params.id).update(saveData)
+      await Database.from(goodsTable).where('ni_id', params.id).update(saveData)
 
       //保存组商品信息
       if(groupGoodsData.length>0){
@@ -663,8 +663,11 @@ class GoodsController {
           if(groupThumbData[index]){
             item.group_thumb = groupThumbData[index]
           }
+          item.ni_id = item.group_ni_id
+          delete item.group_ni_id
           return item
         })
+        /*
         let upGroupData = []
         let addGroupData = []
         newGroupData.forEach(item=>{
@@ -678,22 +681,17 @@ class GoodsController {
             addGroupData.push(item)
           }
         })
-        console.log(upGroupData)
-        console.log(addGroupData)
+        */
         if(newGroupData.length>0){
           try{
-            //await Database.from(goodsGroupTable).update(upGroupData)
-            const dataG = await Database.query("SELECT * from 'ni_goods_groups'")
-            console.log(dataG)
-
-            //await Database.from(goodsGroupTable).insert(addGroupData)
+            const insert = Database.table(goodsGroupTable).insert(newGroupData).toString()
+            await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE group_depict=VALUES(group_depict), group_price=VALUES(group_price), group_instock=VALUES(group_instock), group_status=VALUES(group_status), group_thumb=VALUES(group_thumb)`)
             goodsMsg += '<p>组商品信息保存成功。</p>'
           }catch(error){
             goodsMsg += '<p>组商品信息保存失败！'+ error +'</p>'
           }
         }
       }
-      return
 
       //保存相册信息
       if(galleryGoodsData.length>0){
@@ -702,8 +700,12 @@ class GoodsController {
           if(galleryThumbData[index]){
             item.gallery_thumb = galleryThumbData[index]
           }
+
+          item.ni_id = item.gallery_ni_id
+          delete item.gallery_ni_id
           return item
         })
+        /*
         let upGalleryData = []
         let addGalleryData = []
         newGalleryData.forEach(item=>{
@@ -719,11 +721,12 @@ class GoodsController {
             addGalleryData.push(item)
           }
         })
-
+        */
+        console.log(newGalleryData)
         if(newGalleryData.length>0){
           try{
-            await Database.from(goodsGroupTable).update(upGalleryData)
-            await Database.from(goodsGroupTable).insert(addGalleryData)
+            const insert = Database.table(goodsGalleryTable).insert(newGalleryData).toString()
+            await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE goods_id=VALUES(goods_id), gallery_depict=VALUES(gallery_depict), gallery_sort=VALUES(gallery_sort), gallery_thumb=VALUES(gallery_thumb)`)
             goodsMsg += '<p>相册信息保存成功。</p>'
           }catch(error){
             goodsMsg += '<p>相册信息保存失败！'+ error +'</p>'
@@ -736,10 +739,13 @@ class GoodsController {
         let attrs = []
         attrsData.forEach(item=>{
           item.goods_id=params.id
+
+          item.ni_id = item.goodsAttr_ni_id
+          delete item.goodsAttr_ni_id
           attrs.push(item)
         })
         let newAttrs = attrs.filter(item=>item.goods_attr_value)
-        console.log(newAttrs)
+        /*
         let upAttrData = []
         let addAttrData = []
         newAttrs.forEach(item=>{
@@ -752,10 +758,11 @@ class GoodsController {
             addAttrData.push(item)
           }
         })
+        */
         if(newAttrs.length>0){
           try{
-            await Database.from(goodsAttrTable).update(upAttrData)
-            await Database.from(goodsAttrTable).insert(addAttrData)
+            const insert = Database.table(goodsAttrTable).insert(newAttrs).toString()
+            await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE goods_id=VALUES(goods_id), attr_id=VALUES(attr_id), goods_attr_value=VALUES(goods_attr_value)`)
             goodsMsg += '<p>商品属性保存成功。</p>'
           }catch(error){
             goodsMsg += '<p>商品属性保存失败！'+error +'</p>'

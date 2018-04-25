@@ -610,7 +610,7 @@ class GoodsController {
     let groupGoodsData = []
     let groupThumbData = []
     if(query.goods_is_group && query.group_depict){
-      groupGoodsData = request.collect(['group_ni_id', 'group_depict', 'group_price', 'group_instock', 'group_status'])
+      groupGoodsData = request.collect(['group_ni_id', 'group_depict', 'group_price', 'group_instock', 'group_status', 'group_old_thumb'])
       const groupGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'group_thumb', {width:100, height:100, size:2})
       if(groupGoods_thumb){
         let errorThumbMsg = groupGoods_thumb.filter(item=>item.status=='error'&&item.error.clientName!='')
@@ -628,7 +628,7 @@ class GoodsController {
     let galleryGoodsData = []
     let galleryThumbData = []
     if(query.gallery_depict){
-      galleryGoodsData = request.collect(['gallery_ni_id', 'gallery_depict', 'gallery_sort'])
+      galleryGoodsData = request.collect(['gallery_ni_id', 'gallery_depict', 'gallery_sort', 'gallery_old_thumb'])
       const galleryGoods_thumb =  await GlobalFn.uploadMultiplePic(request, 'gallery_thumb', {width:100, height:100, size:2})
       if(galleryGoods_thumb){
         let galleryErrorThumbMsg = galleryGoods_thumb.filter(item=>item.status=='error'&&item.error.clientName!='')
@@ -662,9 +662,12 @@ class GoodsController {
           item.goods_id = params.id
           if(groupThumbData[index]){
             item.group_thumb = groupThumbData[index]
+          }else{
+            item.group_thumb = item.group_old_thumb
           }
           item.ni_id = item.group_ni_id
           delete item.group_ni_id
+          delete item.group_old_thumb
           return item
         })
         /*
@@ -682,10 +685,11 @@ class GoodsController {
           }
         })
         */
+        //console.log(newGroupData)
         if(newGroupData.length>0){
           try{
             const insert = Database.table(goodsGroupTable).insert(newGroupData).toString()
-            await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE group_depict=VALUES(group_depict), group_price=VALUES(group_price), group_instock=VALUES(group_instock), group_status=VALUES(group_status), group_thumb=VALUES(group_thumb)`)
+            await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE goods_id=VALUES(goods_id), group_depict=VALUES(group_depict), group_price=VALUES(group_price), group_instock=VALUES(group_instock), group_status=VALUES(group_status), group_thumb=VALUES(group_thumb)`)
             goodsMsg += '<p>组商品信息保存成功。</p>'
           }catch(error){
             goodsMsg += '<p>组商品信息保存失败！'+ error +'</p>'
@@ -699,10 +703,13 @@ class GoodsController {
           item.goods_id = params.id
           if(galleryThumbData[index]){
             item.gallery_thumb = galleryThumbData[index]
+          }else{
+            item.gallery_thumb = item.gallery_old_thumb
           }
 
           item.ni_id = item.gallery_ni_id
           delete item.gallery_ni_id
+          delete item.gallery_old_thumb
           return item
         })
         /*
@@ -722,7 +729,7 @@ class GoodsController {
           }
         })
         */
-        console.log(newGalleryData)
+        //console.log(newGalleryData)
         if(newGalleryData.length>0){
           try{
             const insert = Database.table(goodsGalleryTable).insert(newGalleryData).toString()
@@ -774,6 +781,76 @@ class GoodsController {
       response.redirect('/goods/list')
     }catch(error){
       session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async destroy({response, params, session}){
+
+    try{
+      let delMsg = `<p>删除商品成功。</>`
+
+      //删除商品
+      const goodsPic = await Database.table(goodsTable).where('ni_id', params.id).first()
+      const oldPic = Helpers.appRoot('uploads/')+goodsPic.goods_thumb
+      const exists = await Drive.exists(oldPic)
+      if(exists){
+        await Drive.delete(oldPic)
+      }
+      await Database.table(goodsTable).where('ni_id', params.id).delete()
+
+      //删除属性
+      try{
+        await Database.table(goodsAttrTable).where('goods_id', params.id).delete()
+        delMsg += `<p>删除属性成功。</>`
+      }catch (e) {
+        delMsg += `<p>删除属性失败！</>`
+      }
+
+      //删除组商品信息
+      try{
+        const goodsGroupPics = await Database.select('group_thumb').table(goodsGroupTable).where('goods_id', params.id)
+        goodsGroupPics.forEach(item=>{
+          if(item.group_thumb){
+            const oldPic = Helpers.appRoot('uploads/')+item.group_thumb
+            const exists = Drive.exists(oldPic)
+            if(exists){
+              Drive.delete(oldPic)
+            }
+          }
+        })
+        if(goodsGroupPics.length>0){
+          await Database.table(goodsGroupTable).where('goods_id', params.id).delete()
+          delMsg += `<p>删除组商品成功。</>`
+        }
+      }catch (e) {
+        delMsg += `<p>删除组商品失败！</>`
+      }
+
+      //删除相册信息
+      try{
+        const goodsGalleryPics = await Database.select('gallery_thumb').table(goodsGalleryTable).where('goods_id', params.id)
+        goodsGalleryPics.forEach(item=>{
+          if(item.gallery_thumb){
+            const oldPic = Helpers.appRoot('uploads/')+item.gallery_thumb
+            const exists = Drive.exists(oldPic)
+            if(exists){
+              Drive.delete(oldPic)
+            }
+          }
+        })
+        if(goodsGalleryPics.length>0){
+          await Database.table(goodsGalleryTable).where('goods_id', params.id).delete()
+          delMsg += `<p>删除相册信息成功。</>`
+        }
+      }catch (e) {
+        delMsg += `<p>删除相册信息失败！</>`
+      }
+
+      session.flash({notification: delMsg})
+      response.redirect('/goods/list')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
       response.redirect('back')
     }
   }

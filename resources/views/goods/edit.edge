@@ -267,13 +267,14 @@
                               <td>
                                 <div class="row" style="margin-top: 10px;">
                                   <div class="col-sm-8">
-                                    <input type="file" name="gallery_thumb[]" accept="image/*" :id="'selGalleryPic'+index" @change="selectImg('galleryPic'+index)">
+                                    <input type="hidden" name="gallery_old_thumb[]" :value="gallery.gallery_thumb">
+                                    <input type="file" :class="gallery.ni_id?'':'newSelFileG'" name="gallery_thumb[]" accept="image/*" :id="'selGalleryPic'+index" @change="selectImg('galleryPic'+index)">
                                     <hr>
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 700*700 像素，不超过1M</div>
                                   </div>
                                   <div class="col-sm-4">
                                     <img data-src="holder.js/100x100" :src="gallery.gallery_thumb?'/file/pictures/'+gallery.gallery_thumb:''" :id="'galleryPic'+index" @click="document.getElementById('selGalleryPic'+index).click()"
-                                         class="img-thumbnail-border">
+                                         class="img-thumbnail-border" :class="gallery.ni_id?'':'newPicG'">
                                   </div>
                                 </div>
                               </td>
@@ -422,13 +423,15 @@
                               <td>
                                 <div class="row" style="margin-top: 10px;">
                                   <div class="col-sm-8">
-                                    <input type="file" name="group_thumb[]" accept="image/*" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
+                                    <input type="hidden" name="group_old_thumb[]" :value="group.group_thumb">
+                                    <input type="file" name="group_thumb[]" :class="group.ni_id?'':'newSelFileGroup'" accept="image/*" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
                                     <hr>
                                     <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                                   </div>
                                   <div class="col-sm-4">
                                     <img v-if="group.group_thumb" :src="group.group_thumb?'/file/pictures/'+group.group_thumb:''" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
-                                    <img v-else data-src="holder.js/100x100" :src="group.group_thumb?'/file/pictures/'+group.group_thumb:''" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                                    <img v-else data-src="holder.js/100x100" :src="group.group_thumb?'/file/pictures/'+group.group_thumb:''" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()"
+                                         class="img-thumbnail-border" :class="group.ni_id?'':'newPicGroup'">
                                   </div>
                                 </div>
                               </td>
@@ -620,13 +623,34 @@
                 success: function (result) {
                   if(result[0].status==0){
                     alert('删除成功！');
-                    _this.galleryData.splice(index, 1)
+
+                    var newSelFileG = document.getElementsByClassName('newSelFileG');
+                    for(var i=0; i<newSelFileG.length; i++){
+                      newSelFileG[i].value = '';
+                    }
+                    var newPicG = document.getElementsByClassName('newPicG');
+                    for(var p=0; p<newPicG.length; p++){
+                      newPicG[p].setAttribute('src', '');
+                      newPicG[p].setAttribute('data-src', 'holder.js/100x100');
+                    }
+                    _this.galleryData.splice(index, 1);
+
                   }else{
                     alert('删除失败！');
                   }
                 }
               })
             }else{
+
+              var newSelFileG = document.getElementsByClassName('newSelFileG');
+              for(var i=0; i<newSelFileG.length; i++){
+                newSelFileG[i].value = '';
+              }
+              var newPicG = document.getElementsByClassName('newPicG');
+              for(var p=0; p<newPicG.length; p++){
+                newPicG[p].setAttribute('src', '');
+                newPicG[p].setAttribute('data-src', 'holder.js/100x100');
+              }
               this.galleryData.splice(index, 1);
             }
           }
@@ -655,13 +679,31 @@
                 success: function (result) {
                   if(result[0].status==0){
                     alert('删除成功！');
-                    _this.groupData.splice(index, 1)
+                    var newSelFileGroup = document.getElementsByClassName('newSelFileGroup');
+                    for(var i=0; i<newSelFileGroup.length; i++){
+                      newSelFileGroup[i].value = '';
+                    }
+                    var newPicGroup = document.getElementsByClassName('newPicGroup');
+                    for(var p=0; p<newPicGroup.length; p++){
+                      newPicGroup[p].setAttribute('src', '');
+                      newPicGroup[p].setAttribute('data-src', 'holder.js/100x100');
+                    }
+                    _this.groupData.splice(index, 1);
                   }else{
                     alert('删除失败！');
                   }
                 }
               })
             }else{
+              var newSelFileGroup = document.getElementsByClassName('newSelFileGroup');
+              for(var i=0; i<newSelFileGroup.length; i++){
+                newSelFileGroup[i].value = '';
+              }
+              var newPicGroup = document.getElementsByClassName('newPicGroup');
+              for(var p=0; p<newPicGroup.length; p++){
+                newPicGroup[p].setAttribute('src', '');
+                newPicGroup[p].setAttribute('data-src', 'holder.js/100x100');
+              }
               this.groupData.splice(index, 1);
             }
           }

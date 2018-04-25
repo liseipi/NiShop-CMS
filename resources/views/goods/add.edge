@@ -210,14 +210,14 @@
               <table class="table table-bordered">
                 <thead>
                 <tr>
-                  <th width="80px" class="td-center"><a @click="groupData.push(groupData.length+1)" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
+                  <th width="80px" class="td-center"><a @click="groupData.push({group_depict:'', group_price:0, group_instock:0, group_status:0})" class="btn btn-success btn-xs"><span class="fa fa-plus"></span> 增加</a></th>
                   <th>内容</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="(num, index) in groupData">
                   <td width="80px" class="td-center">
-                    <a @click="groupData.splice(index, 1)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 减少</a>
+                    <a @click="removeGroupData(index)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 减少</a>
                   </td>
                   <td>
                     <table class="table table-bordered table-condensed" style="margin:0;">
@@ -226,7 +226,7 @@
                         <td width="80px" class="td-center">标题：<span class="text-success">(*)</span></td>
                         <td class="form-group">
                           <textarea class="form-control" name="group_depict[]" rows="2" v-if="group_depictData.length>0" v-html="group_depictData[index][0]" data-rule-required='true'></textarea>
-                          <textarea class="form-control" name="group_depict[]" rows="2" v-else placeholder="商品不同属性的名称" data-rule-required='true'></textarea>
+                          <textarea class="form-control" name="group_depict[]" rows="2" v-else v-model="num.group_depict" data-rule-required='true'></textarea>
                           <span class="error-container"></span>
                         </td>
                       </tr>
@@ -234,7 +234,7 @@
                         <td class="td-center">价格：<span class="text-success">(*)</span></td>
                         <td class="form-group">
                           <input type="text" class="form-control" name="group_price[]" v-if="group_priceData.length>0" :value="group_priceData[index]" data-rule-required='true'>
-                          <input type="text" class="form-control" name="group_price[]" v-else value="0" data-rule-required='true' data-rule-number='true'>
+                          <input type="text" class="form-control" name="group_price[]" v-else v-model="num.group_price" data-rule-required='true' data-rule-number='true'>
                           <span class="error-container"></span>
                         </td>
                       </tr>
@@ -242,7 +242,7 @@
                         <td class="td-center">库存：<span class="text-success">(*)</span></td>
                         <td class="form-group">
                           <input type="text" class="form-control" name="group_instock[]" v-if="group_instockData.length>0" :value="group_instockData[index]" data-rule-required='true'>
-                          <input type="text" class="form-control" name="group_instock[]" v-else value="0" data-rule-required='true' data-rule-digits='true'>
+                          <input type="text" class="form-control" name="group_instock[]" v-else v-model="num.group_instock" data-rule-required='true' data-rule-digits='true'>
                           <span class="error-container"></span>
                         </td>
                       </tr>
@@ -259,10 +259,10 @@
                           </span>
                           <span v-else>
                             <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" checked value="0">上架
+                              <input type="radio" :name="'group_status['+index+']'" checked v-model="num.group_status" value="0">上架
                             </label>
                             <label class="radio-inline">
-                              <input type="radio" :name="'group_status['+index+']'" value="1">下架
+                              <input type="radio" :name="'group_status['+index+']'" v-model="num.group_status" value="1">下架
                             </label>
                           </span>
                         </td>
@@ -272,12 +272,12 @@
                         <td>
                           <div class="row" style="margin-top: 10px;">
                             <div class="col-sm-8">
-                              <input type="file" name="group_thumb[]" accept="image/*" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
+                              <input type="file" class="selGroupFile" name="group_thumb[]" accept="image/*" :id="'selPreviewPic'+index" @change="selectImg('previewPic'+index)">
                               <hr>
                               <div class="help-block color-danger">图像尺寸/大小指定为： 120*120 像素，不超过1M</div>
                             </div>
                             <div class="col-sm-4">
-                              <img data-src="holder.js/100x100" src="" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border">
+                              <img data-src="holder.js/100x100" src="" :id="'previewPic'+index" @click="document.getElementById('selPreviewPic'+index).click()" class="img-thumbnail-border picGroup">
                             </div>
                           </div>
                         </td>
@@ -424,6 +424,20 @@
             }else{
               this.pageStatus.is_group = false;
             }
+          },
+          removeGroupData: function(index){
+            var selGroupFile = document.getElementsByClassName('selGroupFile');
+            for(var i=0; i<selGroupFile.length; i++){
+              selGroupFile[i].value = '';
+            }
+
+            var picGroup = document.getElementsByClassName('picGroup');
+            for(var p=0; p<picGroup.length; p++){
+              picGroup[p].setAttribute('src', '');
+              picGroup[p].setAttribute('data-src', 'holder.js/100x100');
+            }
+
+            this.groupData.splice(index, 1);
           },
           selectBrands: function(){
             if(parseInt(this.brandsID)!=0){

@@ -93,6 +93,13 @@ Route.group(()=>{
   Route.get('/goods/delGroup', 'GoodsController.delGroup')
   Route.get('/goods/delGallery', 'GoodsController.delGallery')
 
+  Route.get('/advert/list', 'AdvertController.list')
+  Route.get('/advert/add', 'AdvertController.add')
+  Route.post('/advert/add', 'AdvertController.addSave').validator('advert')
+  Route.get('/advert/edit/:id', 'AdvertController.edit')
+  Route.post('/advert/edit/:id', 'AdvertController.editSave').validator('advert')
+  Route.get('/advert/destroy/:id', 'AdvertController.destroy')
+
   Route.get('/file', 'FileController.store')
   Route.get('/file/destroy', 'FileController.destroy')
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')

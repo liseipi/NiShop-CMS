@@ -1,0 +1,326 @@
+@layout('layout')
+@section('content')
+<style>
+  .td-center{
+    vertical-align: middle!important;
+    text-align: center;
+  }
+  .img-thumbnail-border{
+    border:1px solid #ddd;
+    padding:5px;
+    border-radius: 2px;
+    cursor: pointer;
+    width: 100px;
+    height: 100px;
+  }
+</style>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">增加广告</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/advert/edit/{{advertInfo.ni_id}}" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">广告名称</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="ad_name" value="{{advertInfo.ad_name}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('ad_name'), hasErrorFor('ad_name')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">描述</label>
+          <div class="col-sm-6">
+            <textarea class="form-control" name="ad_describe" rows="5">{{advertInfo.ad_describe}}</textarea>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">URL</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="ad_url" value="{{advertInfo.ad_url||''}}" {{advertInfo.ad_type==1?'disabled':''}}>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('ad_url'), hasErrorFor('ad_url')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">选择类型</label>
+          <div class="col-sm-6">
+            <select class="form-control input-lg" name="ad_type" v-model="adType" >
+              <option value="1" {{advertInfo.ad_type==1?'':'disabled'}}>轮播广告</option>
+              <option value="2" {{advertInfo.ad_type==2?'':'disabled'}}>全局广告</option>
+              <option value="3" {{advertInfo.ad_type==3?'':'disabled'}}>图文广告</option>
+            </select>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('ad_type'), hasErrorFor('ad_type')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">广告状态</label>
+          <div class="col-sm-6">
+            <label class="radio-inline">
+              <input type="radio" name="ad_status" value="0" {{advertInfo.ad_status==0?'checked':''}}> 上线
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="ad_status" value="1" {{advertInfo.ad_status==1?'checked':''}}> 下线
+            </label>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">广告图片</label>
+          <div class="col-sm-8">
+            <div v-if="adType==1">
+              <a class="btn btn-success btn-xs" @click="rotationData.push({advert_describe: '', advert_sort: rotationData.length+1, advert_url:''})"><span class="fa fa-plus"></span> 增加</a>
+              <hr>
+              <table class="table table-bordered">
+                <thead>
+                <tr>
+                  <th width="80">操作</th>
+                  <th>内容</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(val, key) in rotationData">
+                  <td class="td-center"><a @click="remodeRotation(key)" class="btn btn-info btn-xs"><span class="fa fa-minus"></span> 减少</a></td>
+                  <td>
+                    <table class="table table-bordered table-condensed" style="margin: 0px;">
+                      <tbody>
+                      <tr>
+                        <td width="100px" class="td-center">广告描述：<span class="text-success">(*)</span></td>
+                        <td class="form-group">
+                          <input type="hidden" name="advert_ni_id[]" v-model="val.ni_id">
+                          <textarea name="advert_describe[]" rows="2" :disabled="adType!=1" class="form-control" v-model="val.advert_describe"></textarea>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="td-center">排序：<span class="text-success">(*)</span></td>
+                        <td class="form-group">
+                          <input type="text" name="advert_sort[]" v-model="val.advert_sort" :disabled="adType!=1" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="td-center">URL链接：<span class="text-success">(*)</span></td>
+                        <td class="form-group">
+                          <input type="text" name="advert_url[]" v-model="val.advert_url" :disabled="adType!=1" class="form-control">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="td-center">上传图片：</td>
+                        <td>
+                          <div class="row" style="margin-top: 10px;">
+                            <div class="col-sm-8">
+                              <input type="hidden" name="advert_old_thumb[]" :value="val.advert_images" :disabled="adType!=1">
+                              <input type="file" :class="val.ni_id?'':'selFile'" name="advert_images[]" :disabled="adType!=1" accept="image/*" :id="'selPreviewPic'+key" @change="selectImg('previewPic'+key)">
+                              <hr>
+                              <div class="help-block color-danger">图像尺寸/大小指定为： 600*450 像素，不超过2M [图片类型=1]</div>
+                            </div>
+                            <div class="col-sm-4">
+                              <img :data-src="val.advert_images?'':'holder.js/100x100'" :src="val.advert_images?'/file/pictures/'+val.advert_images:''" :id="'previewPic'+key" @click="document.getElementById('selPreviewPic'+key).click()"
+                                   class="img-thumbnail-border" :class="val.ni_id?'':'picRotation'" style="width:100px; height: 100px;">
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-if="adType==2">
+              <table class="table table-bordered table-condensed" style="margin: 0px;">
+                <tbody>
+                <tr>
+                  <td class="td-center">顶部长图：</td>
+                  <td>
+                    <div class="row" style="margin-top: 10px;">
+                      <div class="col-sm-8">
+                        <input type="hidden" name="advert_ni_id[]" :disabled="adType!=2" v-model="rotationData[0].ni_id">
+                        <input type="hidden" name="advert_old_thumb[]" :disabled="adType!=2" v-model="rotationData[0].advert_images">
+                        <input type="file" name="advert_images[]" :disabled="adType!=2" accept="image/*" id="selGlobalPic0" @change="selectImg('GlobalPic0')">
+                        <hr>
+                        <div class="help-block color-danger">图像尺寸/大小指定为： 1200*60 像素，不超过2M [图片类型=3]</div>
+                      </div>
+                      <div class="col-sm-4">
+                        <img :data-src="rotationData[0].advert_images?'':'holder.js/100x100'" :src="rotationData[0].advert_images?'/file/pictures/'+rotationData[0].advert_images:''" id="GlobalPic0"
+                             @click="document.getElementById('selGlobalPic0').click()"
+                             class="img-thumbnail-border"
+                             style="width: 100px; height: 100px;">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="td-center">背景风格图：</td>
+                  <td>
+                    <div class="row" style="margin-top: 10px;">
+                      <div class="col-sm-8">
+                        <input type="hidden" name="advert_ni_id[]" :disabled="adType!=2" v-model="rotationData[1].ni_id">
+                        <input type="hidden" name="advert_old_thumb[]" :disabled="adType!=2" v-model="rotationData[1].advert_images">
+                        <input type="file" name="advert_images[]" :disabled="adType!=2" accept="image/*" id="selGlobalPic1" @change="selectImg('GlobalPic1')">
+                        <hr>
+                        <div class="help-block color-danger">图像尺寸/大小指定为： 1200*560 像素，不超过2M [图片类型=4]</div>
+                      </div>
+                      <div class="col-sm-4">
+                        <img :data-src="rotationData[1].advert_images?'':'holder.js/100x100'" :src="rotationData[1].advert_images?'/file/pictures/'+rotationData[1].advert_images:''" id="GlobalPic1"
+                             @click="document.getElementById('selGlobalPic1').click()"
+                             class="img-thumbnail-border" style="width: 100px; height: 100px;">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="td-center">左/右侧图：</td>
+                  <td>
+                    <div class="row" style="margin-top: 10px;">
+                      <div class="col-sm-8">
+                        <input type="hidden" name="advert_ni_id[]" :disabled="adType!=2" v-model="rotationData[2].ni_id">
+                        <input type="hidden" name="advert_old_thumb[]" :disabled="adType!=2" v-model="rotationData[2].advert_images">
+                        <input type="file" name="advert_images[]" :disabled="adType!=2" accept="image/*" id="selGlobalPic2" @change="selectImg('GlobalPic2')">
+                        <hr>
+                        <div class="help-block color-danger">图像尺寸/大小指定为： 190*470 像素，不超过2M [图片类型=5]</div>
+                      </div>
+                      <div class="col-sm-4">
+                        <img :data-src="rotationData[2].advert_images?'':'holder.js/100x100'" :src="rotationData[2].advert_images?'/file/pictures/'+rotationData[2].advert_images:''" id="GlobalPic2"
+                             @click="document.getElementById('selGlobalPic2').click()"
+                             class="img-thumbnail-border" style="width: 100px; height: 100px;">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="td-center">中间内容图：</td>
+                  <td>
+                    <div class="row" style="margin-top: 10px;">
+                      <div class="col-sm-8">
+                        <input type="hidden" name="advert_ni_id[]" :disabled="adType!=2" v-model="rotationData[3].ni_id">
+                        <input type="hidden" name="advert_old_thumb[]" :disabled="adType!=2" v-model="rotationData[3].advert_images">
+                        <input type="file" name="advert_images[]" :disabled="adType!=2" accept="image/*" id="selGlobalPic3" @change="selectImg('GlobalPic3')">
+                        <hr>
+                        <div class="help-block color-danger">图像尺寸/大小指定为： 820*200 像素，不超过2M [图片类型=6]</div>
+                      </div>
+                      <div class="col-sm-4">
+                        <img :data-src="rotationData[3].advert_images?'':'holder.js/100x100'" :src="rotationData[3].advert_images?'/file/pictures/'+rotationData[3].advert_images:''" id="GlobalPic3"
+                             @click="document.getElementById('selGlobalPic3').click()"
+                             class="img-thumbnail-border" style="width: 100px; height: 100px;">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-if="adType==3">
+              <div class="row" style="margin-top: 10px;">
+                <div class="col-sm-8">
+                  <input type="hidden" name="advert_ni_id" :disabled="adType!=3" v-model="rotationData[0].ni_id">
+                  <input type="hidden" name="advert_old_thumb" :disabled="adType!=3" v-model="rotationData[0].advert_images">
+                  <input type="file" name="advert_images" :disabled="adType!=3" accept="image/*" id="selPhotoPic0" @change="selectImg('photoPic0')">
+                  <hr>
+                  <div class="help-block color-danger">不超过2M [图片类型=2]</div>
+                </div>
+                <div class="col-sm-4">
+                  <img :data-src="rotationData[0].advert_images?'':'holder.js/100x100'" :src="rotationData[0].advert_images?'/file/pictures/'+rotationData[0].advert_images:''" id="photoPic0" @click="document.getElementById('selPhotoPic0').click()"
+                       class="img-thumbnail-border" style="width: 100px; height: 100px;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui', 'vue', 'holder'], function (cmsui, Vue, Holder) {
+
+      new Vue({
+        el: '#app-page',
+        data:{
+          adType: {{advertInfo.ad_type}},
+          rotationData: {{{toJSON(photoData)}}}
+        },
+        methods:{
+          selectImg: function (picTag) {
+            var file =  event.currentTarget.files[0];
+            if(file){
+              //var img = new Image();
+              var imgUrl = window.URL.createObjectURL(file);
+              $('#'+picTag).attr('src', imgUrl).attr('data-src', '');
+            }
+          },
+          remodeRotation: function(index){
+
+            var isDel = confirm("确认删除当前相册信息，删除包含图片。");
+            if(isDel){
+              var niID = this.rotationData[index].ni_id
+              if(niID){
+                var _this = this;
+                $.ajax({
+                  url: '/advert/delAdvertPhoto',
+                  data: {
+                    ni_id: niID
+                  },
+                  type: 'get',
+                  success: function (result) {
+                    if(result[0].status==0){
+                      alert('删除成功！');
+
+                      var selFile = document.getElementsByClassName('selFile');
+                      for(var i=0; i<selFile.length; i++){
+                        selFile[i].value = '';
+                      }
+                      var picRotation = document.getElementsByClassName('picRotation');
+                      for(var p=0; p<picRotation.length; p++){
+                        picRotation[p].setAttribute('src', '');
+                        picRotation[p].setAttribute('data-src', 'holder.js/100x100');
+                      }
+                      _this.rotationData.splice(index, 1);
+
+                    }else{
+                      alert('删除失败！');
+                    }
+                  }
+                })
+              }else{
+
+                var selFile = document.getElementsByClassName('selFile');
+                for(var i=0; i<selFile.length; i++){
+                  selFile[i].value = '';
+                }
+                var picRotation = document.getElementsByClassName('picRotation');
+                for(var p=0; p<picRotation.length; p++){
+                  picRotation[p].setAttribute('src', '');
+                  picRotation[p].setAttribute('data-src', 'holder.js/100x100');
+                }
+                this.rotationData.splice(index, 1);
+              }
+            }
+
+          }
+        },
+        watch:{
+          rotationData: function () {
+            this.$nextTick(function () {
+              // 监听当 groupData 数组发生变化，而且在页面元素渲染完成之后($nextTick)的处理
+              Holder.addImage("holder.js/100x100", ".img-thumbnail").run()
+            })
+          }
+        },
+        mounted: function () {
+          Holder.addImage("holder.js/100x100", ".img-thumbnail").run()
+        }
+      });
+
+    });
+  });
+</script>
+@endsection

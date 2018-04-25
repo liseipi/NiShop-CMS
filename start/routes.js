@@ -99,10 +99,12 @@ Route.group(()=>{
   Route.get('/advert/edit/:id', 'AdvertController.edit')
   Route.post('/advert/edit/:id', 'AdvertController.editSave').validator('advert')
   Route.get('/advert/destroy/:id', 'AdvertController.destroy')
+  Route.get('/advert/delAdvertPhoto', 'AdvertController.delAdvertPhoto')
 
   Route.get('/file', 'FileController.store')
   Route.get('/file/destroy', 'FileController.destroy')
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
   Route.post('/file/save', 'FileController.save')
+
 
 }).middleware(['auth', 'role'])

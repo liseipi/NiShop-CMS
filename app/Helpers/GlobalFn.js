@@ -89,20 +89,23 @@ class GlobalFnClass {
       size: upSize+'mb'
     })
 
-    if(profilePic && profilePic.clientName){
-      await profilePic.move(Helpers.appRoot(path), {
-        name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${profilePic.clientName.replace(/^.+\./,'')}`
-      })
-      if (!profilePic.moved()) {
-        //session.flash({notification: '图片上传失败！Error:'+ profilePic.error().message})
-        return {fileName: '', status: 'error', error: profilePic.error()}
+    if(profilePic){
+      if(profilePic && profilePic.clientName){
+        await profilePic.move(Helpers.appRoot(path), {
+          name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${profilePic.clientName.replace(/^.+\./,'')}`
+        })
+        if (!profilePic.moved()) {
+          //session.flash({notification: '图片上传失败！Error:'+ profilePic.error().message})
+          return {fileName: '', status: 'error', error: profilePic.error()}
+        }
+
+        //let picPath = Helpers.appRoot('uploads/'+profilePic.fileName)
+        //const transformer = sharp(picPath).rotate().resize(200, 200)
+
+        return {fileName: profilePic.fileName, status: 'moved', error: {}}
       }
-
-      //let picPath = Helpers.appRoot('uploads/'+profilePic.fileName)
-      //const transformer = sharp(picPath).rotate().resize(200, 200)
-
-      return {fileName: profilePic.fileName, status: 'moved', error: {}}
     }
+
     return
   }
 
@@ -114,27 +117,29 @@ class GlobalFnClass {
       size: upSize+'mb'
     })
 
-    await profilePics.moveAll(Helpers.appRoot(path), (file) => {
-      return {
-        name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${file.clientName.replace(/^.+\./,'')}`
-      }
-    })
-
-    if(!profilePics.movedAll()){
-      profilePics._files.forEach(item=>{
-        if(item.status=='error') {
-          if(Drive.exists(item.tmpPath)){
-             Drive.delete(item.tmpPath)
-          }
+    if(profilePics){
+      await profilePics.moveAll(Helpers.appRoot(path), (file) => {
+        return {
+          name: `${(new Date().getTime()).toString(32)+Math.random().toString(16).substr(2)}.${file.clientName.replace(/^.+\./,'')}`
         }
       })
+      if(!profilePics.movedAll()){
+        profilePics._files.forEach(item=>{
+          if(item.status=='error') {
+            if(Drive.exists(item.tmpPath)){
+              Drive.delete(item.tmpPath)
+            }
+          }
+        })
+      }
+      let proData = profilePics._files.map(item=>{
+        return {fileName: item.fileName, status: item.status, error: item._error}
+      })
+      return proData
     }
 
-    let proData = profilePics._files.map(item=>{
-      return {fileName: item.fileName, status: item.status, error: item._error}
-    })
+    return
 
-    return proData
   }
 
 }

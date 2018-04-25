@@ -37,7 +37,23 @@
       <ul class="nav" id="side-menu">
         @each(menu in menusData)
         <li>
-          <a href="{{menu.controller}}" data-url="/menu" target="iframe-wrapper"><i class="fa fa-list-alt"></i> {{menu.menuname}}
+          <a href="{{menu.controller}}" data-url="/menu" target="iframe-wrapper">
+            @if(menu.controller=='/dashboard')
+            <i class="fa fa-dashboard"></i>
+            @elseif(menu.controller=='/menu')
+            <i class="fa fa-list-alt"></i>
+            @elseif(menu.controller=='/role')
+            <i class="fa fa-lock"></i>
+            @elseif(menu.controller=='/article')
+            <i class="fa fa-file-text"></i>
+            @elseif(menu.controller=='/goods')
+            <i class="fa fa-th-large"></i>
+            @elseif(menu.controller=='/advert')
+            <i class="fa fa-tasks"></i>
+            @else
+            <i class="fa fa-list-alt"></i>
+            @endif
+            {{menu.menuname}}
             @if(menu.children)
             <span class="fa arrow"></span>
             @endif

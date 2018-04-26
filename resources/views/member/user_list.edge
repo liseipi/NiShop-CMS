@@ -1,0 +1,88 @@
+@layout('layout')
+@section('content')
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">会员列表</h5>
+    <div class="main">
+      <table class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline">
+        <thead>
+        <tr>
+          <td>#</td>
+          <td>会员ID</td>
+          <td>信息</td>
+          <td>验证</td>
+          <td>登录</td>
+          <td>购物</td>
+          <td>查看</td>
+        </tr>
+        </thead>
+        <tbody>
+        <!--@each(user in userData)-->
+        <tr>
+          <td>1</td>
+          <td>346246</td>
+          <td>
+            <p>登录名称：oliliu</p>
+            <p>Email：oli@qq.com</p>
+            <p>手机：139****7479</p>
+          </td>
+          <td>
+            <p>是否验证手机：</p>
+            <p>是否验证Email：</p>
+          </td>
+          <td>
+            <p>次数：</p>
+            <p>上次时间：</p>
+          </td>
+          <td>
+            <p>地址条：</p>
+            <p>订单数：</p>
+          </td>
+          <td>
+            <a href="#" class="fa fa-eye btn btn-lg btn-info"> 详细信息</a>
+            <a href="#" class="fa fa-eye btn btn-lg btn-primary"> 收货地址</a>
+            <a href="#" class="fa fa-eye btn btn-lg btn-success"> 订单记录</a>
+            <a href="#" class="fa fa-trash btn btn-lg btn-warning"> 删除用户</a>
+          </td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>346246</td>
+          <td>
+            <p>登录名称：oliliu</p>
+            <p>Email：oli@qq.com</p>
+            <p>手机：139****7479</p>
+          </td>
+          <td>
+            <p>是否验证手机：</p>
+            <p>是否验证Email：</p>
+          </td>
+          <td>
+            <p>次数：</p>
+            <p>上次时间：</p>
+          </td>
+          <td>
+            <p>地址条：</p>
+            <p>订单数：</p>
+          </td>
+          <td>
+            <a href="#" class="fa fa-eye btn btn-lg btn-info"> 详细信息</a>
+            <a href="#" class="fa fa-eye btn btn-lg btn-primary"> 收货地址</a>
+            <a href="#" class="fa fa-eye btn btn-lg btn-success"> 订单记录</a>
+            <a href="#" class="fa fa-trash btn btn-lg btn-warning"> 删除用户</a>
+          </td>
+        </tr>
+        <!--@endeach-->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['../js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {
+    });
+  });
+</script>
+@endsection

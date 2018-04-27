@@ -12,6 +12,7 @@ class MenuSchema extends Schema {
       table.integer('runStatus', 1)
       table.integer('menu_sort', 6)
     })
+    .raw("ALTER TABLE `ni_menus` AUTO_INCREMENT=100")
   }
 
   down () {

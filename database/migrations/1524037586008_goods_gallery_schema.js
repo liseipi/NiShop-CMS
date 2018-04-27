@@ -11,6 +11,7 @@ class GoodsGallerySchema extends Schema {
       table.integer('gallery_sort', 8)
       table.string('gallery_thumb', 64)
     })
+    .raw("ALTER TABLE `ni_goods_galleries` AUTO_INCREMENT=1200")
   }
 
   down () {

@@ -13,6 +13,7 @@ class AdvertGallerySchema extends Schema {
       table.text('advert_describe')
       table.integer('advert_sort', 8)
     })
+    .raw("ALTER TABLE `ni_advert_galleries` AUTO_INCREMENT=2000")
   }
 
   down () {

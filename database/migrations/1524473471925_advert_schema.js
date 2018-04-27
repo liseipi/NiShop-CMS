@@ -12,6 +12,7 @@ class AdvertSchema extends Schema {
       table.integer('ad_status', 1)
       table.string('ad_url', 255)
     })
+    .raw("ALTER TABLE `ni_adverts` AUTO_INCREMENT=300")
   }
 
   down () {

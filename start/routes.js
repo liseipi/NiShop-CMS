@@ -101,10 +101,14 @@ Route.group(()=>{
   Route.get('/advert/destroy/:id', 'AdvertController.destroy')
   Route.get('/advert/delAdvertPhoto', 'AdvertController.delAdvertPhoto')
 
-  Route.get('/file', 'FileController.store')
-  Route.get('/file/destroy', 'FileController.destroy')
+  Route.get('/system/shopInfo', 'SystemController.shopInfo')
+  Route.post('/system/shopInfo', 'SystemController.shopInfoSave')
+
+  Route.get('/member/userList', 'MemberController.userList')
+  Route.get('/member/edit/:id', 'MemberController.edit')
+  Route.post('/member/edit/:id', 'MemberController.editSave')
+
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
-  Route.post('/file/save', 'FileController.save')
 
 
 }).middleware(['auth', 'role'])

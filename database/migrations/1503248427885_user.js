@@ -21,6 +21,7 @@ class UserSchema extends Schema {
       table.datetime('lastlogin_at')
       table.timestamps()
     })
+    .raw("ALTER TABLE `ni_admin_user` AUTO_INCREMENT=8680")
   }
 
   down() {

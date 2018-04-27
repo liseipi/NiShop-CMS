@@ -1,0 +1,145 @@
+@layout('layout')
+@section('content')
+<style>
+  .user{
+    font-size: 30px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+  }
+</style>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">会员信息</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/member/edit/{{memberInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">头像</label>
+          <div class="col-sm-6">
+            @if(memberInfo.avatar)
+            <img src="{{'/file/pictures/'+memberInfo.avatar}}" class="user">
+            @else
+            <span class="fa fa-user user"></span>
+            @endif
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">性别</label>
+          <div class="col-sm-6">
+            {{memberInfo.sex==0?'男':'女'}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">用户名</label>
+          <div class="col-sm-6">
+            {{memberInfo.username}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">手机</label>
+          <div class="col-sm-6">
+            {{memberInfo.mobile}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">邮箱</label>
+          <div class="col-sm-6">
+            {{memberInfo.email}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">密码</label>
+          <div class="col-sm-6">
+            <a href="#" class="btn btn-info">发送重置密码给用户</a>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">级别</label>
+          <div class="col-sm-6">
+            {{memberInfo.level}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">生日</label>
+          <div class="col-sm-6">
+            {{memberInfo.birthday}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">是否验证手机</label>
+          <div class="col-sm-6">
+            {{{memberInfo.is_verify_mobile==0?'<span class="text-primary">No</span>':'<span class="text-success">Yes</span>'}}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">是否验证邮箱</label>
+          <div class="col-sm-6">
+            {{{memberInfo.is_verify_email==0?'<span class="text-primary">No</span>':'<span class="text-success">Yes</span>'}}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">会员状态</label>
+          <div class="col-sm-6">
+            <label><input type="checkbox" name="status" value="1" {{memberInfo.status==1?'checked':''}}> 开/关</label>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">登录次数</label>
+          <div class="col-sm-6">
+            {{memberInfo.visits}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">上次登录时间</label>
+          <div class="col-sm-6">
+            {{memberInfo.this_at}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">上次登录IP</label>
+          <div class="col-sm-6">
+            {{memberInfo.thisIp}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">注册时间</label>
+          <div class="col-sm-6">
+            {{memberInfo.create_at}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {});
+  });
+</script>
+@endsection

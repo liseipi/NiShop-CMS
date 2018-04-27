@@ -13,6 +13,7 @@ class AttrSchema extends Schema {
       table.integer('attr_type', 8)
       table.text('attr_value')
     })
+    .raw("ALTER TABLE `ni_attrs` AUTO_INCREMENT=500")
   }
 
   down () {

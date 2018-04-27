@@ -15,6 +15,7 @@ class BrandsSchema extends Schema {
       table.integer('sort', 10)
       table.text('brands_desc')
     })
+    .raw("ALTER TABLE `ni_brands` AUTO_INCREMENT=700")
   }
 
   down () {

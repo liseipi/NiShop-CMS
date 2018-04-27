@@ -10,6 +10,7 @@ class GoodsAttrSchema extends Schema {
       table.integer('attr_id', 8)
       table.string('goods_attr_value', 255)
     })
+    .raw("ALTER TABLE `ni_goods_attrs` AUTO_INCREMENT=1100")
   }
 
   down () {

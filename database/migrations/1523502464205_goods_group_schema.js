@@ -13,6 +13,7 @@ class GoodsGroupSchema extends Schema {
       table.string('group_thumb', 64)
       table.integer('group_status', 1)
     })
+    .raw("ALTER TABLE `ni_goods_groups` AUTO_INCREMENT=900")
   }
 
   down () {

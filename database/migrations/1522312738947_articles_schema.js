@@ -21,6 +21,7 @@ class ArticlesSchema extends Schema {
       table.bigInteger('create_at', 14)
       table.bigInteger('update_at', 14)
     })
+    .raw("ALTER TABLE `ni_articles` AUTO_INCREMENT=6000")
   }
 
   down () {

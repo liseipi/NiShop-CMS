@@ -12,6 +12,7 @@ class TokensSchema extends Schema {
       table.boolean('is_revoked').defaultTo(false)
       table.timestamps()
     })
+    .raw("ALTER TABLE `ni_admin_tokens` AUTO_INCREMENT=8000")
   }
 
   down () {

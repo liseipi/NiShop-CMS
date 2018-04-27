@@ -37,6 +37,7 @@ class GoodsSchema extends Schema {
       table.integer('is_order_exist', 1).defaultTo(0).comment('是否存在订单，为1时存在订单数据，不可以修改：分类、SKU、品牌')
       table.timestamps()
     })
+    .raw("ALTER TABLE `ni_goods` AUTO_INCREMENT=800")
   }
 
   down () {

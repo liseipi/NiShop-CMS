@@ -16,6 +16,7 @@ class GoodsCategorySchema extends Schema {
       table.integer('column_type', 1)
       table.string('controller', 64)
     })
+    .raw("ALTER TABLE `ni_goods_categories` AUTO_INCREMENT=2000")
   }
 
   down () {

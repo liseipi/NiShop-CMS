@@ -14,6 +14,7 @@ class ArticleCategorySchema extends Schema {
       table.integer('column_type', 1)
       table.string('controller', 64)
     })
+    .raw("ALTER TABLE `ni_article_categories` AUTO_INCREMENT=1000")
   }
 
   down () {

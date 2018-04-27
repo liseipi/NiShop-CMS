@@ -10,6 +10,7 @@ class AuthRoleSchema extends Schema {
       table.string('role_desc', 255)
       table.text('role_auth')
     })
+    .raw("ALTER TABLE `ni_auth_roles` AUTO_INCREMENT=10")
   }
 
   down () {

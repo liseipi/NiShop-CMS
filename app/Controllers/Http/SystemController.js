@@ -21,7 +21,7 @@ class SystemController {
     //上传logo
     const logoThumbInfo =  await GlobalFn.uploadPic(request, 'logo', {width:100, height:100, size:2})
     if(logoThumbInfo && logoThumbInfo.status=='error'){
-      shopMsg += '<p>logo上传出错！Error: <pre><code>' + JSON.stringify(goodsThumbInfo.error) +'</code></pre></p>'
+      shopMsg += '<p>logo上传出错！Error: <pre><code>' + JSON.stringify(logoThumbInfo.error) +'</code></pre></p>'
     }
     if(logoThumbInfo && logoThumbInfo.status=='moved'){
       saveData.logo = logoThumbInfo.fileName

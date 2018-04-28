@@ -104,9 +104,10 @@ Route.group(()=>{
   Route.get('/system/shopInfo', 'SystemController.shopInfo')
   Route.post('/system/shopInfo', 'SystemController.shopInfoSave')
 
-  Route.get('/member/userList', 'MemberController.userList')
+  Route.get('/member/list', 'MemberController.list')
   Route.get('/member/edit/:id', 'MemberController.edit')
   Route.post('/member/edit/:id', 'MemberController.editSave')
+  Route.get('/member/cart/:id', 'MemberController.cart')
 
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
 

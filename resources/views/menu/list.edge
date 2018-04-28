@@ -48,6 +48,9 @@
     width: 8px;
     height: 0px;
   }
+  .fa-list-alt{
+    margin-left: 12px;
+  }
 </style>
 <div id="app-page">
   <div class="container-fluid">
@@ -69,7 +72,7 @@
               @if(menu.level_id==1)
               <thead class="parent">
               <tr>
-                <th width="15%">&nbsp;&nbsp;<span class="fa fa-list-alt"></span></th>
+                <th width="15%"><span class="fa fa-list-alt"></span></th>
                 <th width="25%">{{menu.menuname}}</th>
                 <th width="25%">{{menu.controller}}</th>
                 <th width="15%">{{menu.runStatus==0?'前台显示':'后台处理'}}</th>

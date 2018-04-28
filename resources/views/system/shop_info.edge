@@ -20,35 +20,35 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">商店名称</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="shop_name" value="{{shopInfoData.shop_name}}">
+            <input type="text" class="form-control" name="shop_name" value="{{shopInfoData.shop_name||''}}">
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">商店Title标题</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="shop_title" value="{{shopInfoData.shop_title}}">
+            <input type="text" class="form-control" name="shop_title" value="{{shopInfoData.shop_title||''}}">
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">推广关键词</label>
           <div class="col-sm-6">
-            <textarea class="form-control" name="shop_keyword" rows="3">{{shopInfoData.shop_keyword}}</textarea>
+            <textarea class="form-control" name="shop_keyword" rows="3">{{shopInfoData.shop_keyword||''}}</textarea>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">客服电话</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="shop_tel" value="{{shopInfoData.shop_tel}}">
+            <input type="text" class="form-control" name="shop_tel" value="{{shopInfoData.shop_tel||''}}">
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">ICP证书/ICP备案证书号</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="shop_icp" value="{{shopInfoData.shop_icp}}">
+            <input type="text" class="form-control" name="shop_icp" value="{{shopInfoData.shop_icp||''}}">
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -58,13 +58,13 @@
           <div class="col-sm-8">
             <div class="clearfix">
               <div class="pull-left">
-                <input type="hidden" name="old_logo" value="{{shopInfoData.logo}}">
+                <input type="hidden" name="old_logo" value="{{shopInfoData.logo||''}}">
                 <input type="file" name="logo" accept="image/*" id="logoFile">
                 <hr>
                 <div class="help-block color-danger">图像文件大小 <= 1M</div>
               </div>
               <div class="pull-right">
-                <img data-src="{{shopInfoData.logo?'':'holder.js/100x100'}}" id="logoPic" src="{{'/file/pictures/'+shopInfoData.logo}}" @click="document.getElementById('logoFile').click()" class="img-thumbnail-border">
+                <img data-src="{{shopInfoData.logo?'':'holder.js/100x100'}}" id="logoPic" src="{{shopInfoData.logo?'/file/pictures/'+shopInfoData.logo:''}}" onclick="document.getElementById('logoFile').click()" class="img-thumbnail-border">
               </div>
             </div>
           </div>
@@ -74,7 +74,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">商店描述</label>
           <div class="col-sm-9">
-            <textarea class="form-control" name="introduction">{{shopInfoData.introduction}}</textarea>
+            <textarea class="form-control" name="introduction">{{shopInfoData.introduction||''}}</textarea>
           </div>
         </div>
         <hr>
@@ -89,18 +89,11 @@
 </div>
 <script type="text/javascript">
   requirejs(['/js/config.js'], function () {
-    requirejs(['cmsui', 'vue', 'holder', 'ckedit'], function (cmsui, Vue, Holder) {
+    requirejs(['cmsui', 'holder', 'ckedit'], function (cmsui, Holder) {
 
-      new Vue({
-        el: '#app-page',
-        data: {},
-        methods: {
-
-        },
-        mounted: function () {
-          CKEDITOR.replace('introduction');
-        }
-      });
+      $(function () {
+        CKEDITOR.replace('introduction');
+      })
 
     });
   });

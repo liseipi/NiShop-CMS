@@ -1,4 +1,7 @@
 /*-- public -- */
+[v-cloak] {
+  display: none;
+}
 .form-control {
     height: 32px;
     font-size: 14px;

@@ -63,14 +63,12 @@ class MemberController {
 
   async cart({view, params}){
 
-
     const cartData = await Database.select(cartTable+'.*', goodsTable+'.goods_name', goodsTable+'.status', goodsTable+'.goods_instock', goodsTable+'.goods_price', goodsTable+'.goods_thumb', goodsGroupTable+'.group_depict', goodsGroupTable+'.group_price', goodsGroupTable+'.group_instock', goodsGroupTable+'.group_thumb', goodsGroupTable+'.group_status').from(cartTable)
       .leftJoin(goodsTable, cartTable+'.goods_id', goodsTable+'.ni_id')
       .leftJoin(goodsGroupTable, function () {
         this.on(goodsGroupTable+'.goods_id', '=', cartTable+'.goods_id').on(goodsGroupTable+'.ni_id', '=', cartTable+'.group_id')
       })
       .where('member_id', params.id)
-
 
     return view.render('member.cart', {cartData})
 

@@ -8,6 +8,8 @@ const Drive = use('Drive')
 const advertTable = 'ni_adverts'
 const advertPhotoTable = 'ni_advert_galleries'
 
+const moment = use('moment')
+
 class AdvertController {
 
   async add({view}){
@@ -273,6 +275,10 @@ class AdvertController {
     }catch(error) {
       return [{status: 1}]
     }
+  }
+
+  async saleAdd({view}){
+    return view.render('advert.sale_add', {date: {startDate: moment().format('YYYY-MM-DD'), endDate: moment().add(1, 'year').format('YYYY-MM-DD')}})
   }
 
 }

@@ -100,6 +100,12 @@ Route.group(()=>{
   Route.post('/advert/edit/:id', 'AdvertController.editSave').validator('advert')
   Route.get('/advert/destroy/:id', 'AdvertController.destroy')
   Route.get('/advert/delAdvertPhoto', 'AdvertController.delAdvertPhoto')
+  Route.get('/advert/saleAdd', 'AdvertController.saleAdd')
+  Route.post('/advert/saleAdd', 'AdvertController.saleAddSave')
+  Route.get('/advert/saleList', 'AdvertController.saleList')
+  Route.get('/advert/saleEdit/:id', 'AdvertController.saleEdit')
+  Route.post('/advert/saleEdit/:id', 'AdvertController.saleEditSave')
+  Route.get('/advert/destroySale/:id', 'AdvertController.destroySale')
 
   Route.get('/system/shopInfo', 'SystemController.shopInfo')
   Route.post('/system/shopInfo', 'SystemController.shopInfoSave')
@@ -110,6 +116,9 @@ Route.group(()=>{
   Route.get('/member/cart/:id', 'MemberController.cart')
 
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
+  Route.get('/getBrands', 'GetFindController.getBrands')
+  Route.get('/getCategory', 'GetFindController.getCategory')
+  Route.get('/getGoods', 'GetFindController.getGoods')
 
 
 }).middleware(['auth', 'role'])

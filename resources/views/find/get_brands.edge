@@ -1,0 +1,80 @@
+@layout('layout')
+@section('content')
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">品牌列表</h5>
+    <div class="main">
+      <table class="table table-striped table-hover table-bordered">
+        <caption>
+          <form action="/getBrands" method="get" class="form-inline text-center">
+            <input type="text" name="keywords" class="form-control" value="{{query.keywords||''}}" placeholder="品牌名称">
+            <button type="submit" class="form-control">搜索</button>
+          </form>
+          <hr>
+        </caption>
+        <tbody>
+        <tr>
+          <th width="10%">ID</th>
+          <th width="15%">logo</th>
+          <th width="30%">品牌名称</th>
+          <th width="5%">状态</th>
+          <th>操作</th>
+        </tr>
+        @each(brands in brandsData.data)
+        <tr>
+          <td width="10%">{{brands.ni_id}}</td>
+          <td width="15%">
+            @if(brands.brands_logo)
+            <img src="{{'/file/pictures/'+brands.brands_logo}}" width="100" alt="">
+            @endif
+          </td>
+          <td width="30%">{{brands.brands_name}}</td>
+          <td width="5%">{{brands.status==0?'上线':'下线'}}</td>
+          <td>
+            <a class="btn btn-lg btn-info" onclick="backData({brandsId: '{{brands.ni_id}}', brandsName: '{{brands.brands_name}}', brandsLogo: '{{brands.brands_logo}}'})">选择</a>
+          </td>
+        </tr>
+        @endeach
+        </tbody>
+      </table>
+      <hr>
+      <div class="pager">
+        <nav id="page"></nav>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function backData(data){
+    if(parent.getBrandsData){
+      parent.getBrandsData(data, {tag:"{{query.tag||'default'}}"});
+    }
+  }
+
+  requirejs(['../js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {
+
+      $('#page').pagination({
+        pages: {{brandsData.lastPage}},
+        styleClass: ['pagination-xl'],
+        showCtrl: true,
+        displayPage: 6,
+        currentPage: {{brandsData.page}},
+        onSelect: function (num) {
+          var query = {{{toJSON(query)}}};
+          query.page = num;
+          var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
+          location.href = '/getBrands?'+url
+        }
+      });
+
+      $(function(){
+        $('.pagination').prepend('<div><span>共有 {{brandsData.total}} 个品牌</span></div>');
+      });
+
+    });
+  });
+</script>
+@endsection
+

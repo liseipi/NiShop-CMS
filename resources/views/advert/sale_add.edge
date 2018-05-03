@@ -1,0 +1,195 @@
+@layout('layout')
+@section('content')
+<style>
+  #brands_logo{
+    width: 100px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+  }
+</style>
+<div class="modal fade bs-example-modal-lg" id="selModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h5 class="modal-title">资源管理</h5>
+      </div>
+      <div class="modal-body">
+        <iframe src="/getBrands?tag=offerScope_value1" frameborder="0" id="parWin" style="width: 100%; height: 400px;"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">增加促销活动</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/article/categoryAdd" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">促销标题</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="column_name" value="{{old('column_name', '')}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('column_name'), hasErrorFor('column_name')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">促销开始/结束时间</label>
+          <div class="col-sm-8 form-inline">
+            <input type="text" class="form-control input-date" placeholder="开始时间" name="goods_sale_time_start" id="goods_sale_time_start" value="" /> -
+            <input type="text" class="form-control input-date" placeholder="结束时间" name="goods_sale_time_end" id="goods_sale_time_end" value="" />
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('controller'), hasErrorFor('controller')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">享受优惠的会员等级</label>
+          <div class="col-sm-8">
+            <select class="form-control input-lg" name="brands_id" data-rule-required="true">
+              <option value="0">全部会员</option>
+              <option value="1">VIP1</option>
+              <option value="2">VIP2</option>
+              <option value="3">VIP3</option>
+              <option value="4">VIP4</option>
+              <option value="5">VIP5</option>
+            </select>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">金额下限</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="column_name" value="{{old('column_name', '30')}}" data-rule-required="true">
+            <div class="help-block color-danger">(金额下限：订单金额满足时才能享受优惠)</div>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('column_name'), hasErrorFor('column_name')) }}</div>
+        </div>
+        <div class="form-group form-inline">
+          <label class="col-sm-2 control-label">优惠方式</label>
+          <div class="col-sm-8">
+            <select class="form-control input-lg dropdown-toggle" name="sale_type" v-model="sale_type" data-rule-required="true">
+              <option value="1">享受赠品</option>
+              <option value="2">享受现金减免</option>
+              <option value="3">享受价格折扣</option>
+            </select>
+            <span v-show="sale_type==1" v-cloak>
+              <input type="text" class="form-control" name="type_value1" placeholder="[ id ] or [ id, group_id ]" :disabled="sale_type!=1">
+              <a data-toggle="modal" data-target="#selModal" onclick="document.getElementById('parWin').src='/getGoods?tag=type_value1'" class="btn btn-success btn-lg"><span class="fa fa-search"></span> 查找商品</a>
+            </span>
+            <span v-show="sale_type==2" v-cloak>
+              <input type="text" class="form-control" name="type_value2" placeholder="0" :disabled="sale_type!=2">
+            </span>
+            <span v-show="sale_type==3" v-cloak>
+              <input type="text" class="form-control" name="type_value3" placeholder="0.88" :disabled="sale_type!=3">
+            </span>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_id'), hasErrorFor('brands_id')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">优惠范围</label>
+          <div class="col-sm-8">
+            <select class="form-control input-lg" name="sale_offerScope" v-model="sale_offerScope" data-rule-required="true">
+              <option value="0">全部商品</option>
+              <option value="1">选择品牌</option>
+              <option value="2">选择分类</option>
+              <option value="3">选择商品</option>
+            </select>
+            <hr>
+            <div class="form-inline" v-show="sale_offerScope==1" v-cloak>
+              <table class="table table-bordered">
+                <tr>
+                  <td width="50%">LOGO：<img src="" id="brands_logo"></td>
+                  <td>名称：<span id="brands_name"></span></td>
+                </tr>
+              </table>
+              <input type="text" class="form-control" name="offerScope_value1" placeholder="输入品牌ID" :disabled="sale_offerScope!=1">
+              <a data-toggle="modal" data-target="#selModal" onclick="document.getElementById('parWin').src='/getBrands?tag=offerScope_value1'" class="btn btn-success btn-lg"><span class="fa fa-search"></span> 查找品牌</a>
+            </div>
+            <div class="form-inline" v-show="sale_offerScope==2" v-cloak>
+              <table class="table table-bordered">
+                <tr>
+                  <td>分类：<span id="categroy_name"></span></td>
+                </tr>
+              </table>
+              <input type="text" class="form-control" name="offerScope_value2" placeholder="输入分类ID" :disabled="sale_offerScope!=2">
+              <a data-toggle="modal" data-target="#selModal" onclick="document.getElementById('parWin').src='/getCategory?tag=offerScope_value2'" class="btn btn-success btn-lg"><span class="fa fa-search"></span> 查找分类</a>
+            </div>
+            <span v-show="sale_offerScope==3" v-cloak>
+              <textarea name="offerScope_value3" rows="5" class="form-control" :disabled="sale_offerScope!=3"></textarea>
+              <a data-toggle="modal" data-target="#selModal" onclick="document.getElementById('parWin').src='/getGoods?tag=offerScope_value3'" class="btn btn-success btn-lg"><span class="fa fa-search"></span> 查找商品</a>
+            </span>
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('brands_id'), hasErrorFor('brands_id')) }}</div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+
+  function getBrandsData(data, tag){
+    $("input[name='"+tag.tag+"']").val(data.brandsId);
+    $('#brands_logo').attr('src', '/file/pictures/'+data.brandsLogo);
+    $('#brands_name').html(data.brandsName);
+    $('#selModal').modal('hide');
+  }
+
+  function getCategoryData(data, tag){
+    if(tag.tag=='offerScope_value2'){
+      $("input[name='"+tag.tag+"']").val(data.categoryId);
+      $('#categroy_name').html(data.categoryName);
+      $('#selModal').modal('hide');
+    }
+  }
+
+  function getGoodsData(data, tag){
+    alert(JSON.stringify(data));
+    alert(JSON.stringify(tag));
+  }
+
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui', 'timepicker', 'vue', 'vendor/timepicker/jquery-ui-timepicker-zh-CN'], function (cmsui, timepicker, Vue) {
+
+      new Vue({
+        el: '#app-page',
+        data:{
+          sale_type: 1,
+          sale_offerScope: 0
+        },
+        method:{
+
+        },
+        mounted: function(){
+
+          $(function () {
+
+            $.timepicker.datetimeRange(
+              $('#goods_sale_time_start'),
+              $('#goods_sale_time_end'),
+              {
+                minInterval: (1000*60*10),        // 10分
+                maxInterval: (1000*60*60*24*365), // 1年
+                start: {
+                  timeFormat: 'hh:mm:ss'
+                },
+                end: {
+                  timeFormat: 'hh:mm:ss'
+                }
+              }
+            );
+
+          })
+
+        }
+      })
+
+    });
+  });
+</script>
+@endsection

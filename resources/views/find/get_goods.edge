@@ -13,6 +13,7 @@
     height: 100px;
   }
 </style>
+<pre>{{toJSON(goodsData)}}</pre>
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
@@ -67,9 +68,9 @@
         <tr>
           <th>排序</th>
           <th>分类</th>
-          <th>品牌</th>
           <th>商品信息</th>
           <th>状态</th>
+          <th>组</th>
           <th>操作</th>
         </tr>
         </thead>
@@ -77,8 +78,10 @@
         @each(goods in goodsData.data)
         <tr>
           <td width="5%">{{goods.sort}}</td>
-          <td width="10%">{{goods.column_name}}</td>
-          <td width="20%">{{goods.brands_name}}</td>
+          <td width="10%">
+            <p>分类：{{goods.column_name}}</p>
+            <p>品牌：{{goods.brands_name}}</p>
+          </td>
           <td width="40%">
             <div class="row">
               <div class="col-sm-4">
@@ -103,9 +106,35 @@
             </div>
           </td>
           <td width="8%">{{{goods.status==0?'<span class="text-success">上线</span>':'<span class="text-primary">下线</span>'}}}</td>
-          <td width="25%">
-            <a href="/goods/edit/{{goods.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
-            <a href="/goods/destroy/{{goods.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+          <td>
+            @if(goods.goods_is_group==0)
+            <pre>{{goods.groupData}}</pre>
+            <table class="table table-bordered">
+              <thead>
+              <tr>
+                <td>ID</td>
+                <td>名称</td>
+                <td>选择</td>
+              </tr>
+              </thead>
+              <tbody>
+              @each(group in groupData)
+              <tr>
+                <td>{{group.group_id}}</td>
+                <td></td>
+                <td>cc</td>
+              </tr>
+              @endeach
+              </tbody>
+            </table>
+            @else
+            无
+            @endif
+          </td>
+          <td>
+            @if(goods.goods_is_group==1)
+            <a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{goods.ni_id}}', goodsName: '{{goods.goods_name}}'})">选择</a>
+            @endif
           </td>
         </tr>
         @endeach
@@ -119,6 +148,12 @@
   </div>
 </div>
 <script type="text/javascript">
+  function backData(data){
+    if(parent.getGoodsData){
+      parent.getGoodsData(data, {tag:"{{query.tag||'default'}}"});
+    }
+  }
+
   requirejs(['../js/config.js'], function () {
     requirejs(['cmsui'], function () {
 
@@ -132,7 +167,7 @@
           var query = {{{toJSON(query)}}};
           query.page = num;
           var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
-          location.href = '/goods/list?'+url
+          location.href = '/getGoods?'+url
         }
       });
 

@@ -34,7 +34,10 @@ class Role {
         '/dashboard',
         '/file/pictures',
         '/goods/getAttr',
-        '/goods/checkSku'
+        '/goods/checkSku',
+        '/getBrands',
+        '/getCategory',
+        '/getGoods'
       ]
       if(no_Auth.indexOf(acturl)<0){
         if(LicitUrl){

@@ -19,10 +19,10 @@ class MemberSchema extends Schema {
       table.boolean('is_verify_email').defaultTo(false).comment('是否验证手机')
       table.integer('visits', 12).defaultTo(0).comment('登录次数')
       table.string('lastIp', 15).comment('上次IP')
-      table.timestamp('last_at').comment('上次时间')
+      table.timestamp('last_at').defaultTo(this.fn.now()).comment('上次时间')
       table.string('thisIp', 15).comment('本次IP')
-      table.timestamp('this_at').comment('本次时间')
-      table.timestamp('create_at').comment('注册时间')
+      table.timestamp('this_at').defaultTo(this.fn.now()).comment('本次时间')
+      table.timestamp('create_at').defaultTo(this.fn.now()).comment('注册时间')
     })
     .raw("ALTER TABLE `ni_member` AUTO_INCREMENT=659680")
   }

@@ -7,8 +7,8 @@ class AdvertSaleSchema extends Schema {
     this.create('ni_advert_sale', (table) => {
       table.increments('ni_id')
       table.string('sale_title', 255)
-      table.timestamp('sale_start_time')
-      table.timestamp('sale_end_time')
+      table.timestamp('sale_start_time').defaultTo(this.fn.now())
+      table.timestamp('sale_end_time').defaultTo(this.fn.now())
       table.integer('member_level', 2)
       table.integer('min_amount', 8)
       table.integer('sale_type', 2).comment('优惠方式')
@@ -19,7 +19,7 @@ class AdvertSaleSchema extends Schema {
       table.integer('offerScope_value1', 8).comment('品牌id')
       table.integer('offerScope_value2', 2).comment('分类id')
       table.text('offerScope_value3').comment('优惠的商品')
-      table.timestamp('create_at').comment('促销创建时间')
+      table.timestamp('create_at').defaultTo(this.fn.now()).comment('促销创建时间')
     })
     .raw("ALTER TABLE `ni_advert_sale` AUTO_INCREMENT=25")
   }

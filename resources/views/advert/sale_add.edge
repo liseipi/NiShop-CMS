@@ -149,8 +149,34 @@
   }
 
   function getGoodsData(data, tag){
-    alert(JSON.stringify(data));
-    alert(JSON.stringify(tag));
+    //alert(JSON.stringify(data));
+    //alert(JSON.stringify(tag));
+    if(tag.tag=='type_value1'){
+      var getId = []
+      if(data.groupId){
+        getId.push([data.goodsId, data.groupId])
+      }else{
+        getId.push([data.goodsId])
+      }
+      $("input[name='"+tag.tag+"']").val('['+getId.join(',')+']');
+      $('#selModal').modal('hide');
+    }
+    if(tag.tag=='offerScope_value3'){
+      var getId = []
+      if(data.groupId){
+        getId.push([data.goodsId, data.groupId])
+      }else{
+        getId.push([data.goodsId])
+      }
+      var txt = $("textarea[name='"+tag.tag+"']").text()
+      if(txt==''){
+        $("textarea[name='"+tag.tag+"']").html('['+getId.join(',')+']');
+      }else{
+        $("textarea[name='"+tag.tag+"']").html('['+txt+',['+getId.join(',')+']'+']');
+      }
+
+      $('#selModal').modal('hide');
+    }
   }
 
   requirejs(['/js/config.js'], function () {

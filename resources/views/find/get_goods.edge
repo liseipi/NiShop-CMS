@@ -13,7 +13,6 @@
     height: 100px;
   }
 </style>
-<pre>{{toJSON(goodsData)}}</pre>
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
@@ -71,7 +70,7 @@
           <th>商品信息</th>
           <th>状态</th>
           <th>组</th>
-          <th>操作</th>
+          <th>选择</th>
         </tr>
         </thead>
         <tbody>
@@ -82,7 +81,7 @@
             <p>分类：{{goods.column_name}}</p>
             <p>品牌：{{goods.brands_name}}</p>
           </td>
-          <td width="40%">
+          <td width="30%">
             <div class="row">
               <div class="col-sm-4">
                 @if(goods.goods_thumb)
@@ -108,21 +107,28 @@
           <td width="8%">{{{goods.status==0?'<span class="text-success">上线</span>':'<span class="text-primary">下线</span>'}}}</td>
           <td>
             @if(goods.goods_is_group==0)
-            <pre>{{goods.groupData}}</pre>
             <table class="table table-bordered">
               <thead>
               <tr>
-                <td>ID</td>
-                <td>名称</td>
+                <td>组ID</td>
+                <td>组图片</td>
+                <td>组名称</td>
                 <td>选择</td>
               </tr>
               </thead>
               <tbody>
-              @each(group in groupData)
+              @each(groups in goods.groupData)
               <tr>
-                <td>{{group.group_id}}</td>
-                <td></td>
-                <td>cc</td>
+                <td width="15%">{{groups.groupId}}</td>
+                <td width="120">
+                  @if(groups.groupPic)
+                  <img src="{{'/file/pictures/'+groups.groupPic}}" width="100" height="100" class="img-thumbnail">
+                  @else
+                  <img src="" width="100" height="100" title="缺少图片" class="img-thumbnail">
+                  @endif
+                </td>
+                <td width="40%">{{groups.groupDepict}}</td>
+                <td><a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{$parent.goods.ni_id}}', goodsName: '{{$parent.goods.goods_name}}', groupId: '{{groups.groupId}}', groupDepict: '{{groups.groupDepict}}', groupPic: '{{groups.groupPic}}'})">选择</a></td>
               </tr>
               @endeach
               </tbody>
@@ -133,7 +139,7 @@
           </td>
           <td>
             @if(goods.goods_is_group==1)
-            <a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{goods.ni_id}}', goodsName: '{{goods.goods_name}}'})">选择</a>
+            <a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{goods.ni_id}}', goodsName: '{{goods.goods_name}}', goodsPic: '{{goods.goods_thumb}}'})">选择</a>
             @endif
           </td>
         </tr>
@@ -155,7 +161,7 @@
   }
 
   requirejs(['../js/config.js'], function () {
-    requirejs(['cmsui'], function () {
+    requirejs(['cmsui', 'vue'], function (cmsui, Vue) {
 
       $('#page').pagination({
         pages: {{goodsData.lastPage}},

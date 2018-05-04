@@ -48,7 +48,9 @@ class GetFindController {
       whereCategoty = [].concat([parseInt(category_id)], formatSubData)
     }
 
-    const goodsData = await Database.select(goodsTable+'.*', categoryTable+'.column_name', brandsTable+'.brands_name', Database.raw('group_concat("{group_id:", gt.ni_id, ", group_depict:", gt.group_depict, "}") as groupData'), Database.raw('(gt.ni_id) as testData')).from(goodsTable)
+    const count = await Database.from(goodsTable).count()
+
+    const goodsData = await Database.select(goodsTable+'.*', categoryTable+'.column_name', brandsTable+'.brands_name', Database.raw('group_concat("{\'groupId\': ", gt.ni_id, ", \'groupDepict\': \'", gt.group_depict, "\', \'groupPic\': \'", gt.group_thumb, "\'}") as groupData')).from(goodsTable)
       .leftJoin(categoryTable, goodsTable+'.category_id', categoryTable+'.ni_id')
       .leftJoin(goodsGroupTable+' as gt', 'gt.goods_id', goodsTable+'.ni_id')
       .leftJoin(brandsTable, goodsTable+'.brands_id', brandsTable+'.ni_id')
@@ -75,8 +77,16 @@ class GetFindController {
       })
       .groupBy(goodsTable+'.ni_id')
       .orderBy(goodsTable+'.ni_id', 'desc')
-      //.toString()
       .paginate(page, perPage)
+
+    goodsData.total = count[0]['count(*)']
+    goodsData.lastPage = Math.ceil(count[0]['count(*)']/perPage)
+
+    goodsData.data.forEach((item, index)=>{
+      if(item.groupData){
+        item.groupData = JSON.parse('['+(item.groupData.replace(/\'/g, '"'))+']')
+      }
+    })
 
     return view.render('find.get_goods', {brandsData, categoryData:formatData, goodsData, query: query})
   }

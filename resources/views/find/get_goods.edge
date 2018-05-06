@@ -12,6 +12,10 @@
   .img-thumbnail{
     height: 100px;
   }
+  .formInput .form-group{
+    display: inline-block;
+    width: auto;
+  }
 </style>
 <div id="app-page">
   <div class="container-fluid">
@@ -20,7 +24,7 @@
     <div class="main">
       <table class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline">
         <caption>
-          <form action="/goods/list" method="get" class="form-inline text-center">
+          <form action="/goods/list" method="get" class="form-inline text-center formInput">
             <div class="form-group">
               <p class="form-control-static">品牌</p>
             </div>
@@ -112,7 +116,7 @@
               <tr>
                 <td>组ID</td>
                 <td>组图片</td>
-                <td>组名称</td>
+                <td>组商品</td>
                 <td>选择</td>
               </tr>
               </thead>
@@ -120,15 +124,15 @@
               @each(groups in goods.groupData)
               <tr>
                 <td width="15%">{{groups.groupId}}</td>
-                <td width="120">
+                <td>
                   @if(groups.groupPic)
                   <img src="{{'/file/pictures/'+groups.groupPic}}" width="100" height="100" class="img-thumbnail">
                   @else
                   <img src="" width="100" height="100" title="缺少图片" class="img-thumbnail">
                   @endif
                 </td>
-                <td width="40%">{{groups.groupDepict}}</td>
-                <td><a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{$parent.goods.ni_id}}', goodsName: '{{$parent.goods.goods_name}}', groupId: '{{groups.groupId}}', groupDepict: '{{groups.groupDepict}}', groupPic: '{{groups.groupPic}}'})">选择</a></td>
+                <td>{{groups.groupDepict}}</td>
+                <td><a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{$parent.goods.ni_id}}', goodsName: '{{$parent.goods.goods_name}}', goodsPic: '{{$parent.goods.goods_thumb}}', groupId: '{{groups.groupId}}', groupDepict: '{{groups.groupDepict}}', groupPic: '{{groups.groupPic}}'})">选择</a></td>
               </tr>
               @endeach
               </tbody>
@@ -138,9 +142,7 @@
             @endif
           </td>
           <td>
-            @if(goods.goods_is_group==1)
             <a class="btn btn-lg btn-info" onclick="backData({goodsId: '{{goods.ni_id}}', goodsName: '{{goods.goods_name}}', goodsPic: '{{goods.goods_thumb}}'})">选择</a>
-            @endif
           </td>
         </tr>
         @endeach
@@ -158,6 +160,10 @@
     if(parent.getGoodsData){
       parent.getGoodsData(data, {tag:"{{query.tag||'default'}}"});
     }
+  }
+
+  function promptMsg(){
+    $.toast("加入成功.");
   }
 
   requirejs(['../js/config.js'], function () {

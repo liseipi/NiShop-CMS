@@ -10,7 +10,7 @@ requirejs.config({
     ckedit: 'vendor/ckeditor/ckeditor',
     holder: 'lib/holder',
     zyUpload: 'vendor/zyUploads/js/zyupload-1.0.0.min',
-    timepicker: 'vendor/timepicker/jquery-ui-timepicker-addon.min'
+    laydate: 'vendor/laydate/laydate'
   },
   map: {
     '*': {
@@ -40,11 +40,9 @@ requirejs.config({
         'jquery'
       ]
     },
-    timepicker: {
+    laydate: {
       deps: [
-        'css!vendor/jquery-ui/jquery-ui.min.css',
-        'css!vendor/timepicker/jquery-ui-timepicker-addon.min.css',
-        'jquery'
+        'css!vendor/laydate/theme/default/laydate.css'
       ]
     },
   }

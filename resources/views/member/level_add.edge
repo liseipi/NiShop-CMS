@@ -1,0 +1,61 @@
+@layout('layout')
+@section('content')
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">增加会员级别</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/member/levelAdd" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">级别名称</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="level_name" value="{{old('level_name', '')}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('level_name'), hasErrorFor('level_name')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">最小订单数</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="min_order" value="{{old('min_order', 0)}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('min_order'), hasErrorFor('min_order')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">最小交易金额</label>
+          <div class="col-sm-6">
+            <input type="number" class="form-control" name="min_amount" value="{{old('min_amount', 0)}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('min_amount'), hasErrorFor('min_amount')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">最小交易积分</label>
+          <div class="col-sm-6">
+            <input type="number" class="form-control" name="min_points" value="{{old('min_points', 0)}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('min_points'), hasErrorFor('min_points')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">级别备注</label>
+          <div class="col-sm-6">
+            <textarea class="form-control" name="level_note" rows="5">{{old('level_note', '')}}</textarea>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui'], function (cmsui) {
+    });
+  });
+</script>
+@endsection

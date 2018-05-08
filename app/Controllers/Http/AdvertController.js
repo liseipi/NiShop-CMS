@@ -7,6 +7,8 @@ const Drive = use('Drive')
 
 const advertTable = 'ni_adverts'
 const advertPhotoTable = 'ni_advert_galleries'
+const levelTable = 'ni_member_level'
+const saleTable = 'ni_advert_sale'
 
 const moment = use('moment')
 
@@ -278,7 +280,69 @@ class AdvertController {
   }
 
   async saleAdd({view}){
-    return view.render('advert.sale_add', {date: {startDate: moment().format('YYYY-MM-DD'), endDate: moment().add(1, 'year').format('YYYY-MM-DD')}})
+    const levelData = await Database.select('*').from(levelTable)
+    return view.render('advert.sale_add', {
+      levelData,
+      date: {
+        startDate: moment().format('YYYY-MM-DD'),
+        endDate: moment().add(1, 'year').format('YYYY-MM-DD')
+      }
+    })
+  }
+
+  async saleAddSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(saleTable, request.all())
+    //saveData.sale_start_time = new Date(saveData.sale_start_time).getTime()
+    //saveData.sale_end_time = new Date(saveData.sale_end_time).getTime()
+
+    if(new Date(saveData.sale_start_time).getTime() >= new Date(saveData.sale_end_time).getTime()){
+      session.flash({notification: '开始时间不大于或等于结束时间！'})
+      session.withErrors().flashAll()
+      return response.redirect('back')
+    }
+
+    if(saveData.sale_type==1 && !saveData.type_value1){
+      session.flash({notification: '缺少优惠赠品！'})
+      session.withErrors().flashAll()
+      return response.redirect('back')
+    }
+
+    if(saveData.sale_offerScope==3 && !saveData.offerScope_value3){
+      session.flash({notification: '缺少优惠商品！'})
+      session.withErrors().flashAll()
+      return response.redirect('back')
+    }
+
+    if(saveData.sale_offerScope==3 && saveData.offerScope_value3){
+      saveData.offerScope_value3 = saveData.offerScope_value3.join(',')
+    }
+
+    try{
+      await Database.table(saleTable).insert(saveData)
+      session.flash({notification: '增加成功！'})
+      return response.redirect('/advert/saleList')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      return response.redirect('back')
+    }
+  }
+
+  async saleList({view}){
+    const saleData = await Database.select('*').from(saleTable)
+    return view.render('advert.sale_list', {saleData})
+  }
+
+  async saleEdit({view, params}){
+    const saleInfo = await Database.table(saleTable).where('ni_id', params.id).first()
+    const levelData = await Database.select('*').from(levelTable)
+    return view.render('advert.sale_edit', {
+      saleInfo,
+      levelData,
+      date: {
+        startDate: moment().format('YYYY-MM-DD'),
+        endDate: moment().add(1, 'year').format('YYYY-MM-DD')
+      }
+    })
   }
 
 }

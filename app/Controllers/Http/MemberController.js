@@ -9,6 +9,7 @@ const regionTable = 'ni_region'
 const cartTable = 'ni_member_cart'
 const goodsTable = 'ni_goods'
 const goodsGroupTable = 'ni_goods_groups'
+const levelTable = 'ni_member_level'
 
 class MemberController {
 
@@ -72,6 +73,58 @@ class MemberController {
 
     return view.render('member.cart', {cartData})
 
+  }
+
+  async levelAdd({view}){
+    return view.render('member.level_add')
+  }
+
+  async levelAddSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(levelTable, request.all())
+
+    try{
+      await Database.table(levelTable).insert(saveData)
+      session.flash({notification: '增加成功！'})
+      response.redirect('/member/level')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async level({view}){
+    const levelData = await Database.select('*').from(levelTable)
+    return view.render('member.level', {levelData})
+  }
+
+  async levelEdit({view, params}){
+    const levelInfo = await Database.table(levelTable).where('ni_id', params.id).first()
+    return view.render('member.level_edit', {levelInfo})
+  }
+
+  async levelEditSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(levelTable, request.all())
+
+    try{
+      await Database.table(levelTable).where('ni_id', params.id).update(saveData)
+      session.flash({notification: '修改成功！'})
+      response.redirect('/member/level')
+    }catch(error){
+      session.flash({notification: '修改失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async levelDestroy({response, params, session}){
+
+    try{
+      await Database.table(levelTable).where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/member/level')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
   }
 
 }

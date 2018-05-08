@@ -15,7 +15,7 @@ class GoodsSchema extends Schema {
       table.integer('goods_instock', 32).comment('库存')
       table.integer('goods_price', 32).comment('商品价格')
       table.integer('goods_original_price', 32).comment('商品原价')
-      table.integer('goods_calculus', 64).comment('商品积分')
+      table.integer('goods_points', 64).comment('商品积分')
       table.integer('goods_is_real', 1).defaultTo(0).comment('是否为虚拟商品')
       table.integer('goods_weight', 32).comment('重量')
       table.string('goods_volume', 64).comment('体积')

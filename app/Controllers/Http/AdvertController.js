@@ -9,6 +9,9 @@ const advertTable = 'ni_adverts'
 const advertPhotoTable = 'ni_advert_galleries'
 const levelTable = 'ni_member_level'
 const saleTable = 'ni_advert_sale'
+const goodsTable = 'ni_goods'
+const brandsTable = 'ni_brands'
+const categoryTable = 'ni_goods_categories'
 
 const moment = use('moment')
 
@@ -292,10 +295,10 @@ class AdvertController {
 
   async saleAddSave({request, response, params, session}){
     const saveData = await GlobalFn.formatSubmitData(saleTable, request.all())
-    //saveData.sale_start_time = new Date(saveData.sale_start_time).getTime()
-    //saveData.sale_end_time = new Date(saveData.sale_end_time).getTime()
+    saveData.sale_start_time = new Date(saveData.sale_start_time).getTime()
+    saveData.sale_end_time = new Date(saveData.sale_end_time).getTime()
 
-    if(new Date(saveData.sale_start_time).getTime() >= new Date(saveData.sale_end_time).getTime()){
+    if(saveData.sale_start_time >= saveData.sale_end_time){
       session.flash({notification: '开始时间不大于或等于结束时间！'})
       session.withErrors().flashAll()
       return response.redirect('back')
@@ -319,11 +322,12 @@ class AdvertController {
 
     try{
       await Database.table(saleTable).insert(saveData)
+
       session.flash({notification: '增加成功！'})
-      return response.redirect('/advert/saleList')
+      response.redirect('/advert/saleList')
     }catch(error){
       session.flash({notification: '增加失败！'+error})
-      return response.redirect('back')
+      response.redirect('back')
     }
   }
 
@@ -335,6 +339,31 @@ class AdvertController {
   async saleEdit({view, params}){
     const saleInfo = await Database.table(saleTable).where('ni_id', params.id).first()
     const levelData = await Database.select('*').from(levelTable)
+
+    //返回赠品
+    if(saleInfo.sale_type==1 && saleInfo.type_value1){
+      const gifts = await Database.select('ni_id', 'goods_name', 'goods_thumb').table(goodsTable).where('ni_id', saleInfo.type_value1).first()
+      saleInfo.giftsGoods = gifts
+    }
+
+    //返回品牌
+    if(saleInfo.sale_offerScope==1 && saleInfo.offerScope_value1){
+      const brandsInfo = await Database.select('ni_id', 'brands_name', 'brands_logo').table(brandsTable).where('ni_id', saleInfo.offerScope_value1).first()
+      saleInfo.brandsInfo = brandsInfo
+    }
+
+    //返回分类
+    if(saleInfo.sale_offerScope==2 && saleInfo.offerScope_value2){
+      const categoryInfo = await Database.select('ni_id', 'column_name').table(categoryTable).where('ni_id', saleInfo.offerScope_value2).first()
+      saleInfo.categoryInfo = categoryInfo
+    }
+
+    //返回优惠的商品
+    if(saleInfo.sale_offerScope==3 && saleInfo.offerScope_value3){
+      const offerGoods = await Database.select('ni_id', 'goods_name', 'goods_thumb').from(goodsTable).whereIn('ni_id', saleInfo.offerScope_value3.split(','))
+      saleInfo.offerGoods = offerGoods
+    }
+
     return view.render('advert.sale_edit', {
       saleInfo,
       levelData,
@@ -343,6 +372,56 @@ class AdvertController {
         endDate: moment().add(1, 'year').format('YYYY-MM-DD')
       }
     })
+  }
+
+  async saleEditSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(saleTable, request.all())
+    saveData.sale_start_time = new Date(saveData.sale_start_time).getTime()
+    saveData.sale_end_time = new Date(saveData.sale_end_time).getTime()
+
+    if(saveData.sale_start_time >= saveData.sale_end_time){
+      session.flash({notification: '开始时间不大于或等于结束时间！'})
+      session.withErrors().flashAll()
+      return response.redirect('back')
+    }
+
+    if(saveData.sale_type==1 && !saveData.type_value1){
+      session.flash({notification: '缺少优惠赠品！'})
+      session.withErrors().flashAll()
+      return response.redirect('back')
+    }
+
+    if(saveData.sale_offerScope==3 && !saveData.offerScope_value3){
+      session.flash({notification: '缺少优惠商品！'})
+      session.withErrors().flashAll()
+      return response.redirect('back')
+    }
+
+    if(saveData.sale_offerScope==3 && saveData.offerScope_value3){
+      saveData.offerScope_value3 = saveData.offerScope_value3.join(',')
+    }
+
+    try{
+      await Database.from(saleTable).where('ni_id', params.id).update(saveData)
+
+      session.flash({notification: '编辑成功！'})
+      response.redirect('/advert/saleList')
+    }catch(error){
+      session.flash({notification: '编辑失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async saleDestroy({response, params, session}){
+    try{
+      await Database.table(saleTable).where('ni_id', params.id).delete()
+
+      session.flash({notification: '删除成功！'})
+      response.redirect('/advert/saleList')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
   }
 
 }

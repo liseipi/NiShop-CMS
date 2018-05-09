@@ -202,18 +202,7 @@
   }
 
   function getGoodsData(data, tag){
-    //alert(JSON.stringify(data));
-    //alert(JSON.stringify(tag));
     if(tag.tag=='type_value1'){
-      /*
-      var getId = []
-      if(data.groupId){
-        getId.push([data.goodsId, data.groupId])
-      }else{
-        getId.push([data.goodsId])
-      }
-      $("input[name='"+tag.tag+"']").val('['+getId.join(',')+']');
-      */
       $('#typeval').show();
       $('#type_val').val(data.goodsId);
       $('#type_id').html(data.goodsId);
@@ -224,35 +213,19 @@
     }
 
     if(tag.tag=='offerScope_value3'){
-      /*
-      var getId = []
-      if(data.groupId){
-        getId.push([data.goodsId, data.groupId])
-      }else{
-        getId.push([data.goodsId])
-      }
-      var txt = $("textarea[name='"+tag.tag+"']").text()
-      if(txt==''){
-        $("textarea[name='"+tag.tag+"']").html('['+getId.join(',')+']');
-      }else{
-        $("textarea[name='"+tag.tag+"']").html('['+txt+',['+getId.join(',')+']'+']');
-      }
-      */
-
       $('#addOfferScope').append('<tr><td><input type="checkbox" name="offerScope_value3[]" checked value="'+data.goodsId+'"></td><td>'+data.goodsId+'</td><td><img src="/file/pictures/'+data.goodsPic+'" class="picFile" ></td><td>'+data.goodsName+'</td></tr>');
       window.frames['parWin'].promptMsg();
-      //$('#selModal').modal('hide');
     }
   }
 
   requirejs(['/js/config.js'], function () {
-    requirejs(['cmsui', 'vue', 'laydate'], function (cmsui, Vue, laydate) {
+    requirejs(['cmsui', 'laydate', 'vue'], function (cmsui, laydate, Vue) {
 
       new Vue({
         el: '#app-page',
         data:{
-          sale_type: '{{old("sale_type")}}'||1,
-          sale_offerScope: '{{old("sale_offerScope")}}'||0,
+          sale_type: '{{old("sale_type", 1)}}',
+          sale_offerScope: '{{old("sale_offerScope", 0)}}'
         },
         methods:{
 

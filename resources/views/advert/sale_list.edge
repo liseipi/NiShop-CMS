@@ -22,7 +22,7 @@
         <tr>
           <td>{{sale.ni_id}}</td>
           <td>{{sale.sale_title}}</td>
-          <td>{{{sale.sale_start_time}}} 到 {{sale.sale_end_time}} <span v-html="formatDateTime(new Date())"></span></td>
+          <td><span v-text="formatDateTime({{sale.sale_start_time}})"></span> 到 <span v-text="formatDateTime({{sale.sale_end_time}})"></span></td>
           <td>{{sale.status==0?'上线':'下线'}}</td>
           <td>
             @if(sale.sale_type==1)
@@ -61,9 +61,10 @@
 
       new Vue({
         el: '#app-page',
-        data:{},
-        methods:{
+        data: {},
+        methods: {
           formatDateTime: function (date) {
+            date = new Date(date);
             var y = date.getFullYear();
             var m = date.getMonth() + 1;
             m = m < 10 ? ('0' + m) : m;
@@ -78,10 +79,9 @@
             return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
           }
         },
-        mounted: function () {
-          console.log(11)
-        }
+        mounted: function () {}
       });
+
 
     });
   });

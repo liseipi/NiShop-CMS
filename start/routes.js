@@ -106,6 +106,12 @@ Route.group(()=>{
   Route.get('/advert/saleEdit/:id', 'AdvertController.saleEdit')
   Route.post('/advert/saleEdit/:id', 'AdvertController.saleEditSave').validator('sale')
   Route.get('/advert/saleDestroy/:id', 'AdvertController.saleDestroy')
+  Route.get('/advert/redPacket', 'AdvertController.redPacket')
+  Route.get('/advert/redPacketAdd', 'AdvertController.redPacketAdd')
+  Route.post('/advert/redPacketAdd', 'AdvertController.redPacketAddSave').validator('redpacket')
+  Route.get('/advert/redPacketEdit/:id', 'AdvertController.redPacketEdit')
+  Route.post('/advert/redPacketEdit/:id', 'AdvertController.redPacketEditSave').validator('redpacket')
+  Route.get('/advert/redPacketDestroy/:id', 'AdvertController.redPacketDestroy')
 
   Route.get('/system/shopInfo', 'SystemController.shopInfo')
   Route.post('/system/shopInfo', 'SystemController.shopInfoSave')

@@ -424,6 +424,20 @@ class AdvertController {
     }
   }
 
+  async redPacketAdd({view}){
+    return view.render('advert.redpacket_add',{
+      date: {
+        startDate: moment().format('YYYY-MM-DD'),
+        endDate: moment().add(1, 'month').format('YYYY-MM-DD'),
+        useEndDate: moment().add(3, 'month').format('YYYY-MM-DD')
+      }
+    })
+  }
+
+  async redPacketAddSave({request, response, session}){
+    console.log(request.all())
+  }
+
 }
 
 module.exports = AdvertController

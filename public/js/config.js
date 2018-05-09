@@ -2,7 +2,6 @@ requirejs.config({
   baseUrl: '/js',
   paths: {
     jquery: 'lib/jquery.min',
-    'jquery-ui': 'vendor/jquery-ui/jquery-ui.min',
     sui: 'vendor/sui3/js/sui.min',
     metisMenu: 'lib/metisMenu',
     vue: 'lib/vue.min',
@@ -10,7 +9,8 @@ requirejs.config({
     ckedit: 'vendor/ckeditor/ckeditor',
     holder: 'lib/holder',
     zyUpload: 'vendor/zyUploads/js/zyupload-1.0.0.min',
-    laydate: 'vendor/laydate/laydate'
+    laydate: 'vendor/laydate/laydate',
+    domReady: 'lib/domReady'
   },
   map: {
     '*': {

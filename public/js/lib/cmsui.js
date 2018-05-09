@@ -40,6 +40,8 @@ $(function () {
     }
   }
 
-  $('#notification').trigger('click')
+  setTimeout(function () {
+    $('#notification').trigger('click');
+  }, 30);
 
 });

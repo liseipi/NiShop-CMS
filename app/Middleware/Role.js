@@ -37,7 +37,8 @@ class Role {
         '/goods/checkSku',
         '/getBrands',
         '/getCategory',
-        '/getGoods'
+        '/getGoods',
+        '/getMember'
       ]
       if(no_Auth.indexOf(acturl)<0){
         if(LicitUrl){

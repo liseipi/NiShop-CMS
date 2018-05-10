@@ -9,28 +9,29 @@
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
-    <h5 class="page-header">增加红包</h5>
+    <h5 class="page-header">编辑红包</h5>
     <div class="main">
-      <form class="form-horizontal" action="/advert/redPacketAdd" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/advert/redPacketEdit/{{redpacketInfo.ni_id}}" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
           <label class="col-sm-2 control-label">红包名称</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="redpacket_name" value="{{old('redpacket_name', '')}}" data-rule-required="true">
+            <input type="text" class="form-control" name="redpacket_name" value="{{redpacketInfo.redpacket_name}}" data-rule-required="true">
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_name'), hasErrorFor('redpacket_name')) }}</div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">红包金额</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="redpacket_price" value="{{old('redpacket_price', '')}}" data-rule-required="true" data-rule-number="true">
+            <input type="text" class="form-control" name="redpacket_price" value="{{redpacketInfo.redpacket_price}}" {{redpacketInfo.emit_status==0?'readonly':''}} data-rule-required="true" data-rule-number="true">
+            <div v-if="{{redpacketInfo.emit_status}}==0" class="text-danger">已经发放的红包不可修改红包金额</div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_price'), hasErrorFor('redpacket_price')) }}</div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">最小订单金额</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="redpacket_min_order_price" value="{{old('redpacket_min_order_price', '')}}" data-rule-required="true" data-rule-number="true">
+            <input type="text" class="form-control" name="redpacket_min_order_price" value="{{redpacketInfo.redpacket_min_order_price}}" data-rule-required="true" data-rule-number="true">
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_min_order_price'), hasErrorFor('redpacket_min_order_price')) }}</div>
         </div>
@@ -38,10 +39,10 @@
           <label class="col-sm-2 control-label">红包状态</label>
           <div class="col-sm-8">
             <label class="radio-inline">
-              <input type="radio" name="status" value="0" {{old('status')==0?'checked':''}}> 开启
+              <input type="radio" name="status" value="0" {{redpacketInfo.status==0?'checked':''}}> 开启
             </label>
             <label class="radio-inline">
-              <input type="radio" name="status" value="1" {{old('status')?'':'checked'}} {{old('status')==1?'checked':''}}> 关闭
+              <input type="radio" name="status" value="1" {{redpacketInfo.status==1?'checked':''}}> 关闭
             </label>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('status'), hasErrorFor('status')) }}</div>
@@ -49,36 +50,37 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">红包发放类型</label>
           <div class="col-sm-8">
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="1" {{old('redpacket_type')?'':'checked'}} {{old('redpacket_type')==1?'checked':''}}> 按用户等级发放
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="1" {{redpacketInfo.redpacket_type==1?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=1)?'disabled':''}}> 按用户等级发放
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="2" {{old('redpacket_type')==2?'checked':''}}> 按品牌发放
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="2" {{redpacketInfo.redpacket_type==2?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=2)?'disabled':''}}> 按品牌发放
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="3" {{old('redpacket_type')==3?'checked':''}}> 按分类发放
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="3" {{redpacketInfo.redpacket_type==3?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=3)?'disabled':''}}> 按分类发放
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="4" {{old('redpacket_type')==4?'checked':''}}> 按订单金额发放
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="4" {{redpacketInfo.redpacket_type==4?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=4)?'disabled':''}}> 按订单金额发放
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="5" {{old('redpacket_type')==5?'checked':''}}> 优惠券
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="5" {{redpacketInfo.redpacket_type==5?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=5)?'disabled':''}}> 优惠券
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="6" {{old('redpacket_type')==6?'checked':''}}> 按用户发放
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="6" {{redpacketInfo.redpacket_type==6?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=6)?'disabled':''}}> 按用户发放
             </label>
-            <label class="radio-inline">
-              <input type="radio" name="redpacket_type" value="7" {{old('redpacket_type')==7?'checked':''}}> 按商品发放
+            <label class="radio-inline {{redpacketInfo.emit_status==0?'disabled':''}}">
+              <input type="radio" name="redpacket_type" value="7" {{redpacketInfo.redpacket_type==7?'checked':''}} {{(redpacketInfo.emit_status==0&&redpacketInfo.redpacket_type!=7)?'disabled':''}}> 按商品发放
             </label>
+            <div v-if="{{redpacketInfo.emit_status}}==0" class="text-danger">已经发放的红包不可修改红包类型</div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_type'), hasErrorFor('redpacket_type')) }}</div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">红包发放开始/结束时间</label>
           <div class="col-sm-8 form-inline">
-            <input type="text" class="form-control input-date" placeholder="开始时间" readonly name="redpacket_push_start_at" value="{{old('redpacket_push_start_at', '')}}" id="pushStartDate" data-rule-required="true" />
+            <input type="text" class="form-control input-date" placeholder="开始时间" readonly name="redpacket_push_start_at" :value="formatDateTime({{redpacketInfo.redpacket_push_start_at}})" id="pushStartDate" data-rule-required="true" />
             -
-            <input type="text" class="form-control input-date" placeholder="结束时间" readonly name="redpacket_push_end_at" value="{{old('redpacket_push_end_at', '')}}" id="pushEndDate" data-rule-required="true" />
+            <input type="text" class="form-control input-date" placeholder="结束时间" readonly name="redpacket_push_end_at" :value="formatDateTime({{redpacketInfo.redpacket_push_end_at}})" id="pushEndDate" data-rule-required="true" />
             <div class="help-block color-danger">发放红包当前时间最长延至1个月</div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_push_start_at'), hasErrorFor('redpacket_push_start_at')) }} {{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_push_end_at'), hasErrorFor('redpacket_push_end_at')) }}</div>
@@ -86,9 +88,9 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">红包使用开始/结束时间</label>
           <div class="col-sm-8 form-inline">
-            <input type="text" class="form-control input-date" placeholder="开始时间" readonly name="redpacket_use_start_at" value="{{old('redpacket_use_start_at', '')}}" id="useStartDate" data-rule-required="true" />
+            <input type="text" class="form-control input-date" placeholder="开始时间" readonly name="redpacket_use_start_at" :value="formatDateTime({{redpacketInfo.redpacket_use_start_at}})" id="useStartDate" data-rule-required="true" />
             -
-            <input type="text" class="form-control input-date" placeholder="结束时间" readonly name="redpacket_use_end_at" value="{{old('redpacket_use_end_at', '')}}" id="useEndDate" data-rule-required="true" />
+            <input type="text" class="form-control input-date" placeholder="结束时间" readonly name="redpacket_use_end_at" :value="formatDateTime({{redpacketInfo.redpacket_use_end_at}})" id="useEndDate" data-rule-required="true" />
             <div class="help-block color-danger">使用红包当前时间最长延至3个月</div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_use_start_at'), hasErrorFor('redpacket_use_start_at')) }} {{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_use_end_at'), hasErrorFor('redpacket_use_end_at')) }}</div>
@@ -112,6 +114,21 @@
           data:{
           },
           methods:{
+            formatDateTime: function (date) {
+              date = new Date(date);
+              var y = date.getFullYear();
+              var m = date.getMonth() + 1;
+              m = m < 10 ? ('0' + m) : m;
+              var d = date.getDate();
+              d = d < 10 ? ('0' + d) : d;
+              var h = date.getHours();
+              h=h < 10 ? ('0' + h) : h;
+              var minute = date.getMinutes();
+              minute = minute < 10 ? ('0' + minute) : minute;
+              var second=date.getSeconds();
+              second=second < 10 ? ('0' + second) : second;
+              return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
+            }
           },
           mounted: function(){
 

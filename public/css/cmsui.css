@@ -2,6 +2,11 @@
 [v-cloak] {
   display: none;
 }
+.thumb-border{
+  width: 100px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+}
 .form-control {
     height: 32px;
     font-size: 14px;

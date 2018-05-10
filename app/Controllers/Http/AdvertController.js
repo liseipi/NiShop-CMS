@@ -12,6 +12,7 @@ const saleTable = 'ni_advert_sale'
 const goodsTable = 'ni_goods'
 const brandsTable = 'ni_brands'
 const categoryTable = 'ni_goods_categories'
+const redpacketTable = 'ni_redpacket'
 
 const moment = use('moment')
 
@@ -435,7 +436,137 @@ class AdvertController {
   }
 
   async redPacketAddSave({request, response, session}){
-    console.log(request.all())
+    const saveData = await GlobalFn.formatSubmitData(redpacketTable, request.all())
+    saveData.redpacket_push_start_at = new Date(saveData.redpacket_push_start_at).getTime()
+    saveData.redpacket_push_end_at = new Date(saveData.redpacket_push_end_at).getTime()
+    saveData.redpacket_use_start_at = new Date(saveData.redpacket_use_start_at).getTime()
+    saveData.redpacket_use_end_at = new Date(saveData.redpacket_use_end_at).getTime()
+
+    try{
+      await Database.from(redpacketTable).insert(saveData)
+
+      session.flash({notification: '增加成功！'})
+      response.redirect('/advert/redPacket')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async redPacket({view}){
+    const redpacketData = await Database.select('*').from(redpacketTable)
+    return view.render('advert.redpacket_list', {redpacketData})
+  }
+
+  async redPacketEdit({view, params}){
+    const redpacketInfo = await Database.table(redpacketTable).where('ni_id', params.id).first()
+    return view.render('advert.redpacket_edit', {
+      redpacketInfo,
+      date: {
+        startDate: moment().format('YYYY-MM-DD'),
+        endDate: moment().add(1, 'month').format('YYYY-MM-DD'),
+        useEndDate: moment().add(3, 'month').format('YYYY-MM-DD')
+      }
+    })
+  }
+
+  async redPacketEditSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(redpacketTable, request.all())
+    saveData.redpacket_push_start_at = new Date(saveData.redpacket_push_start_at).getTime()
+    saveData.redpacket_push_end_at = new Date(saveData.redpacket_push_end_at).getTime()
+    saveData.redpacket_use_start_at = new Date(saveData.redpacket_use_start_at).getTime()
+    saveData.redpacket_use_end_at = new Date(saveData.redpacket_use_end_at).getTime()
+
+    try{
+      await Database.from(redpacketTable).where('ni_id', params.id).update(saveData)
+
+      session.flash({notification: '编辑成功！'})
+      response.redirect('/advert/redPacket')
+    }catch(error){
+      session.flash({notification: '编辑失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async redPacketLibrary({view, params}){
+    const redpacketInfo = await Database.table(redpacketTable).where('ni_id', params.id).first()
+    const typeData = {}
+
+    //用户等级
+    if(redpacketInfo.redpacket_type==1){
+      typeData.selectItem = await Database.select('*').from(levelTable)
+    }
+
+    //品牌
+    if(redpacketInfo.redpacket_type==2){
+      typeData.selectItem = await Database.select('*').from(brandsTable)
+    }
+
+    //分类
+    if(redpacketInfo.redpacket_type==3){
+      const categoryData = await Database.select('*').from(categoryTable)
+      typeData.selectItem = await GlobalFn.soleTreeSort(categoryData)
+    }
+
+    return view.render('advert.redpacket_library', {redpacketInfo, typeData})
+  }
+
+  async redPacketLibrarySave({request, response, params, session}){
+    const redpacketInfo = await Database.table(redpacketTable).where('ni_id', params.id).first()
+
+    const saveData = {
+      redpacket_id: params.id,
+      redpacket_type: redpacketInfo.redpacket_type
+    }
+    const query = request.all()
+
+    //用户级别ID
+    if(query.member_level_id){
+      saveData.member_level_id = query.member_level_id
+    }
+
+    //品牌ID
+    if(query.brands_id){
+      saveData.brands_id = query.brands_id
+    }
+
+    //分类ID
+    if(query.category_id){
+      saveData.category_id = query.category_id
+    }
+
+    //订单金额
+    if(query.order_amount){
+      saveData.order_amount = query.order_amount
+    }
+
+    //生成优惠券
+    if(query.coupon_number){
+      //query.coupon_number
+      let couponArr = new Array()
+      for(let cp=0; cp<query.coupon_number; cp++){
+        couponArr.push({
+          redpacket_id: params.id,
+          redpacket_type: redpacketInfo.redpacket_type,
+          coupon: (Math.random().toString(16).substr(2, 8)).toUpperCase()
+        });
+      }
+    }
+
+    //生成指定用户
+    if(query.member_id){
+      let memberArr = []
+      query.member_id.forEach((item)=>{
+        memberArr.push({
+          redpacket_id: params.id,
+          redpacket_type: redpacketInfo.redpacket_type,
+          member_id:item
+        })
+      })
+    }
+
+    console.log(saveData)
+
   }
 
 }

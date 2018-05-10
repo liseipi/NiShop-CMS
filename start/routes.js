@@ -112,6 +112,8 @@ Route.group(()=>{
   Route.get('/advert/redPacketEdit/:id', 'AdvertController.redPacketEdit')
   Route.post('/advert/redPacketEdit/:id', 'AdvertController.redPacketEditSave').validator('redpacket')
   Route.get('/advert/redPacketDestroy/:id', 'AdvertController.redPacketDestroy')
+  Route.get('/advert/redPacketLibrary/:id', 'AdvertController.redPacketLibrary')
+  Route.post('/advert/redPacketLibrary/:id', 'AdvertController.redPacketLibrarySave')
 
   Route.get('/system/shopInfo', 'SystemController.shopInfo')
   Route.post('/system/shopInfo', 'SystemController.shopInfoSave')
@@ -131,6 +133,7 @@ Route.group(()=>{
   Route.get('/getBrands', 'GetFindController.getBrands')
   Route.get('/getCategory', 'GetFindController.getCategory')
   Route.get('/getGoods', 'GetFindController.getGoods')
+  Route.get('/getMember', 'GetFindController.getMember')
 
 
 }).middleware(['auth', 'role'])

@@ -7,19 +7,17 @@
     <title>Document</title>
 </head>
 <body>
+
+<div>
+
+
+</div>
+
 <script>
 
-  var arr = [ { goods_attr_value: 'bb', attr_id: 1, goods_id: 9 },
-    { goods_attr_value: 'xzc', attr_id: 2, goods_id: 9 },
-    { goods_attr_value: null, attr_id: 3, goods_id: 9 },
-    { goods_attr_value: null, attr_id: 4, goods_id: 9 } ];
-
-  var data = [];
-  arr.forEach(val=>{
-    val.id = 10
-    data.push(val);
-  })
-  console.log(data)
+  var str = '[{"groupId": 73, "groupDepict": "aa"},{"groupId": 76, "groupDepict": "cc"},{"groupId": 77, "groupDepict": "dd"}]';
+  var test =  JSON.parse(str)
+  console.log(test)
 
 
 </script>

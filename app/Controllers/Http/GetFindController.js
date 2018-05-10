@@ -7,6 +7,7 @@ const brandsTable = 'ni_brands'
 const categoryTable = 'ni_goods_categories'
 const goodsTable = 'ni_goods'
 const goodsGroupTable = 'ni_goods_groups'
+const memberTable = 'ni_member'
 
 class GetFindController {
 
@@ -20,7 +21,6 @@ class GetFindController {
       .where('status', 0).paginate(page, perPage)
     return view.render('find.get_brands', {brandsData, query})
   }
-
 
   async getCategory({view, request}){
     const query = request.get()
@@ -89,6 +89,25 @@ class GetFindController {
     })
 
     return view.render('find.get_goods', {brandsData, categoryData:formatData, goodsData, query: query})
+  }
+
+  async getMember({view, request}){
+    const query = request.get()
+    const page = query.page || 1
+    const perPage = 20
+    const typeValue = query.type || 0
+    const keywords = query.keywords || ''
+
+    const memberData = await Database.select('ni_id', 'username', 'mobile', 'email', 'is_verify_mobile', 'is_verify_email').from(memberTable)
+      .where(function(){
+        if(typeValue!=0){
+          this.where(memberTable+'.'+typeValue, 'like', `%${keywords}%`)
+        }
+      })
+      .orderBy('ni_id', 'desc')
+      .paginate(page, perPage)
+
+    return view.render('find.get_member', {memberData, query: query})
   }
 
 }

@@ -10,6 +10,7 @@ class RedpacketSchema extends Schema {
       table.float('redpacket_price', 8)
       table.float('redpacket_min_order_price', 8)
       table.integer('status', 2).defaultTo(1)
+      table.integer('emit_status', 2).defaultTo(1)
       table.integer('redpacket_type', 2)
       table.bigInteger('redpacket_push_start_at', 13)
       table.bigInteger('redpacket_push_end_at', 13)

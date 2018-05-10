@@ -28,12 +28,6 @@ requirejs.config({
         'jquery',
       ]
     },
-    cmsui: {
-      deps: [
-        'sui',
-        'metisMenu'
-      ]
-    },
     zyUpload: {
       deps: [
         'css!vendor/zyUploads/css/zyupload-1.0.0.min.css',

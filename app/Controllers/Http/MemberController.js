@@ -2,6 +2,7 @@
 
 const Database = use('Database')
 const GlobalFn = use('App/Helpers/GlobalFn')
+const Mail = use('Mail')
 
 const memberTable = 'ni_member'
 const addressTable = 'ni_member_address'
@@ -39,6 +40,15 @@ class MemberController {
 
   async addSave({request, response, params, session}){
     console.log(request.all())
+    const saveData = await GlobalFn.formatSubmitData(memberTable, request.all())
+
+    if(saveData.email){
+      await Mail.send('email.welcome', {}, (message) => {
+        message.from('foo@bar.com')
+        message.to('522371046@qq.com')
+      })
+    }
+
   }
 
   async edit({view, params}){

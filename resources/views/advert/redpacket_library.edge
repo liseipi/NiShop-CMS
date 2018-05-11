@@ -297,7 +297,9 @@
           el: '#app-page',
           data: {
             selectArr: {{{ toJSON(typeData.selectItem) }}},
-            libData: {{{ toJSON(redpacketLib) }}},
+            libData: {{{ toJSON(redpacketLib) }}}
+          },
+          methods: {
             formatDateTime: function (date) {
               date = new Date(date);
               var y = date.getFullYear();
@@ -312,9 +314,7 @@
               var second=date.getSeconds();
               second=second < 10 ? ('0' + second) : second;
               return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
-            }
-          },
-          methods: {
+            },
             filterLevel: function () {
               var _this = this;
               var member = this.selectArr.filter(function(item){

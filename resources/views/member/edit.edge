@@ -68,7 +68,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">密码</label>
           <div class="col-sm-6">
-            <a href="#" class="btn btn-info">重置密码发送给用户</a>
+            <a href="#" class="btn btn-info">发送验证码到邮箱重置密码</a>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -82,7 +82,11 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">生日</label>
           <div class="col-sm-6">
-            {{memberInfo.birthday}}
+            @if(memberInfo.birthday)
+            <span v-html="formatDateTime({{memberInfo.birthday}})"></span>
+            @else
+            未填写
+            @endif
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -101,9 +105,9 @@
           <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
-          <label class="col-sm-2 control-label">会员状态</label>
+          <label class="col-sm-2 control-label">会员登录状态</label>
           <div class="col-sm-6">
-            <label><input type="checkbox" name="status" value="1" {{memberInfo.status==1?'checked':''}}> 开/关</label>
+            <label><input type="checkbox" name="status" value="1" {{memberInfo.status==1?'checked':''}}> 开 / 关</label>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -117,7 +121,11 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">上次登录时间</label>
           <div class="col-sm-6">
-            {{memberInfo.this_at}}
+            @if(memberInfo.this_at)
+            <span v-html="formatDateTime({{memberInfo.this_at}})"></span>
+            @else
+            未登录过
+            @endif
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -131,7 +139,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">注册时间</label>
           <div class="col-sm-6">
-            {{memberInfo.create_at}}
+            <span v-html="formatDateTime({{memberInfo.create_at}})"></span>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -166,7 +174,31 @@
 </div>
 <script type="text/javascript">
   requirejs(['/js/config.js'], function () {
-    requirejs(['cmsui'], function (cmsui) {});
+    requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
+      domReady(function () {
+        new Vue({
+          el: '#app-page',
+          data:{},
+          methods:{
+            formatDateTime: function (date) {
+              date = new Date(date);
+              var y = date.getFullYear();
+              var m = date.getMonth() + 1;
+              m = m < 10 ? ('0' + m) : m;
+              var d = date.getDate();
+              d = d < 10 ? ('0' + d) : d;
+              var h = date.getHours();
+              h=h < 10 ? ('0' + h) : h;
+              var minute = date.getMinutes();
+              minute = minute < 10 ? ('0' + minute) : minute;
+              var second=date.getSeconds();
+              second=second < 10 ? ('0' + second) : second;
+              return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
+            },
+          }
+        });
+      });
+    });
   });
 </script>
 @endsection

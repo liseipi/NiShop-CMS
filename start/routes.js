@@ -119,6 +119,8 @@ Route.group(()=>{
   Route.post('/system/shopInfo', 'SystemController.shopInfoSave')
 
   Route.get('/member/list', 'MemberController.list')
+  Route.get('/member/add', 'MemberController.add')
+  Route.post('/member/add', 'MemberController.addSave').validator('member')
   Route.get('/member/edit/:id', 'MemberController.edit')
   Route.post('/member/edit/:id', 'MemberController.editSave')
   Route.get('/member/cart/:id', 'MemberController.cart')

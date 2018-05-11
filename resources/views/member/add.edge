@@ -1,0 +1,79 @@
+@layout('layout')
+@section('content')
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">增加会员</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/member/add" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">用户名</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="username" value="{{old('username', '')}}" placeholder="username" data-rule-required="true" data-rule-maxlength="32" >
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('username'), hasErrorFor('username')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">登录邮箱</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="email" value="{{old('email', '')}}" placeholder="email" data-rule-email="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('email'), hasErrorFor('email')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">手机</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="mobile" value="{{old('mobile', '')}}" placeholder="mobile" data-rule-digits="true">
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">性别</label>
+          <div class="col-sm-6">
+            <label class="radio-inline">
+              <input type="radio" name="user_sex" value="0" {{old('user_sex')?'':'checked'}} {{old('user_sex')==0?'checked':''}}> 男
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="user_sex" value="1" {{old('user_sex')==1?'checked':''}}> 女
+            </label>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">生日</label>
+          <div class="col-sm-6">
+            <input type="text" name="birthday" class="form-control" placeholder="输入日期" data-toggle="datepicker" data-date-start-date='1980-01-01'/>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">状态</label>
+          <div class="col-sm-6">
+            <label class="radio-inline">
+              <input type="radio" name="status" value="0" {{old('status')?'':'checked'}} {{old('status')==0?'checked':''}}> 禁用
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="status" value="1" {{old('status')==1?'checked':''}}> 开启
+            </label>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['cmsui', 'vue'], function (cmsui, Vue) {
+
+    });
+  });
+</script>
+@endsection

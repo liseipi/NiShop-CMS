@@ -587,6 +587,10 @@ class AdvertController {
     }
 
     //生成指定用户
+    if(redpacketInfo.redpacket_type==6 && !query.member_id){
+      session.flash({notification: '请选择发放的用户.'})
+      return response.redirect('back')
+    }
     if(query.member_id){
       let memberArr = []
       query.member_id.forEach((item)=>{
@@ -600,6 +604,10 @@ class AdvertController {
     }
 
     //生成指定商品
+    if(redpacketInfo.redpacket_type==7 && !query.goods_id){
+      session.flash({notification: '请选择发放的商品.'})
+      return response.redirect('back')
+    }
     if(query.goods_id){
       let goodsArr = []
       query.goods_id.forEach((item)=>{
@@ -635,9 +643,39 @@ class AdvertController {
 
     //第二次或多次发放
     if(redpacketInfo.emit_status==0){
-      console.log(2222222)
+      try{
+        if([5, 6, 7].includes(redpacketInfo.redpacket_type)){
+          await Database.table(redpacketLibraryTable).insert(saveData)
+        }
+
+        session.flash({notification: '发放成功！'})
+        response.redirect('/advert/redPacket')
+      }catch(error){
+        session.flash({notification: '发放失败！'+error})
+        response.redirect('back')
+      }
     }
 
+  }
+
+  async redPacketDestroy({response, params, session}){
+    try{
+      await Database.table(redpacketTable).where('ni_id', params.id).delete()
+
+      let delMsg = ''
+      try{
+        await Database.table(redpacketLibraryTable).where('redpacket_id', params.id).delete()
+        delMsg = '删除发放红包信息成功。'
+      }catch(error){
+        delMsg = '删除发放红包信息失败！'
+      }
+
+      session.flash({notification: '删除成功。'+delMsg})
+      response.redirect('/advert/redPacket')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
   }
 
 }

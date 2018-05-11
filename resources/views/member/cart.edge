@@ -10,7 +10,6 @@
     border:1px solid #ddd;
   }
 </style>
-<pre>{{toJSON(cartData)}}</pre>
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
@@ -24,24 +23,31 @@
             <hr>
             <div class="goods-item">
               <table class="table">
+                @each(cart in cartData)
                 <tr>
-                  <td width="110"><img class="goods_img" src="/file/pictures/1524118784887.jpg" alt=""></td>
-                  <td width="50%">
-                    <p>名称：</p>
-                    <p>选择：</p>
+                  <td width="110">
+                    @if(cart.goods_is_group==1)
+                    <img class="goods_img" src="/file/pictures/{{cart.group_thumb}}">
+                    @else
+                    <img class="goods_img" src="/file/pictures/{{cart.goods_thumb}}">
+                    @endif
                   </td>
-                  <td width="15%">价格：</td>
-                  <td>数量：</td>
-                </tr>
-                <tr>
-                  <td width="110"><img class="goods_img" src="/file/pictures/1524118784887.jpg" alt=""></td>
                   <td width="50%">
-                    <p>名称：</p>
-                    <p>选择：</p>
+                    <p>名称：{{cart.goods_name}}</p>
+                    @if(cart.goods_is_group==1)
+                    <p>选择：{{cart.group_depict}}</p>
+                    @endif
                   </td>
-                  <td width="15%">价格：</td>
-                  <td>数量：</td>
+                  <td width="15%">
+                    @if(cart.goods_is_group==1)
+                    <p>价格：{{cart.group_price}}</p>
+                    @else
+                    <p>价格：{{cart.goods_price}}</p>
+                    @endif
+                  </td>
+                  <td>数量：{{cart.quantity}}</td>
                 </tr>
+                @endeach
               </table>
             </div>
           </div>

@@ -33,6 +33,14 @@ class MemberController {
     return view.render('member.list', {memberData, query: query})
   }
 
+  async add({view}){
+    return view.render('member.add')
+  }
+
+  async addSave({request, response, params, session}){
+    console.log(request.all())
+  }
+
   async edit({view, params}){
     const memberInfo = await Database.select('*').from(memberTable).where('ni_id', params.id).first()
 

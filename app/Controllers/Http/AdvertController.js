@@ -13,6 +13,7 @@ const goodsTable = 'ni_goods'
 const brandsTable = 'ni_brands'
 const categoryTable = 'ni_goods_categories'
 const redpacketTable = 'ni_redpacket'
+const redpacketLibraryTable = 'ni_redpacket_library'
 
 const moment = use('moment')
 
@@ -488,9 +489,13 @@ class AdvertController {
     }
   }
 
-  async redPacketLibrary({view, params}){
+  async redPacketLibrary({view, params, request}){
     const redpacketInfo = await Database.table(redpacketTable).where('ni_id', params.id).first()
     const typeData = {}
+
+    const query = request.get()
+    const page = query.page || 1
+    const perPage = 20
 
     //用户等级
     if(redpacketInfo.redpacket_type==1){
@@ -508,13 +513,40 @@ class AdvertController {
       typeData.selectItem = await GlobalFn.soleTreeSort(categoryData)
     }
 
-    return view.render('advert.redpacket_library', {redpacketInfo, typeData})
+    //如果已经发放红包
+    let redpacketLib = []
+    if(redpacketInfo.emit_status==0) {
+      //5,6,7表示 优惠券、 按用户发放、 按商品发放
+      if ([5, 6].includes(redpacketInfo.redpacket_type)) {
+        redpacketLib = await Database.table(redpacketLibraryTable).where({
+          redpacket_id: params.id,
+          redpacket_type: redpacketInfo.redpacket_type
+        }).paginate(page, perPage)
+      }
+      else if([7].includes(redpacketInfo.redpacket_type)){
+        redpacketLib = await Database.select(redpacketLibraryTable+'.*', goodsTable+'.goods_name', goodsTable+'.goods_thumb').table(redpacketLibraryTable)
+          .leftJoin(goodsTable, redpacketLibraryTable+'.goods_id', goodsTable+'.ni_id')
+          .where({
+            redpacket_id: params.id,
+            redpacket_type: redpacketInfo.redpacket_type
+          })
+          .paginate(page, perPage)
+      }else{
+        redpacketLib = await Database.table(redpacketLibraryTable).where({
+          redpacket_id: params.id,
+          redpacket_type: redpacketInfo.redpacket_type
+        })
+      }
+
+    }
+
+    return view.render('advert.redpacket_library', {redpacketInfo, typeData, redpacketLib, query})
   }
 
   async redPacketLibrarySave({request, response, params, session}){
     const redpacketInfo = await Database.table(redpacketTable).where('ni_id', params.id).first()
 
-    const saveData = {
+    let saveData = {
       redpacket_id: params.id,
       redpacket_type: redpacketInfo.redpacket_type
     }
@@ -551,6 +583,7 @@ class AdvertController {
           coupon: (Math.random().toString(16).substr(2, 8)).toUpperCase()
         });
       }
+      saveData = [...couponArr]
     }
 
     //生成指定用户
@@ -563,9 +596,47 @@ class AdvertController {
           member_id:item
         })
       })
+      saveData = [...memberArr]
     }
 
-    console.log(saveData)
+    //生成指定商品
+    if(query.goods_id){
+      let goodsArr = []
+      query.goods_id.forEach((item)=>{
+        goodsArr.push({
+          redpacket_id: params.id,
+          redpacket_type: redpacketInfo.redpacket_type,
+          goods_id:item
+        })
+      })
+      saveData = [...goodsArr]
+    }
+
+    //第一次发放
+    if(redpacketInfo.emit_status==1){
+      try{
+        await Database.table(redpacketLibraryTable).insert(saveData)
+
+        let redpacket = ''
+        try{
+          await Database.from(redpacketTable).where('ni_id', params.id).update({emit_status: 0})
+          redpacket = '红包发放状态更新成功。'
+        }catch(error){
+          redpacket = '红包发放状态更新失败。'
+        }
+
+        session.flash({notification: '发放成功！'+redpacket})
+        response.redirect('/advert/redPacket')
+      }catch(error){
+        session.flash({notification: '发放失败！'+error})
+        response.redirect('back')
+      }
+    }
+
+    //第二次或多次发放
+    if(redpacketInfo.emit_status==0){
+      console.log(2222222)
+    }
 
   }
 

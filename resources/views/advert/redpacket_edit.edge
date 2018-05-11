@@ -81,7 +81,8 @@
             <input type="text" class="form-control input-date" placeholder="开始时间" readonly name="redpacket_push_start_at" :value="formatDateTime({{redpacketInfo.redpacket_push_start_at}})" id="pushStartDate" data-rule-required="true" />
             -
             <input type="text" class="form-control input-date" placeholder="结束时间" readonly name="redpacket_push_end_at" :value="formatDateTime({{redpacketInfo.redpacket_push_end_at}})" id="pushEndDate" data-rule-required="true" />
-            <div class="help-block color-danger">发放红包当前时间最长延至1个月</div>
+            <div v-if="{{redpacketInfo.emit_status}}==0" class="text-danger">已经发放的红包不可修改时间</div>
+            <div v-else class="help-block color-danger">发放红包当前时间最长延至1个月</div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_push_start_at'), hasErrorFor('redpacket_push_start_at')) }} {{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_push_end_at'), hasErrorFor('redpacket_push_end_at')) }}</div>
         </div>
@@ -91,7 +92,8 @@
             <input type="text" class="form-control input-date" placeholder="开始时间" readonly name="redpacket_use_start_at" :value="formatDateTime({{redpacketInfo.redpacket_use_start_at}})" id="useStartDate" data-rule-required="true" />
             -
             <input type="text" class="form-control input-date" placeholder="结束时间" readonly name="redpacket_use_end_at" :value="formatDateTime({{redpacketInfo.redpacket_use_end_at}})" id="useEndDate" data-rule-required="true" />
-            <div class="help-block color-danger">使用红包当前时间最长延至3个月</div>
+            <div v-if="{{redpacketInfo.emit_status}}==0" class="text-danger">已经发放的红包不可修改时间</div>
+            <div v-else class="help-block color-danger">使用红包当前时间最长延至3个月</div>
           </div>
           <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_use_start_at'), hasErrorFor('redpacket_use_start_at')) }} {{ elIf('<span class="text-danger">$self</span>', getErrorFor('redpacket_use_end_at'), hasErrorFor('redpacket_use_end_at')) }}</div>
         </div>
@@ -132,105 +134,107 @@
           },
           mounted: function(){
 
-            //发放开始时间
-            var pushStart = laydate.render({
-              elem: '#pushStartDate',
-              type: 'datetime',
-              min: '{{date.startDate}} 00:00:00',
-              max: '{{date.endDate}} 23:59:59',
-              trigger: 'click', //采用click弹出
-              btns: ['clear', 'confirm'],
-              calendar: true,
-              done: function (value, date, endDate) {
-                pushEnd.config.min = {
-                  year: date.year,
-                  month: date.month - 1,
-                  date: date.date,
-                  hours: date.hours,
-                  minutes: date.minutes,
-                  seconds: date.seconds
-                }; //开始日选好后，重置结束日的最小日期
-                pushEnd.config.value = {
-                  year: date.year,
-                  month: date.month - 1,
-                  date: date.date,
-                  hours: date.hours,
-                  minutes: date.minutes,
-                  seconds: date.seconds
-                }; //将结束日的初始值设定为开始日
-              }
-            });
+            if({{redpacketInfo.emit_status}}==1){
+              //发放开始时间
+              var pushStart = laydate.render({
+                elem: '#pushStartDate',
+                type: 'datetime',
+                min: '{{date.startDate}} 00:00:00',
+                max: '{{date.endDate}} 23:59:59',
+                trigger: 'click', //采用click弹出
+                btns: ['clear', 'confirm'],
+                calendar: true,
+                done: function (value, date, endDate) {
+                  pushEnd.config.min = {
+                    year: date.year,
+                    month: date.month - 1,
+                    date: date.date,
+                    hours: date.hours,
+                    minutes: date.minutes,
+                    seconds: date.seconds
+                  }; //开始日选好后，重置结束日的最小日期
+                  pushEnd.config.value = {
+                    year: date.year,
+                    month: date.month - 1,
+                    date: date.date,
+                    hours: date.hours,
+                    minutes: date.minutes,
+                    seconds: date.seconds
+                  }; //将结束日的初始值设定为开始日
+                }
+              });
 
-            //发放结束时间
-            var pushEnd = laydate.render({
-              elem: '#pushEndDate',
-              type: 'datetime',
-              min: '{{date.startDate}} 00:00:00',
-              max: '{{date.endDate}} 23:59:59',
-              trigger: 'click', //采用click弹出
-              btns: ['clear', 'confirm'],
-              calendar: true,
-              done: function (value, date, endDate) {
-                pushStart.config.max = {
-                  year: date.year,
-                  month: date.month - 1,
-                  date: date.date,
-                  hours: date.hours,
-                  minutes: date.minutes,
-                  seconds: date.seconds
-                }; //结束日选好后，重置开始日的最大日期
-              }
-            });
+              //发放结束时间
+              var pushEnd = laydate.render({
+                elem: '#pushEndDate',
+                type: 'datetime',
+                min: '{{date.startDate}} 00:00:00',
+                max: '{{date.endDate}} 23:59:59',
+                trigger: 'click', //采用click弹出
+                btns: ['clear', 'confirm'],
+                calendar: true,
+                done: function (value, date, endDate) {
+                  pushStart.config.max = {
+                    year: date.year,
+                    month: date.month - 1,
+                    date: date.date,
+                    hours: date.hours,
+                    minutes: date.minutes,
+                    seconds: date.seconds
+                  }; //结束日选好后，重置开始日的最大日期
+                }
+              });
 
-            //开始使用时间
-            var useStart = laydate.render({
-              elem: '#useStartDate',
-              type: 'datetime',
-              min: '{{date.startDate}} 00:00:00',
-              max: '{{date.endDate}} 23:59:59',
-              trigger: 'click', //采用click弹出
-              btns: ['clear', 'confirm'],
-              calendar: true,
-              done: function (value, date, endDate) {
-                useEnd.config.min = {
-                  year: date.year,
-                  month: date.month - 1,
-                  date: date.date,
-                  hours: date.hours,
-                  minutes: date.minutes,
-                  seconds: date.seconds
-                }; //开始日选好后，重置结束日的最小日期
-                useEnd.config.value = {
-                  year: date.year,
-                  month: date.month - 1,
-                  date: date.date,
-                  hours: date.hours,
-                  minutes: date.minutes,
-                  seconds: date.seconds
-                }; //将结束日的初始值设定为开始日
-              }
-            });
+              //开始使用时间
+              var useStart = laydate.render({
+                elem: '#useStartDate',
+                type: 'datetime',
+                min: '{{date.startDate}} 00:00:00',
+                max: '{{date.endDate}} 23:59:59',
+                trigger: 'click', //采用click弹出
+                btns: ['clear', 'confirm'],
+                calendar: true,
+                done: function (value, date, endDate) {
+                  useEnd.config.min = {
+                    year: date.year,
+                    month: date.month - 1,
+                    date: date.date,
+                    hours: date.hours,
+                    minutes: date.minutes,
+                    seconds: date.seconds
+                  }; //开始日选好后，重置结束日的最小日期
+                  useEnd.config.value = {
+                    year: date.year,
+                    month: date.month - 1,
+                    date: date.date,
+                    hours: date.hours,
+                    minutes: date.minutes,
+                    seconds: date.seconds
+                  }; //将结束日的初始值设定为开始日
+                }
+              });
 
-            //使用结束时间
-            var useEnd = laydate.render({
-              elem: '#useEndDate',
-              type: 'datetime',
-              min: '{{date.startDate}} 00:00:00',
-              max: '{{date.useEndDate}} 23:59:59',
-              trigger: 'click', //采用click弹出
-              btns: ['clear', 'confirm'],
-              calendar: true,
-              done: function (value, date, endDate) {
-                useStart.config.max = {
-                  year: date.year,
-                  month: date.month - 1,
-                  date: date.date,
-                  hours: date.hours,
-                  minutes: date.minutes,
-                  seconds: date.seconds
-                }; //结束日选好后，重置开始日的最大日期
-              }
-            });
+              //使用结束时间
+              var useEnd = laydate.render({
+                elem: '#useEndDate',
+                type: 'datetime',
+                min: '{{date.startDate}} 00:00:00',
+                max: '{{date.useEndDate}} 23:59:59',
+                trigger: 'click', //采用click弹出
+                btns: ['clear', 'confirm'],
+                calendar: true,
+                done: function (value, date, endDate) {
+                  useStart.config.max = {
+                    year: date.year,
+                    month: date.month - 1,
+                    date: date.date,
+                    hours: date.hours,
+                    minutes: date.minutes,
+                    seconds: date.seconds
+                  }; //结束日选好后，重置开始日的最大日期
+                }
+              });
+            }
 
           }
         });

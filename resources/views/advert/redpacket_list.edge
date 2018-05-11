@@ -55,7 +55,7 @@
             <p>使用时间：<span v-text="formatDateTime({{redpacket.redpacket_use_start_at}})">1</span> - <span v-text="formatDateTime({{redpacket.redpacket_use_end_at}})">2</span></p>
           </td>
           <td width="25%">
-            <a href="/advert/redPacketLibrary/{{redpacket.ni_id}}" class="fa fa-send-o btn btn-lg btn-primary"> 发放红包</a>
+            <a href="/advert/redPacketLibrary/{{redpacket.ni_id}}" class="fa fa-send-o btn btn-lg btn-primary"> 发放/查看红包</a>
             <a href="/advert/redPacketEdit/{{redpacket.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
             <a href="/advert/redPacketDestroy/{{redpacket.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
           </td>

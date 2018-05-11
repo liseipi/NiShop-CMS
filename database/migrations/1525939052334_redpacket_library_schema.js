@@ -12,7 +12,7 @@ class RedpacketLibrarySchema extends Schema {
       table.integer('brands_id', 8).comment('品牌ID')
       table.integer('category_id', 8).comment('分类ID')
       table.float('order_amount').comment('订单金额')
-      table.bigInteger('coupon', 13).comment('优惠券')
+      table.string('coupon', 13).comment('优惠券')
       table.integer('member_id', 8).comment('会员ID')
       table.integer('goods_id', 8).comment('商品ID')
       table.integer('order_id', 8).comment('订单ID')

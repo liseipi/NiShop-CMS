@@ -26,7 +26,7 @@ module.exports = {
     driver: 'smtp',
     pool: true,
     port: 2525,
-    host: '',
+    host: 'smtp.mailtrap.io',
     secure: false,
     auth: {
       user: Env.get('MAIL_USERNAME'),

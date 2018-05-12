@@ -3,7 +3,7 @@
 class member {
   get rules () {
     return {
-      'username': 'required|min:5|max:32|unique:ni_admin_user|not_in:root,admin,super',
+      'username': 'required|min:4|max:32|unique:ni_admin_user|not_in:root,admin,super',
       'email': 'required_if:needs_delivery|email|unique:ni_admin_user',
     }
   }

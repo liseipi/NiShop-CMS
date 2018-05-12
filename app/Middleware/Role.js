@@ -35,6 +35,7 @@ class Role {
         '/file/pictures',
         '/goods/getAttr',
         '/goods/checkSku',
+        '/member/getRegion',
         '/getBrands',
         '/getCategory',
         '/getGoods',

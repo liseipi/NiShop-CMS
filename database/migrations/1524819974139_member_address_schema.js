@@ -15,6 +15,8 @@ class MemberAddressSchema extends Schema {
       table.integer('region_d', 8).defaultTo(0)
       table.string('address', 32)
       table.string('mobile', 12)
+      table.string('email', 64)
+      table.bigInteger('create_at', 13)
     })
     .raw("ALTER TABLE `ni_member_address` AUTO_INCREMENT=3000")
   }

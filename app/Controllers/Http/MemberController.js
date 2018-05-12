@@ -42,11 +42,21 @@ class MemberController {
     console.log(request.all())
     const saveData = await GlobalFn.formatSubmitData(memberTable, request.all())
 
-    if(saveData.email){
-      await Mail.send('email.welcome', {}, (message) => {
-        message.from('foo@bar.com')
-        message.to('522371046@qq.com')
-      })
+    try{
+      await Database.table(memberTable).insert(saveData)
+
+      if(saveData.email){
+        Mail.send('email.welcome', {}, (message) => {
+          message.from('yaowen1998@gmail.com')
+          message.to(saveData.email)
+        })
+      }
+
+      session.flash({notification: '增加成功！'})
+      response.redirect('/member/list')
+    }catch(error){
+      session.flash({notification: '增加失败！'+error})
+      response.redirect('back')
     }
 
   }
@@ -77,6 +87,25 @@ class MemberController {
     }catch(error){
       session.flash({notification: '修改失败！'+error})
       response.redirect('back')
+    }
+  }
+
+  async newAddress({view}){
+    return view.render('member.new_address')
+  }
+
+  async getRegion({request}){
+    const query = request.get()
+    const pid = query.parendId
+    if(pid){
+      const regionData = await Database.select('*').from(regionTable).where('parent_id', pid)
+      if(regionData){
+        return regionData
+      }else{
+        return
+      }
+    }else{
+      return []
     }
   }
 

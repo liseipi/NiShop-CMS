@@ -151,14 +151,20 @@
         </div>
       </form>
       <hr>
-      <h3 class="text-center">用户收货地址表名</h3>
+      <h3 class="text-center">用户收货地址</h3>
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-2">
+          <p><a class="btn btn-success" href="/member/newAddress/{{memberInfo.ni_id}}">增加用户收货地址</a></p>
+        </div>
+      </div>
+      <hr>
       <div class="form-horizontal">
-      @each(address in addressData)
+        @each(address in addressData)
         <div class="form-group">
           <label class="col-sm-2 control-label">地址{{ $loop.index+1 }}</label>
           <div class="col-sm-8">
             <div class="addressItem">
-              <h4>{{address.username}} {{address.region_a_name}} {{{address.default==1?'<span class="btn btn-success">默认</span>':''}}}</h4>
+              <h4>{{address.username}} {{address.region_a_name}} {{{address.default==1?'<span class="label label-success">默认</span>':''}}}</h4>
               <p>收货人： {{address.username}}</p>
               <p>所在地区： {{address.region_a_name||''}}{{address.region_b_name||''}}{{address.region_c_name||''}}{{address.region_d_name||''}}</p>
               <p>地址： {{address.address}}</p>
@@ -167,7 +173,13 @@
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
-      @endeach
+        @else
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <div style="margin-bottom: 50px;">暂无地址</div>
+          </div>
+        </div>
+        @endeach
       </div>
     </div>
   </div>

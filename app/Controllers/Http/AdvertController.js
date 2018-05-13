@@ -644,8 +644,33 @@ class AdvertController {
     //第二次或多次发放
     if(redpacketInfo.emit_status==0){
       try{
+        console.log(saveData)
+        /*
         if([5, 6, 7].includes(redpacketInfo.redpacket_type)){
-          await Database.table(redpacketLibraryTable).insert(saveData)
+          const insert = Database.table(redpacketLibraryTable).insert(saveData).toString()
+          await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE advert_id=VALUES(advert_id), advert_images=VALUES(advert_images), advert_url=VALUES(advert_url), advert_describe=VALUES(advert_describe), advert_sort=VALUES(advert_sort), pic_type=VALUES(pic_type)`)
+
+          //await Database.table(redpacketLibraryTable).insert(saveData)
+        }
+
+        */
+
+        /*
+        if(redpacketInfo.redpacket_type==5){
+          const insert = Database.table(redpacketLibraryTable).insert(saveData).toString()
+          await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE redpacket_id=VALUES(redpacket_id), redpacket_type=VALUES(redpacket_type), coupon=VALUES(coupon)`)
+        }
+        */
+
+        if(redpacketInfo.redpacket_type==6){
+          //const insert = Database.table(redpacketLibraryTable).insert(saveData).toString()
+          //await Database.schema.raw(insert + ` WHERE NOT EXISTS (SELECT redpacket_id, redpacket_type, member_id FROM ${redpacketLibraryTable} WHERE redpacket_id=VALUES(redpacket_id) and redpacket_type=VALUES(redpacket_type) and member_id=VALUES(member_id))`)
+
+          //console.log(await Database.from(redpacketLibraryTable).where('member_id', 659683))
+          await Database.insert(saveData).from(redpacketLibraryTable).whereNotExists(function () {
+            //console.log(this)
+            this.from(redpacketLibraryTable).where('member_id', 659683)
+          })
         }
 
         session.flash({notification: '发放成功！'})

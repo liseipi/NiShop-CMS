@@ -32,9 +32,9 @@
         <div class="form-group form-inline">
           <label class="col-sm-2 control-label">所在地区</label>
           <div class="col-sm-6">
-            <component :is="item.region" @find-region="findRegion" :text="item.text" :data="item.data" :value="item.value" v-for="item in items"></component>
+            <component :is="item.region" @find-region="findRegion" @refresher="refresher" :text="item.text" :data="item.data" :value="item.value" v-for="item in items"></component>
           </div>
-          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('email'), hasErrorFor('email')) }}</div>
+          <div class="col-sm-4 error-container" id="region-error-msg"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">详细地址</label>
@@ -66,6 +66,10 @@
           methods: {
             getRegion: function (pid, text, region) {
               var _this = this;
+              $("#loadingModal").modal({
+                backdrop: 'static',
+                keyboard: false
+              });
               $.ajax({
                 data:{
                   parendId: pid
@@ -73,6 +77,7 @@
                 type: 'get',
                 url: '/member/getRegion',
                 success: function (data) {
+                  $("#loadingModal").modal('hide');
                   var items = _this.items;
                   var isRegion = false;
                   var regionNum = 1;
@@ -97,12 +102,22 @@
                       'value': 0,
                       'data': data
                     });
+                    $('#region-error-msg').html('');
                   }
+                },
+                error: function (error) {
+                  $("#loadingModal").modal('hide');
+                  $.toast("地区数据请求失败.");
                 }
               });
             },
             findRegion: function (info) {
               this.getRegion(info[0], info[1], info[2]);
+            },
+            refresher: function (level) {
+              this.items.splice(level, this.items.length-level);
+              this.items[level-1].value = 0;
+              $('#region-error-msg').html('');
             }
           },
           components: {
@@ -129,11 +144,12 @@
                 checkRegion: function (ev) {
                   if(ev.target.value>0){
                     this.$emit('find-region', [ev.target.value, '市区', 'b-region'])
+                  } else {
+                    this.$emit('refresher', 1);
                   }
-                  return;
                 }
               },
-              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选择省市. "><option value="0">@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
+              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选择省市. "><option value="0">选择@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
             },
             'b-region': {
               props: {
@@ -156,10 +172,14 @@
               },
               methods:{
                 checkRegion: function (ev) {
-                  this.$emit('find-region', [ev.target.value, '乡镇', 'c-region']);
+                  if(ev.target.value>0){
+                    this.$emit('find-region', [ev.target.value, '乡镇', 'c-region']);
+                  } else {
+                    this.$emit('refresher', 2);
+                  }
                 }
               },
-              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选市区. "><option value="0" checked>@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
+              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选市区. "><option value="0" checked>选择@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
             },
             'c-region': {
               props: {
@@ -182,10 +202,14 @@
               },
               methods:{
                 checkRegion: function (ev) {
-                  this.$emit('find-region', [ev.target.value, '街道', 'd-region'])
+                  if(ev.target.value>0){
+                    this.$emit('find-region', [ev.target.value, '街道', 'd-region']);
+                  } else {
+                    this.$emit('refresher', 3);
+                  }
                 }
               },
-              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选择乡镇. "><option value="0" checked>@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
+              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选择乡镇. "><option value="0" checked>选择@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
             },
             'd-region': {
               props: {
@@ -206,16 +230,17 @@
                   default: 0
                 }
               },
-              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选择街道. "><option value="0" checked>@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select></div>'
+              methods:{
+                checkRegion: function (ev) {
+                  if(ev.target.value>0){
+                    $('#region-error-msg').html('');
+                  }
+                }
+              },
+              template: '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" v-model="value" @change="checkRegion" :name="field" data-rule-required="true" data-rule-min="1" data-msg-min="请选择街道. "><option value="0" checked>选择@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select></div>'
             },
           },
           mounted: function () {
-            /*
-            $("#loadingModal").modal({
-              backdrop: 'static',
-              keyboard: false
-            });
-            */
             this.getRegion(0, '省市', 'a-region');
           }
         });

@@ -134,7 +134,13 @@
                   <td>用户名称</td>
                 </tr>
                 </thead>
-                <tbody id="memberItem"></tbody>
+                <tbody id="memberItem">
+                <tr v-for="member in addMemberData">
+                  <td><input type="checkbox" name="member_id[]" checked :value="member.userID"></td>
+                  <td>@{{member.userID}}</td>
+                  <td>@{{member.userName}}</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -155,7 +161,14 @@
                   <td>商品名称</td>
                 </tr>
                 </thead>
-                <tbody id="goodsItem"></tbody>
+                <tbody id="goodsItem">
+                <tr v-for="goods in addGoodsData">
+                  <td><input type="checkbox" name="goods_id[]" checked :value="goods.goodsId"></td>
+                  <td>@{{goods.goodsId}}</td>
+                  <td><img :src="'/file/pictures/'+goods.goodsPic" class="thumb-border" ></td>
+                  <td>@{{goods.goodsName}}</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -274,10 +287,21 @@
   </div>
 </div>
 <script type="text/javascript">
+  var app;
+
   function getMemberData(data, tag){
     if(tag.tag=='default'){
       $('#memberTab').show();
-      $('#memberItem').append('<tr><td><input type="checkbox" name="member_id[]" checked value="'+data.userID+'"></td><td>'+data.userID+'</td><td>'+data.userName+'</td></tr>');
+      //$('#memberItem').append('<tr><td><input type="checkbox" name="member_id[]" checked value="'+data.userID+'"></td><td>'+data.userID+'</td><td>'+data.userName+'</td></tr>');
+
+      var isExist = app.addMemberData.filter(function (item) {
+        if(item.userID==data.userID){
+          return item;
+        }
+      }).length;
+      if(isExist==0){
+        app.addMemberData.push(data);
+      }
       window.frames['parWin'].promptMsg();
     }
   }
@@ -285,7 +309,16 @@
   function getGoodsData(data, tag){
     if(tag.tag=='default'){
       $('#goods').show();
-      $('#goodsItem').append('<tr><td><input type="checkbox" name="goods_id[]" checked value="'+data.goodsId+'"></td><td>'+data.goodsId+'</td><td><img src="/file/pictures/'+data.goodsPic+'" class="thumb-border" ></td><td>'+data.goodsName+'</td></tr>');
+      //$('#goodsItem').append('<tr><td><input type="checkbox" name="goods_id[]" checked value="'+data.goodsId+'"></td><td>'+data.goodsId+'</td><td><img src="/file/pictures/'+data.goodsPic+'" class="thumb-border" ></td><td>'+data.goodsName+'</td></tr>');
+
+      var isExist = app.addGoodsData.filter(function (item) {
+        if(item.goodsId==data.goodsId){
+          return item;
+        }
+      }).length;
+      if(isExist==0){
+        app.addGoodsData.push(data);
+      }
       window.frames['parWin'].promptMsg();
     }
   }
@@ -293,9 +326,11 @@
   requirejs(['/js/config.js'], function () {
     requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
       domReady(function () {
-        new Vue({
+        app = new Vue({
           el: '#app-page',
           data: {
+            addMemberData: [],
+            addGoodsData: [],
             selectArr: {{{ toJSON(typeData.selectItem) }}},
             libData: {{{ toJSON(redpacketLib) }}}
           },

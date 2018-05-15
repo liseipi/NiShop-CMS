@@ -90,8 +90,64 @@ class MemberController {
     }
   }
 
-  async newAddress({view}){
-    return view.render('member.new_address')
+  async addressNew({view, params}){
+    return view.render('member.address_add', {member_id: params.id})
+  }
+
+  async addressNewSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(addressTable, request.all())
+    saveData.member_id = params.id
+
+    const count = await Database.from(addressTable).where({member_id: params.id}).count()
+    const total = count[0]['count(*)']
+
+    if(total<=20){
+      try{
+        await Database.table(addressTable).insert(saveData)
+
+        session.flash({notification: '增加成功！'})
+        response.redirect('/member/edit/'+params.id)
+      }catch(error){
+        session.flash({notification: '增加失败！'+error})
+        response.redirect('back')
+      }
+    }else{
+      session.flash({notification: '增加失败！当前用户能创建20条地址.'})
+      response.redirect('back')
+    }
+  }
+
+  async addressEdit({view, params}){
+    const addressInfo = await Database.from(addressTable).where('ni_id', params.id).first()
+    return view.render('member.address_edit', {addressInfo})
+  }
+
+  async addressEditSave({request, response, params, session}){
+    const addressInfo = await Database.from(addressTable).where('ni_id', params.id).first()
+    const saveData = await GlobalFn.formatSubmitData(addressTable, request.all())
+
+    try{
+      await Database.table(addressTable).where('ni_id', params.id).update(saveData)
+
+      session.flash({notification: '修改成功！'})
+      response.redirect('/member/edit/'+addressInfo.member_id)
+    }catch(error){
+      session.flash({notification: '修改失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async addressDestroy({response, params, session}){
+    const addressInfo = await Database.from(addressTable).where('ni_id', params.id).first()
+
+    try{
+      await Database.table(addressTable).where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/member/edit/'+addressInfo.member_id)
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
   }
 
   async getRegion({request}){

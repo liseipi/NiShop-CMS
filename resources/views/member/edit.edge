@@ -154,7 +154,7 @@
       <h3 class="text-center">用户收货地址</h3>
       <div class="row">
         <div class="col-sm-6 col-sm-offset-2">
-          <p><a class="btn btn-success" href="/member/newAddress/{{memberInfo.ni_id}}">增加用户收货地址</a></p>
+          <p><a class="btn btn-success" href="/member/addressNew/{{memberInfo.ni_id}}">增加用户收货地址</a></p>
         </div>
       </div>
       <hr>
@@ -164,7 +164,7 @@
           <label class="col-sm-2 control-label">地址{{ $loop.index+1 }}</label>
           <div class="col-sm-8">
             <div class="addressItem">
-              <h4>{{address.username}} {{address.region_a_name}} {{{address.default==1?'<span class="label label-success">默认</span>':''}}}</h4>
+              <h4>{{address.username}} {{address.region_a_name}} {{{address.default==1?'<span class="label label-success">默认</span>':''}}} <span class="pull-right"><a class="btn btn-info" href="/member/addressEdit/{{address.ni_id}}">编辑</a> <a class="btn btn-danger" href="/member/addressDestroy/{{address.ni_id}}" onclick="if(!confirm('确定删除吗?')){return false;}">删除</a></span></h4>
               <p>收货人： {{address.username}}</p>
               <p>所在地区： {{address.region_a_name||''}}{{address.region_b_name||''}}{{address.region_c_name||''}}{{address.region_d_name||''}}</p>
               <p>地址： {{address.address}}</p>

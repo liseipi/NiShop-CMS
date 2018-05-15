@@ -1,0 +1,238 @@
+@layout('layout')
+@section('content')
+<div class="modal fade" id="loadingModal">
+  <div style="width: 200px;height:20px; z-index: 20000; position: absolute; text-align: center; left: 50%; top: 50%;margin-left:-100px;margin-top:-10px">
+    <div class="progress progress-striped active" style="margin-bottom: 0;">
+      <div class="progress-bar" style="width: 100%;"></div>
+    </div>
+    <h5>正在加载...</h5>
+  </div>
+</div>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">编辑会员收货地址</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/member/addressEdit/{{addressInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">收货人</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="username" value="{{addressInfo.username}}" data-rule-required="true" data-rule-maxlength="32" >
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('username'), hasErrorFor('username')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">手机</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="mobile" value="{{addressInfo.mobile}}" data-rule-required="true" data-rule-number="true">
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('mobile'), hasErrorFor('mobile')) }}</div>
+        </div>
+        <div class="form-group form-inline">
+          <label class="col-sm-2 control-label">所在地区</label>
+          <div class="col-sm-8">
+            <component v-for="item in items" @find-region="findRegion" @refresher="refresher" :is="item.region" :text="item.text" :data="item.data" :value="item.value" :level="item.level" :field="item.field"></component>
+          </div>
+          <div class="col-sm-2 error-container" id="region-error-msg">
+            {{ elIf('<span class="text-danger">$self</span>', getErrorFor('region_a'), hasErrorFor('region_a')) }}
+            {{ elIf('<span class="text-danger">$self</span>', getErrorFor('region_b'), hasErrorFor('region_b')) }}
+            {{ elIf('<span class="text-danger">$self</span>', getErrorFor('region_c'), hasErrorFor('region_c')) }}
+            {{ elIf('<span class="text-danger">$self</span>', getErrorFor('region_d'), hasErrorFor('region_d')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">详细地址</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="address" value="{{addressInfo.address}}" data-rule-required="true">
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('address'), hasErrorFor('address')) }}</div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
+      domReady(function () {
+
+        new Vue({
+          el: '#app-page',
+          data: {
+            items: [],
+            aRegion: {{addressInfo.region_a}},
+            bRegion: {{addressInfo.region_b}},
+            cRegion: {{addressInfo.region_c}},
+            dRegion: {{addressInfo.region_d}},
+            getCount: 1
+          },
+          methods: {
+            getRegion: function(pid, level, val){
+              $("#loadingModal").modal({
+                backdrop: 'static',
+                keyboard: false
+              });
+
+              var _this = this;
+              $.ajax({
+                data:{
+                  parendId: pid
+                },
+                type: 'get',
+                url: '/member/getRegion',
+                success: function (data) {
+                  $("#loadingModal").modal('hide');
+
+                  var text = '';
+                  var field = '';
+                  switch (level){
+                    case 1:
+                      text = '省市';
+                      field = 'region_a';
+                      break;
+                    case 2:
+                      text = '市区';
+                      field = 'region_b';
+                      break;
+                    case 3:
+                      text = '乡镇';
+                      field = 'region_c';
+                      break;
+                    case 4:
+                      text = '街道';
+                      field = 'region_d';
+                      break;
+                  }
+
+                  if(data && data.length>0){
+                    _this.items.push({
+                      region: 'select-region',
+                      level: level||1,
+                      value: val||0,
+                      field: field||'region_a',
+                      text: text||'省份',
+                      data: data
+                    });
+                    //$('#region-error-msg').html('');
+
+                    if(_this.items.length>1){
+                      _this.items[level-2].value = pid;
+                      _this.items.splice(level-1, _this.items.length-level);
+                    }
+
+                    if(_this.getCount>0){
+                      var actLevel = ++_this.getCount;
+                      var actVal = null;
+                      switch(actLevel){
+                        case 1:
+                          actVal = _this.aRegion;
+                          break;
+                        case 2:
+                          actVal = _this.bRegion;
+                          break;
+                        case 3:
+                          actVal = _this.cRegion;
+                          break;
+                        case 4:
+                          actVal = _this.dRegion;
+                          _this.getCount = 0;
+                          break;
+                      }
+
+                      if(val>0){
+                        _this.getRegion(val, actLevel, actVal);
+                      }
+                    }
+
+                  }else{
+                    _this.items.splice(level-1);
+                    _this.getCount = 0;
+                    _this.items[level-2].value = pid;
+                  }
+
+                },
+                error: function(error){
+                  $("#loadingModal").modal('hide');
+                  $.toast("地区数据请求失败.");
+                }
+              });
+
+            },
+            findRegion: function (info) {
+              this.getRegion(info.pid, info.level, info.value);
+            },
+            refresher: function (level) {
+              this.items[level-1].value = 0;
+              this.items.splice(level, this.items.length-level);
+              $('#region-error-msg').html('');
+            }
+          },
+          components: {
+            'select-region': {
+              data: function(){
+                return {
+                  txt: '请选择'
+                }
+              },
+              props: {
+                field: {
+                  type: String,
+                  default: 'region_a'
+                },
+                text: {
+                  type: String,
+                  default: '省市'
+                },
+                data: {
+                  type: Array,
+                  default: []
+                },
+                value: {
+                  type: Number,
+                  default: 0
+                },
+                level: {
+                  type: Number,
+                  default: 1
+                }
+              },
+              methods:{
+                checkRegion: function(ev){
+                  if(ev.target.value>0){
+                    this.$emit('find-region', {pid: ev.target.value, level: this.level+1, value: 0});
+                  } else {
+                    this.$emit('refresher', this.level);
+                  }
+                }
+              },
+              template:
+                '<div class="form-control-static"><select class="form-control input-lg dropdown-toggle" @change="checkRegion" v-model="value" :name="field" data-rule-required="true" data-rule-min="1" :data-msg-min="txt+text"><option value="0">选择@{{text}}</option><option v-for="region in data" :value="region.ni_id">@{{region.region_name}}</option></select>&nbsp;</div>'
+            }
+          },
+          mounted: function () {
+            if(this.aRegion){
+              this.getRegion(0, 1, this.aRegion);
+            }
+            // if(this.bRegion){
+            //   this.getRegion(this.aRegion, 2, this.bRegion);
+            // }
+            // if(this.cRegion){
+            //   this.getRegion(this.bRegion, 3, this.cRegion);
+            // }
+            // if(this.dRegion){
+            //   this.getRegion(this.cRegion, 4, this.dRegion);
+            // }
+          }
+        });
+
+      });
+    });
+  });
+</script>
+@endsection

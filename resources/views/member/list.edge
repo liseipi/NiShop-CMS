@@ -58,7 +58,7 @@
           <td>
             <a href="/member/edit/{{member.ni_id}}" class="fa fa-eye btn btn-lg btn-info"> 详细/地址</a>
             <a href="/member/cart/{{member.ni_id}}" class="fa fa-shopping-cart btn btn-lg btn-primary"> 购物车</a>
-            <a href="#" class="fa fa-reorder btn btn-lg btn-success"> 用户订单</a>
+            <a href="/order/list?member={{member.ni_id}}" class="fa fa-reorder btn btn-lg btn-success"> 用户订单</a>
             <a href="/member/destroy/{{member.ni_id}}" onclick="if(!confirm('删除会员时将删除用户的收货地址、购物车信息、用户订单记录，确定删除吗?')){return false;}" class="fa fa-trash btn btn-lg btn-warning"> 删除用户</a>
           </td>
         </tr>

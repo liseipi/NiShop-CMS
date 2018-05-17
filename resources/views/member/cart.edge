@@ -93,7 +93,7 @@
           <hr>
           <div class="col-sm-6">
             <input type="submit" value="保存" id="saveCart" class="btn btn-xl btn-primary hidden">
-            <a class="btn btn-xl btn-success" :class="{'disabled': isCount}" href="#">去生成结算</a>
+            <a href="/order/add/{{member_id}}" class="btn btn-xl btn-success" :class="{'disabled': isCount}">去生成结算</a>
           </div>
         </div>
       </form>

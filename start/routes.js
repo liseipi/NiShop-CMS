@@ -139,6 +139,10 @@ Route.group(()=>{
   Route.post('/member/levelEdit/:id', 'MemberController.levelEditSave').validator('memberLevel')
   Route.get('/member/levelDestroy/:id', 'MemberController.levelDestroy')
 
+  Route.get('/order/add/:id', 'OrderController.add')
+  Route.post('/order/add/:id', 'OrderController.addSave')
+  Route.get('/order/list', 'OrderController.list')
+
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
   Route.get('/getBrands', 'GetFindController.getBrands')
   Route.get('/getCategory', 'GetFindController.getCategory')

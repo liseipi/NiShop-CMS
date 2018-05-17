@@ -1,0 +1,236 @@
+@layout('layout')
+@section('content')
+<style>
+  hr{
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .address-item ul,.address-item li{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    padding: 2px 0;
+  }
+  .address-item .select-item{
+    width: 160px;
+    border: 2px solid #ccc;
+    padding: 5px 10px;
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .address-item .select-item:hover, .address-item .select-action{
+    border: 2px solid red;
+    position: relative;
+  }
+  .address-item .select-item .fa{
+    display: none;
+  }
+  .address-item .select-action .fa{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: red;
+    color: #fff;
+    display: inline-block;
+  }
+  .count-item{
+    display: inline-block;
+    width: 180px;
+    text-align: right;
+  }
+</style>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">填写并核对订单信息</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/menu/add" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">收货人信息</label>
+          <div class="col-sm-8">
+            <div class="address-item">
+              <ul>
+                <li v-for="(add, index) in addressData" v-cloak v-show="isShow()[index]==1"><span @click="selectAdd(index)" class="select-item" :class="{'select-action': add.is_select==1}"><i class="fa fa-check"></i>@{{add.username}}-@{{add.region_a_name}}</span> @{{add.username}} @{{add.region_a_name}} @{{add.region_b_name}} @{{add.region_c_name}}
+                  @{{add.region_d_name||''}} @{{add.address}}
+                  @{{add.mobile}} <label
+                  class='label label-default' v-show="add.default==1">默认地址</label></li>
+              </ul>
+            </div>
+            <hr>
+            <a href="javascript:;" v-cloak class="btn" @click="status.address=!status.address">
+              <span v-show="!status.address">更多地址 <i class="fa fa-angle-double-down"></i></span>
+              <span v-show="status.address">收起地址 <i class="fa fa-angle-double-up"></i></span>
+            </a>
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('parent_id'), hasErrorFor('parent_id')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">支付方式</label>
+          <div class="col-sm-8">
+            <div class="tag-group tag-checkable tag-xl" data-toggle='tag'>
+              <label class='tag active'>微信 <i class="fa fa-check-circle"></i> <input type='radio' name='simple-tag-4' value='2' checked='checked'/></label>
+              <label class="tag">支付宝 <i class="fa fa-circle-thin"></i> <input type='radio' name='simple-tag-4' value='2'/></label>
+            </div>
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('menuname'), hasErrorFor('menuname')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">商品清单</label>
+          <div class="col-sm-8">
+            <table class="table table-bordered">
+              @each(cart in newCartData)
+              <tr>
+                <td width="110"><img src="/file/pictures/{{cart.thumb}}" class="thumb-border"></td>
+                <td>
+                  {{cart.goods_name}}
+                  @if(cart.goods_is_group==0)
+                  <p>选择：{{cart.group_depict}}</p>
+                  @endif
+                </td>
+                <td>￥ {{cart.price}}</td>
+                <td>x{{cart.quantity}}</td>
+                <td>
+                  有货
+                </td>
+              </tr>
+              @endeach
+            </table>
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('controller'), hasErrorFor('controller')) }}</div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">发票信息</label>
+          <div class="col-sm-8">
+            <div class="invoice">
+              <ul class="nav nav-tabs nav-lg">
+                <li class="active"><a href="#index" data-toggle="tab">无</a></li>
+                <li><a href="#profile" data-toggle="tab">电子发票</a></li>
+                <li><a href="#about" data-toggle="tab">增值税普通发票</a></li>
+              </ul>
+              <div class="tab-content tab-wraped">
+                <div id="index" class="tab-pane active">
+                  <p>不开发票</p>
+                </div>
+                <div id="profile" class="tab-pane">
+                  <p>test</p>
+                </div>
+                <div id="about" class="tab-pane">
+                  <p>tofu synth chambray yr.</p>
+                </div>
+                <div id="help" class="tab-pane">
+                  <p>help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">优惠</label>
+          <div class="col-sm-8">
+            <div class="invoice">
+              <ul class="nav nav-tabs nav-lg">
+                <li class="active"><a href="#index" data-toggle="tab">积分</a></li>
+                <li><a href="#about" data-toggle="tab">红包</a></li>
+              </ul>
+              <div class="tab-content tab-wraped">
+                <div id="index" class="tab-pane active">
+                  <p>abc</p>
+                </div>
+                <div id="about" class="tab-pane">
+                  <p>tofu synth chambray yr.</p>
+                </div>
+                <div id="help" class="tab-pane">
+                  <p>help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!help!!!</p>
+                </div>
+              </div>
+            </div>
+            <!--
+            <label class="radio-inline">
+              <input type="radio" name="aa" value="0" {{old('runStatus')?'':'checked'}} {{old('runStatus')==0?'checked':''}}> 无
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="aa" value="1" {{old('runStatus')==1?'checked':''}}> 积分
+            </label>
+            -->
+          </div>
+          <div class="col-sm-2 error-container"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">结算</label>
+          <div class="col-sm-8">
+            <div class="tag-group tag-checkable tag-xl" data-toggle='tag'>
+              <h5>
+                <p><span class="count-item">1 件商品，总商品金额：</span>￥119.00</p>
+                <p><span class="count-item">运费：</span> ￥0.00</p>
+                <p><span class="count-item">应付总额：</span> ￥119.00</p>
+                <p>寄送至：@{{countAddress[0].region_a_name}} @{{countAddress[0].region_b_name}} @{{countAddress[0].region_c_name}} @{{countAddress[0].region_d_name||''}} @{{countAddress[0].address}} <span style="padding-left: 20px;">收货人：@{{countAddress[0].username}} @{{countAddress[0].mobile}}</span></p>
+              </h5>
+            </div>
+          </div>
+          <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('menuname'), hasErrorFor('menuname')) }}</div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-2">
+            <input type="submit" value="提交订单" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  requirejs(['/js/config.js'], function () {
+    requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
+      domReady(function () {
+
+        new Vue({
+          el: '#app-page',
+          data: {
+            addressData: {{{ toJSON(addressData) }}},
+            status: {
+              address: false
+            }
+          },
+          methods: {
+            selectAdd: function(index){
+              this.addressData.map(function(item){
+                item.is_select = 0
+                return item;
+              });
+              this.addressData[index].is_select = 1;
+            },
+            isShow: function(){
+              if(this.status.address){
+                return this.addressData.map(function(item){
+                  return 1
+                });
+              }else{
+                return this.addressData.map(function(item){
+                  return item.is_select
+                });
+              }
+            }
+          },
+          computed: {
+            countAddress: function(){
+              return this.addressData.filter(function(item){
+                return item.is_select==1
+              })
+            }
+          },
+          mounted: function () {
+            console.log(1)
+          }
+        });
+
+      });
+    });
+  });
+</script>
+@endsection

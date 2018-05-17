@@ -90,6 +90,22 @@ class MemberController {
     }
   }
 
+  async destroy({response, params, session}){
+
+    session.flash({notification: '暂不支持删除用户操作！'})
+    return response.redirect('back')
+    /*
+    try{
+      await Database.table(levelTable).where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/member/level')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
+    */
+  }
+
   async addressNew({view, params}){
     return view.render('member.address_add', {member_id: params.id})
   }
@@ -167,15 +183,119 @@ class MemberController {
 
   async cart({view, params}){
 
-    const cartData = await Database.select(cartTable+'.*', goodsTable+'.goods_name', goodsTable+'.status', goodsTable+'.goods_instock', goodsTable+'.goods_price', goodsTable+'.goods_thumb', goodsGroupTable+'.group_depict', goodsGroupTable+'.group_price', goodsGroupTable+'.group_instock', goodsGroupTable+'.group_thumb', goodsGroupTable+'.group_status').from(cartTable)
+    const cartData = await Database.select(cartTable+'.*', goodsTable+'.goods_name', goodsTable+'.goods_sku', goodsTable+'.status', goodsTable+'.goods_instock', goodsTable+'.goods_price', goodsTable+'.goods_thumb', goodsGroupTable+'.group_depict', goodsGroupTable+'.group_price', goodsGroupTable+'.group_instock', goodsGroupTable+'.group_thumb', goodsGroupTable+'.group_status').from(cartTable)
       .leftJoin(goodsTable, cartTable+'.goods_id', goodsTable+'.ni_id')
       .leftJoin(goodsGroupTable, function () {
         this.on(goodsGroupTable+'.goods_id', '=', cartTable+'.goods_id').on(goodsGroupTable+'.ni_id', '=', cartTable+'.group_id')
       })
       .where('member_id', params.id)
+      .orderBy('ni_id', 'desc')
 
-    return view.render('member.cart', {cartData})
+    return view.render('member.cart', {cartData, member_id: params.id})
 
+  }
+
+  async cartSave({request, response, params, session}){
+    const body = request.collect(['ni_id', 'goods_id', 'is_select', 'quantity', 'group_id'])
+    body.forEach(item=>item.member_id = params.id)
+    const cartData = await Database.select('ni_id', 'member_id', 'goods_id', 'is_select', 'quantity', 'goods_is_group', 'group_id').from(cartTable).where('member_id', params.id)
+
+    /* 分析增删改 */
+    //分析增
+    const newData = body.filter(item => {
+      return cartData.every(oldItem => {
+        return !(item.member_id==oldItem.member_id && item.goods_id==oldItem.goods_id)
+      })
+    })
+
+    //分析改
+    const editData = body.filter(item => {
+      return cartData.some(oldItem => {
+        //return item.member_id==oldItem.member_id && item.goods_id==oldItem.goods_id
+        return item.member_id==oldItem.member_id && item.goods_id==oldItem.goods_id && (item.is_select!=oldItem.is_select || item.quantity!=oldItem.quantity)
+      })
+    })
+
+    //分析删除
+    const delData = cartData.filter(item => {
+      return body.every(oldItem => {
+        return !(item.member_id==oldItem.member_id && item.goods_id==oldItem.goods_id)
+      })
+    })
+
+    /*---------------*/
+    //存储增删改
+    //存储新增
+    let newMsg = ''
+    if(newData.length>0){
+      let NewIds = newData.map(item=>item.goods_id)
+      let goodsIsGroup = await Database.select('goods_is_group').from(goodsTable).whereIn('ni_id', NewIds)
+      newData.forEach((item, index)=>{
+        Object.assign(item, goodsIsGroup[index])
+      })
+      const checkNewData = newData.filter(item=>{
+        let flag = false
+        if(item.goods_is_group==0 && item.group_id){
+          flag = true
+        }
+        if(item.goods_is_group==1){
+          flag = true
+        }
+        return flag
+      })
+      if(newData.length!=checkNewData.length){
+        newMsg = '增加部分商品出错，请检查对应的子商品。'
+      }
+      let saveNewData = checkNewData.map(item=>{
+        delete item.ni_id
+        item.create_at = new Date().getTime()
+        return item
+      })
+
+      if(saveNewData.length>0){
+        try{
+          await Database.table(cartTable).insert(saveNewData)
+        }catch(error){
+          newMsg += '增加出错. '
+        }
+      }
+    }
+
+    //存储修改
+    let editMsg = ''
+    if(editData.length>0){
+      let saveEditData = editData.map(item=>{
+        delete item.goods_id
+        delete item.group_id
+        delete item.member_id
+        return item
+      })
+      if(saveEditData.length>0){
+        try{
+          const insert = Database.table(cartTable).insert(saveEditData).toString()
+          await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE is_select=VALUES(is_select), quantity=VALUES(quantity)`)
+        }catch(error){
+          editMsg = '编辑失败.'+error
+        }
+      }
+
+    }
+
+    //存储删除
+    let delMsg = ''
+    if(delData.length>0){
+      let saveDelData = delData.map(item=>item.ni_id)
+      try{
+        await Database.table(cartTable).whereIn('ni_id', saveDelData).delete()
+      }catch(error){
+        delMsg = '删除失败.'
+      }
+    }
+
+    if(newMsg!='' || editMsg!='' || delMsg!=''){
+      session.flash({notification: newMsg + editMsg + delMsg})
+    }
+    return response.redirect('/member/cart/'+ params.id)
   }
 
   async levelAdd({view}){

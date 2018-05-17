@@ -298,7 +298,7 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">商品分类<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <select class="form-control input-lg" name="category_id" id="category_id" {{ goodsData.is_order_exist==1?'disabled':'' }} @change="changeCategory" v-model="selectCID" data-rule-required="true" data-rule-min="1"
+                  <select class="form-control input-lg" name="category_id" id="category_id" {{ goodsData.is_order_exist==1?'readonly':'' }} @change="changeCategory" v-model="selectCID" data-rule-required="true" data-rule-min="1"
                           data-msg-min="请选择分类">
                     <option value="0">选择分类</option>
                     @each(category in categoryData)
@@ -311,14 +311,14 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">SKU/货号<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" @blur="checkSku('goods_sku')" {{ goodsData.is_order_exist==1?'disabled':'' }} :disabled="swSku" data-rule-required="true" data-rule-minlength="4">
+                  <input type="text" class="form-control" name="goods_sku" id="goods_sku" v-model="goodsSku" @blur="checkSku('goods_sku')" {{ goodsData.is_order_exist==1?'readonly':'' }} :disabled="swSku" data-rule-required="true" data-rule-minlength="4">
                 </div>
                 <div class="col-sm-2 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('goods_sku'), hasErrorFor('goods_sku')) }}</div>
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label">商品品牌<span class="text-success">(*)</span></label>
                 <div class="col-sm-8">
-                  <select class="form-control input-lg" name="brands_id" {{ goodsData.is_order_exist==1?'disabled':'' }} @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
+                  <select class="form-control input-lg" name="brands_id" {{ goodsData.is_order_exist==1?'readonly':'' }} @change="selectBrands" v-model="brandsID" data-rule-required="true" data-rule-min="1" data-msg-min="请选择品牌">
                     <option value="0">品牌</option>
                     @each(brands in brandsData)
                     <option value="{{brands.ni_id}}">{{brands.brands_name}}</option>

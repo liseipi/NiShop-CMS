@@ -1,6 +1,10 @@
 @layout('layout')
 @section('content')
+@include('select_model')
 <style>
+  p {
+    margin: 0 0 2px;
+  }
   .goods_img{
     width: 100px;
     height: 100px;
@@ -9,57 +13,182 @@
   .goods-item{
     border:1px solid #ddd;
   }
+  .goods-status{
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .goods-status .notinstock{
+    width: 100px;
+    position: absolute;
+    height: 100px;
+    background-color: rgba(117, 117, 117, 0.8);
+    border-radius: 0px;
+    z-index: 9;
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+    line-height: 100px;
+  }
 </style>
 <div id="app-page">
   <div class="container-fluid">
     @include('notification')
     <h5 class="page-header">会员购物车列表</h5>
     <div class="main">
-      <div class="row">
-        <div class="form-group">
-          <label class="col-sm-2 control-label"></label>
-          <div class="col-sm-8">
-            <h3 class="text-center">购物车信息</h3>
-            <hr>
-            <div class="goods-item">
-              <table class="table">
-                @each(cart in cartData)
-                <tr>
-                  <td width="110">
-                    @if(cart.goods_is_group==1)
-                    <img class="goods_img" src="/file/pictures/{{cart.group_thumb}}">
-                    @else
-                    <img class="goods_img" src="/file/pictures/{{cart.goods_thumb}}">
-                    @endif
-                  </td>
-                  <td width="50%">
-                    <p>名称：{{cart.goods_name}}</p>
-                    @if(cart.goods_is_group==1)
-                    <p>选择：{{cart.group_depict}}</p>
-                    @endif
-                  </td>
-                  <td width="15%">
-                    @if(cart.goods_is_group==1)
-                    <p>价格：{{cart.group_price}}</p>
-                    @else
-                    <p>价格：{{cart.goods_price}}</p>
-                    @endif
-                  </td>
-                  <td>数量：{{cart.quantity}}</td>
-                </tr>
-                @endeach
-              </table>
-            </div>
-          </div>
-          <div class="col-sm-2 error-container"></div>
+      <h3 class="text-center">购物车信息</h3>
+      <p><a data-toggle="modal" data-target="#selModal" onclick="document.getElementById('parWin').src='/getGoods'" class="btn btn-success btn-lg"><span class="fa fa-search"></span> 选择商品</a></p>
+      <form class="form-horizontal" action="/member/cartSave/{{member_id}}" method="post" enctype="multipart/form-data" data-toggle="validate" novalidate="novalidate">
+        <div class="goods-item form-inline">
+          {{ csrfField() }}
+          <table class="table table-striped">
+            <template v-if="cartData.length>0">
+              <tbody>
+              <tr v-for="(cart, index) in cartData">
+                <td width="50">
+                  <input hidden type="checkbox" :name="'is_select['+index+']'" :value="cart.is_select" checked>
+                  <input type="checkbox" :checked="cart.is_select" @click="cart.is_select=cart.is_select==1?0:1">
+                  <input type="hidden" name="ni_id[]" :value="cart.ni_id">
+                  <input type="hidden" name="goods_id[]" v-model="cart.goods_id">
+                  <input type="hidden" name="group_id[]" v-model="cart.group_id">
+                </td>
+                <td width="110">
+                  <p class="goods-status"><span class="notinstock" v-show="(cart.goods_is_group==1 && cart.goods_instock<1) || (cart.goods_is_group==0 && cart.group_instock<1)">缺货</span><span class="notinstock" v-show="cart.status==1 || (cart.goods_is_group==0 && cart.group_status==1)">下架</span><img class="goods_img" v-if="cart.goods_is_group==0"
+                                                                                                                                                                                                                                                                                  :src="'/file/pictures/'+cart.group_thumb">
+                  <img class="goods_img" v-else :src="'/file/pictures/'+cart.goods_thumb"></p>
+                </td>
+                <td width="40%">
+                  <p>名称：@{{cart.goods_name}}</p>
+                  <p v-if="cart.goods_is_group==0">选择：@{{cart.group_depict}}</p>
+                  <p>商品ID：@{{cart.goods_id}}</p>
+                  <p>组商品ID：@{{cart.group_id}}</p>
+                  <p>SKU：@{{cart.goods_sku}}</p>
+                </td>
+                <td width="15%">
+                  <p v-if="cart.goods_is_group==0">价格：@{{cart.group_price}}</p>
+                  <p v-else>价格：@{{cart.goods_price}}</p>
+                </td>
+                <td>
+                  <p>库存：<span v-if="cart.goods_is_group==0">@{{cart.group_instock}}</span><span v-else>@{{cart.goods_instock}}</span></p>
+                  <p>数量：<input type="text" name="quantity" class="form-control" style="width: 60px;" :value="cart.quantity" @change="checkQuantity(event, index)"></p>
+                </td>
+                <td>
+                  <a class="btn btn-danger btn-lg" @click="if(!confirm('确认删除此商品？')){return false;}cartData.splice(index, 1)"><span class="fa fa-trash-o"></span> 删除</a>
+                </td>
+              </tr>
+              </tbody>
+            </template>
+            <template v-else>
+              <tbody>
+              <tr>
+                <td>暂无</td>
+              </tr>
+              </tbody>
+            </template>
+          </table>
         </div>
-      </div>
+        <div class="form-group" v-cloak="" v-if="cartData.length>0">
+          <hr>
+          <div class="col-sm-6">
+            <input type="submit" value="保存" id="saveCart" class="btn btn-xl btn-primary hidden">
+            <a class="btn btn-xl btn-success" :class="{'disabled': isCount}" href="#">去生成结算</a>
+          </div>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>
 <script type="text/javascript">
+  var app;
+
+  function getGoodsData(data, tag){
+    if(tag.tag=='default'){
+      var isExist = app.cartData.filter(function (item) {
+        if(item.goods_id==data.goodsId){
+          return item;
+        }
+      }).length;
+      if(isExist==0){
+        var saveData = {
+          "member_id": {{member_id}},
+          "goods_id": data.goodsId,
+          "is_select": 1,
+          "quantity": 1,
+          "goods_is_group": data.groupId?1:0,
+          "group_id": data.groupId||null,
+          "goods_name": data.goodsName,
+          "goods_sku": "",
+          "status": 0,
+          "goods_instock": 1,
+          "goods_price": 0,
+          "goods_thumb": data.goodsPic,
+          "group_depict": data.groupDepict||null,
+          "group_price": 0,
+          "group_instock": 1,
+          "group_thumb": data.groupPic||null,
+          "group_status": 0
+        }
+        app.cartData.unshift(saveData);
+        $('#selModal').modal('hide');
+        $.toast('加入成功.');
+        //window.frames['parWin'].promptMsg();
+        //$('#saveCart').trigger('click');
+      }else{
+        $('#selModal').modal('hide');
+        $.toast('商品已经存在.');
+      }
+
+    }
+  }
+
   requirejs(['/js/config.js'], function () {
-    requirejs(['cmsui'], function (cmsui) {
+    requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
+      domReady(function () {
+        app = new Vue({
+          el: '#app-page',
+          data: {
+            cartData: {{{ toJSON(cartData) }}}
+          },
+          methods: {
+            checkQuantity: function(event, index){
+              if(this.cartData[index].goods_is_group==0){
+                this.cartData[index].quantity = this.cartData[index].group_instock>=parseInt(event.currentTarget.value)?parseInt(event.currentTarget.value):this.cartData[index].group_instock;
+                event.currentTarget.value = this.cartData[index].quantity;
+              }else{
+                this.cartData[index].quantity = this.cartData[index].goods_instock>=parseInt(event.currentTarget.value)?parseInt(event.currentTarget.value):this.cartData[index].goods_instock;
+                event.currentTarget.value = this.cartData[index].quantity;
+              }
+            }
+          },
+          computed:{
+            isCount: function(){
+              var flag = false;
+              flag = this.cartData.some(function(item){
+                return (item.goods_is_group==0 && item.is_select==1 && (item.group_instock<1 || item.group_status==1)) || (item.goods_is_group==1 && item.is_select==1 && (item.goods_instock<1 || item.status==1))
+              }) || this.cartData.filter(function(item){
+                return item.is_select==1
+              }).length==0;
+              return flag;
+            }
+          },
+          watch:{
+            cartData: {
+              handler: function(val, oldVal) {
+                this.$nextTick(function () {
+                  $('#saveCart').trigger('click');
+                });
+              },
+              deep: true
+            }
+          },
+          mounted: function () {
+
+          }
+        });
+      });
     });
   });
 </script>

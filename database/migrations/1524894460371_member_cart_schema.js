@@ -8,10 +8,11 @@ class MemberCartSchema extends Schema {
       table.increments('ni_id')
       table.integer('member_id', 8)
       table.integer('goods_id', 8)
+      table.integer('is_select', 1).defaultTo(0)
       table.integer('quantity', 4).defaultTo(0)
       table.boolean('goods_is_group').defaultTo(false)
       table.integer('group_id', 8)
-      table.timestamp('create_at').comment('加入时间')
+      table.bigInteger('create_at').comment('加入时间')
     })
   }
 

@@ -28,7 +28,7 @@ class GoodsSchema extends Schema {
       table.bigInteger('goods_promotions_time_end', 14).comment('促销结束时间')
       table.integer('goods_postage', 1).comment('是否免邮')
       table.float('goods_postage_price', 32).comment('邮费价格')
-      table.integer('goods_is_group', 1).comment('是否为组商品')
+      table.integer('goods_is_group', 1).defaultTo(1).comment('是否为组商品')
       table.integer('brands_id', 8).comment('品牌ID')
       table.string('goods_thumb', 64).comment('商品主图')
       table.text('content').comment('商品详细')

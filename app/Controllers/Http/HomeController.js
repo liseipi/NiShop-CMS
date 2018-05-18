@@ -7,7 +7,7 @@ class HomeController {
 
   async store({view, auth}){
     const menusData = await Database.select('*').from('ni_menus').where('runStatus', '=', 0)
-    const menus = menusData.filter((item, index)=>{
+    const menus = menusData.filter((item)=>{
       return (auth.user.auth.split(',')).indexOf(item.ni_id+'')>=0
     })
     //console.log(menus)

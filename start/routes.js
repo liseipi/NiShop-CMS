@@ -19,8 +19,9 @@ Route.on('/test').render('test')
 
 Route.on('/login').render('auth.login')
 Route.post('/login', 'AuthController.signIn')
-Route.get('/logout', async ({auth, response})=>{
+Route.get('/logout', async ({auth, response, session})=>{
   await auth.logout()
+  session.clear()
   return response.redirect('/')
 })
 

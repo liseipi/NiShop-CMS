@@ -1,6 +1,7 @@
 'use strict'
 
 const Schema = use('Schema')
+const Database = use('Database')
 
 class UserSchema extends Schema {
   up() {
@@ -24,6 +25,15 @@ class UserSchema extends Schema {
     })
     .raw("ALTER TABLE `ni_admin_user` AUTO_INCREMENT=8985")
 
+    this.schedule(async (trx) => {
+      await Database.table('ni_admin_user').transacting(trx).insert({
+        username: 'oli.liu',
+        email: 'oli@qq.com',
+        password: '$2a$10$AgQC6LdhSgienEDIdeO6We3NHkOfcEpv/ITeT6cdnHPBlV3mZc31m',
+        status: 1,
+        create_at: new Date().getTime()
+      })
+    })
   }
 
   down() {

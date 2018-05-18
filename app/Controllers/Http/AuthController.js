@@ -2,6 +2,7 @@
 
 const { validate } = use('Validator')
 const Database = use('Database')
+const Hash = use('Hash')
 
 class AuthController {
 
@@ -44,7 +45,7 @@ class AuthController {
           thisIp : request.ip(),
           lastlogin_at: userInfo.updated_at,
           updated_at: new Date(),
-          frequency: userInfo.frequency+1
+          access_count: userInfo.access_count+1
         }
         let upMsg = ''
         try{
@@ -53,8 +54,10 @@ class AuthController {
           upMsg = '用户信息更新失败。'
         }
 
-        //const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
-        //session.put('menusData', menusData)
+        //开启使用menu储存在session
+        const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
+        session.put('menusData', menusData)
+
 
         session.flash({notification: '登录成功！'+upMsg})
         return response.redirect('/')

@@ -55,9 +55,8 @@ class AuthController {
         }
 
         //开启使用menu储存在session
-        const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
-        session.put('menusData', menusData)
-
+        //const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
+        //session.put('menusData', menusData)
 
         session.flash({notification: '登录成功！'+upMsg})
         return response.redirect('/')

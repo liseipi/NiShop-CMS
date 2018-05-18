@@ -14,8 +14,7 @@ class Role {
         acturl = '/'+urlArr[1]+'/'+urlArr[2]
       }
 
-      //关闭取数据menus
-      /*
+      //取数据menus
       const Database = use('Database')
       const menusData = await Database.select('ni_id', 'controller').from('ni_menus')
       if(menusData){
@@ -26,9 +25,9 @@ class Role {
           }
         })
       }
-      */
 
-      //开启使用menu储存在session -- 认证
+      //使用menu储存在session -- 认证
+      /*
       console.log(session.get('menusData'))
       if(session.get('menusData')){
         session.get('menusData').forEach((item)=>{
@@ -38,6 +37,7 @@ class Role {
           }
         })
       }
+      */
 
       //指定URL不做全局权限认证
       const no_Auth = [

@@ -37,19 +37,18 @@ Route.group(()=>{
   Route.post('/menu/edit/:id', 'MenuController.editSave').validator('menu')
   Route.get('/menu/destroy/:id', 'MenuController.destroy')
 
+  Route.get('/manager/roleAdd', 'ManagerController.roleAdd')
+  Route.post('/manager/roleAdd', 'ManagerController.roleAddSave').validator('role')
+  Route.get('/manager/role', 'ManagerController.role')
+  Route.get('/manager/roleEdit/:id', 'ManagerController.roleEdit')
+  Route.post('/manager/roleEdit/:id', 'ManagerController.roleEditSave').validator('role')
+  Route.get('/manager/roleDestroy/:id', 'ManagerController.roleDestroy')
   Route.get('/manager/add', 'ManagerController.add')
   Route.post('/manager/add', 'ManagerController.addSave').validator('manager')
   Route.get('/manager/list', 'ManagerController.list')
   Route.get('/manager/edit/:id', 'ManagerController.edit')
   Route.post('/manager/edit/:id', 'ManagerController.editSave').validator('managerEdit')
   Route.get('/manager/destroy/:id', 'ManagerController.destroy')
-
-  Route.get('/role/add', 'RoleController.add')
-  Route.post('/role/add', 'RoleController.addSave').validator('role')
-  Route.get('/role/list', 'RoleController.list')
-  Route.get('/role/edit/:id', 'RoleController.edit')
-  Route.post('/role/edit/:id', 'RoleController.editSave').validator('role')
-  Route.get('/role/destroy/:id', 'RoleController.destroy')
 
   Route.get('/article/category', 'ArticleController.category')
   Route.get('/article/categoryAdd', 'ArticleController.categoryAdd')
@@ -145,6 +144,7 @@ Route.group(()=>{
   Route.get('/order/list', 'OrderController.list')
 
   Route.get('/file/pictures/(.*/?)', 'FileController.pictures')
+
   Route.get('/getBrands', 'GetFindController.getBrands')
   Route.get('/getCategory', 'GetFindController.getCategory')
   Route.get('/getGoods', 'GetFindController.getGoods')

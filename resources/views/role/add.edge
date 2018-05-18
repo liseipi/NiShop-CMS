@@ -5,7 +5,7 @@
     @include('notification')
     <h5 class="page-header">增加管理角色</h5>
     <div class="main">
-      <form class="form-horizontal" action="/role/add" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/manager/roleAdd" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <div class="form-group">
           <label class="col-sm-2 control-label">角色名称</label>

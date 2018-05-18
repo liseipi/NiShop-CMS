@@ -18,8 +18,8 @@
           <td>{{role.role_name}}</td>
           <td>{{role.role_desc}}</td>
           <td>
-            <a href="/role/edit/{{role.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
-            <a href="/role/destroy/{{role.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
+            <a href="/manager/roleEdit/{{role.ni_id}}" class="fa fa-edit btn btn-lg btn-info"> 编辑</a>
+            <a href="/manager/roleDestroy/{{role.ni_id}}" class="fa fa-trash btn btn-lg btn-danger" onclick="if(!confirm('确定删除吗?')){return false;}"> 删除</a>
           </td>
         </tr>
         @endeach

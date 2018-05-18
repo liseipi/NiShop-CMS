@@ -31,6 +31,7 @@ class UserSchema extends Schema {
         email: 'oli@qq.com',
         password: '$2a$10$AgQC6LdhSgienEDIdeO6We3NHkOfcEpv/ITeT6cdnHPBlV3mZc31m',
         status: 1,
+        auth:'450,451,452,453,454,455,456,457,458',
         create_at: new Date().getTime()
       })
     })

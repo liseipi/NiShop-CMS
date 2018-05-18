@@ -6,8 +6,8 @@ class RedpacketLibrarySchema extends Schema {
   up () {
     this.create('ni_redpacket_library', (table) => {
       table.increments('ni_id')
-      table.integer('redpacket_id', 8).comment('对应红包')
-      table.integer('redpacket_type', 2).comment('对应类型')
+      table.integer('redpacket_id', 8).notNullable().comment('对应红包')
+      table.integer('redpacket_type', 2).notNullable().comment('对应类型')
       table.integer('member_level_id', 8).comment('会员级别ID')
       table.integer('brands_id', 8).comment('品牌ID')
       table.integer('category_id', 8).comment('分类ID')

@@ -51,7 +51,7 @@ module.exports = {
       port: Env.get('DB_PORT', '3306'),
       user: Env.get('DB_USER', 'root'),
       password: Env.get('DB_PASSWORD', '123456'),
-      database: Env.get('DB_DATABASE', 'nishop')
+      database: Env.get('DB_DATABASE', 'nishop2')
     }
   },
 

@@ -3,7 +3,7 @@
 const Database = use('Database')
 const Helpers = use('Helpers')
 const Drive = use('Drive')
-const sharp = use('sharp')
+//const sharp = use('sharp')
 
 class GlobalFnClass {
 

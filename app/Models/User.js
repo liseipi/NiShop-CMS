@@ -12,6 +12,14 @@ class User extends Model {
   static get primaryKey() {
     return 'ni_id'
   }
+  //禁用时间戳创建的字段名称
+  static get createdAtColumn () {
+    return false
+  }
+  //禁用时间戳更新的字段名称
+  static get updatedAtColumn () {
+    return false
+  }
 
   static boot () {
     super.boot()

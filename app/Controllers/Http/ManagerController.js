@@ -5,6 +5,8 @@ const Database = use('Database')
 const GlobalFn = use('App/Helpers/GlobalFn')
 const Hash = use('Hash')
 
+const moment = use('moment')
+
 class ManagerController {
 
   async roleAdd({view}){
@@ -116,9 +118,19 @@ class ManagerController {
       return
     }
     if(userInfo.birthday && userInfo.birthday!=''){
-      userInfo.birthday = GlobalFn.timestampToTime(userInfo.birthday, 'YMD')
+      userInfo.birthday = moment(userInfo.birthday).format('YYYY-MM-DD')
     }else{
       userInfo.birthday = ''
+    }
+
+    if(userInfo.last_at && userInfo.last_at!=''){
+      userInfo.last_at = moment(userInfo.last_at).format('YYYY-MM-DD hh:mm:ss')
+    }
+    if(userInfo.this_at && userInfo.this_at!=''){
+      userInfo.this_at = moment(userInfo.this_at).format('YYYY-MM-DD hh:mm:ss')
+    }
+    if(userInfo.create_at && userInfo.create_at!=''){
+      userInfo.create_at = moment(userInfo.create_at).format('YYYY-MM-DD hh:mm:ss')
     }
 
     //console.log(userInfo)

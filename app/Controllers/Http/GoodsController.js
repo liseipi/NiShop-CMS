@@ -417,8 +417,8 @@ class GoodsController {
       attrsData = request.collect(['goods_attr_value', 'attr_id'])
     }
 
-    saveData.created_at = new Date()
-    saveData.updated_at = new Date()
+    saveData.create_at = new Date().getTime()
+    //saveData.update_at = new Date().getTime()
     saveData.goods_created_admin = auth.user.ni_id
 
     //console.log(saveData)
@@ -648,7 +648,7 @@ class GoodsController {
       attrsData = request.collect(['goods_attr_value', 'attr_id', 'goodsAttr_ni_id'])
     }
 
-    saveData.updated_at = new Date()
+    saveData.update_at = new Date().getTime()
 
     //console.log(saveData)
     //return
@@ -915,6 +915,14 @@ class GoodsController {
     }catch(error) {
       return [{status: 1}]
     }
+  }
+
+  async relatedNew({view}){
+    return view.render('goods.related_new')
+  }
+
+  async relatedNewSave({request, response, session}){
+    console.log(request.all())
   }
 
 }

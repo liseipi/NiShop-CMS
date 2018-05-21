@@ -59,8 +59,8 @@ Route.group(()=>{
   Route.get('/article/add', 'ArticleController.add')
   Route.post('/article/add', 'ArticleController.addSave').validator('article')
   Route.get('/article/list', 'ArticleController.list')
-  Route.get('/article/edit/:id', 'ArticleController.edit').validator('article')
-  Route.post('/article/edit/:id', 'ArticleController.editSave')
+  Route.get('/article/edit/:id', 'ArticleController.edit')
+  Route.post('/article/edit/:id', 'ArticleController.editSave').validator('article')
   Route.get('/article/destroy/:id', 'ArticleController.destroy')
 
   Route.get('/goods/category', 'GoodsController.category')
@@ -92,6 +92,12 @@ Route.group(()=>{
   Route.get('/goods/delAttr', 'GoodsController.delAttr')
   Route.get('/goods/delGroup', 'GoodsController.delGroup')
   Route.get('/goods/delGallery', 'GoodsController.delGallery')
+  Route.get('/goods/relatedNew', 'GoodsController.relatedNew')
+  Route.post('/goods/relatedNew', 'GoodsController.relatedNewSave')
+  Route.get('/goods/related', 'GoodsController.related')
+  Route.get('/goods/relatedEdit/:id', 'GoodsController.relatedNew')
+  Route.post('/goods/relatedEdit/:id', 'GoodsController.relatedNewSave')
+  Route.get('/goods/relatedDestroy/:id', 'GoodsController.relatedDestroy')
 
   Route.get('/advert/list', 'AdvertController.list')
   Route.get('/advert/add', 'AdvertController.add')

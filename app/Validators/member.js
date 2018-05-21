@@ -3,8 +3,8 @@
 class member {
   get rules () {
     return {
-      'username': 'required|min:4|max:32|unique:ni_admin_user|not_in:root,admin,super',
-      'email': 'required_if:needs_delivery|email|unique:ni_admin_user',
+      'username': 'required|min:4|max:32|unique:ni_member|not_in:root,admin,super',
+      'email': 'required_if:needs_delivery|email|unique:ni_member',
     }
   }
   get messages(){

@@ -2,6 +2,8 @@
 
 const Database = use('Database')
 const GlobalFn = use('App/Helpers/GlobalFn')
+const Helpers = use('Helpers')
+const Drive = use('Drive')
 
 class ArticleController {
 
@@ -85,9 +87,22 @@ class ArticleController {
     saveData.article_author = auth.user.ni_id
     saveData.create_at = new Date().getTime()
 
+    //上传商品主图片
+    const ThumbInfo =  await GlobalFn.uploadPic(request, 'thumb_img', {width:100, height:100, size:2})
+    let imgMsg = ''
+    if(ThumbInfo && ThumbInfo.status=='error'){
+      imgMsg += '<p>图上传出错！Error: <pre><code>' + JSON.stringify(ThumbInfo.error) +'</code></pre></p>'
+    }
+    if(ThumbInfo && ThumbInfo.status=='moved'){
+      saveData.thumb_img = ThumbInfo.fileName
+      imgMsg += '<p>图上传成功。</p>'
+    }
+
     try{
+      console.log(saveData)
       await Database.from('ni_articles').insert(saveData)
-      session.flash({notification: '增加成功！'})
+
+      session.flash({notification: '增加成功！'+imgMsg})
       response.redirect('/article/list')
     }catch(error){
       session.flash({notification: '增加失败！'+error})
@@ -124,20 +139,39 @@ class ArticleController {
     return view.render('article.list', {categoryData: formatData, articleData, query: query})
   }
 
-  async edit({view, params, session}){
+  async edit({view, params}){
     const categoryData = await Database.select('ni_id', 'parent_id', 'column_name').from('ni_article_categories')
     const formatData = await GlobalFn.soleTreeSort(categoryData)
 
-    const articleData = await Database.select('*').from('ni_articles').where('ni_id', params.id).first()
+    const articleInfo = await Database.select('*').from('ni_articles').where('ni_id', params.id).first()
 
-    return view.render('article.edit', {categoryData: formatData, articleData})
+    return view.render('article.edit', {categoryData: formatData, articleInfo})
   }
 
-  async editSave({request, response, session, params, auth}){
+  async editSave({request, response, session, params}){
     const saveData = await GlobalFn.formatSubmitData('ni_articles', request.all())
+
+    //上传商品主图片
+    const ThumbInfo =  await GlobalFn.uploadPic(request, 'thumb_img', {width:100, height:100, size:2})
+    let imgMsg = ''
+    if(ThumbInfo && ThumbInfo.status=='error'){
+      imgMsg += '<p>图上传出错！Error: <pre><code>' + JSON.stringify(ThumbInfo.error) +'</code></pre></p>'
+    }
+    if(ThumbInfo && ThumbInfo.status=='moved'){
+      saveData.thumb_img = ThumbInfo.fileName
+      imgMsg += '<p>图上传成功。</p>'
+
+      const articlePic = await Database.table('ni_articles').select('thumb_img').where('ni_id', params.id).first()
+      const oldPic = Helpers.appRoot('uploads/')+articlePic.thumb_img
+      const exists = await Drive.exists(oldPic)
+      if(exists){
+        await Drive.delete(oldPic)
+      }
+    }
 
     try{
       await Database.table('ni_articles').where('ni_id', params.id).update(saveData)
+
       session.flash({notification: '修改成功！'})
       response.redirect('/article/list')
     }catch(error){

@@ -10,14 +10,14 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">用户名</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="username" value="{{userInfo.username}}" placeholder="username" disabled>
+            {{userInfo.username}}
           </div>
-          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('username'), hasErrorFor('username')) }}</div>
+          <div class="col-sm-4 error-container"></div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">登录邮箱</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="email" value="{{userInfo.email}}" placeholder="email" disabled>
+            {{userInfo.email}}
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('email'), hasErrorFor('email')) }}</div>
         </div>
@@ -25,6 +25,7 @@
           <label for="password" class="col-sm-2 control-label">密码</label>
           <div class="col-sm-6">
             <input type="password" id="password" class="form-control" name="password" placeholder="password" data-rule-minlength="8">
+            <div class="help-block color-danger">不修改请留空</div>
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('password'), hasErrorFor('password')) }}</div>
         </div>
@@ -32,6 +33,7 @@
           <label class="col-sm-2 control-label">重复密码</label>
           <div class="col-sm-6">
             <input type="password" class="form-control" name="repassword" placeholder="password" data-rule-minlength="8" data-rule-equalto="#password">
+            <div class="help-block color-danger">不修改请留空</div>
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('repassword'), hasErrorFor('repassword')) }}</div>
         </div>
@@ -70,6 +72,48 @@
           <label class="col-sm-2 control-label">生日</label>
           <div class="col-sm-6">
             <input type="text" name="birthday" class="form-control" placeholder="输入日期" v-model="birthday" data-toggle="datepicker" data-date-start-date='1980-01-01'/>
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">登录次数</label>
+          <div class="col-sm-6">
+            {{userInfo.access_count}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">上次IP</label>
+          <div class="col-sm-6">
+            {{userInfo.lastIp}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">上次时间</label>
+          <div class="col-sm-6">
+            {{userInfo.last_at}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">本次IP</label>
+          <div class="col-sm-6">
+            {{userInfo.thisIp}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">本次时间</label>
+          <div class="col-sm-6">
+            {{userInfo.this_at}}
+          </div>
+          <div class="col-sm-4 error-container"></div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">注册时间</label>
+          <div class="col-sm-6">
+            {{userInfo.create_at}}
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>

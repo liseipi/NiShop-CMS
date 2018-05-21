@@ -22,7 +22,7 @@ class MemberController {
     const typeValue = query.type || 0
     const keywords = query.keywords || ''
 
-    const memberData = await Database.select('ni_id', 'username', 'mobile', 'email', 'is_verify_mobile', 'is_verify_email').from(memberTable)
+    let memberData = await Database.select('ni_id', 'username', 'mobile', 'email', 'is_verify_mobile', 'is_verify_email').from(memberTable)
       .where(function(){
         if(typeValue!=0){
           this.where(memberTable+'.'+typeValue, 'like', `%${keywords}%`)
@@ -30,6 +30,12 @@ class MemberController {
       })
       .orderBy('ni_id', 'desc')
       .paginate(page, perPage)
+
+    memberData.data.forEach(item => {
+      if(item.mobile && item.mobile>0){
+        item.mobile = item.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+      }
+    })
 
     return view.render('member.list', {memberData, query: query})
   }
@@ -135,6 +141,7 @@ class MemberController {
 
   async addressEdit({view, params}){
     const addressInfo = await Database.from(addressTable).where('ni_id', params.id).first()
+    addressInfo.mobile = addressInfo.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
     return view.render('member.address_edit', {addressInfo})
   }
 

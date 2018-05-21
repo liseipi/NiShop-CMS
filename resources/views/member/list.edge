@@ -5,9 +5,9 @@
     @include('notification')
     <h5 class="page-header">会员列表</h5>
     <div class="main">
-      <table class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline">
+      <table class="table table-striped table-bordered table-hover">
         <caption>
-          <form action="/member/userList" method="get" class="form-inline text-center">
+          <form action="/member/list" method="get" class="form-inline text-center">
             <div class="form-group">
               <p class="form-control-static">选择：</p>
             </div>
@@ -44,8 +44,8 @@
           <td>{{member.ni_id}}</td>
           <td>
             <p>登录名称：{{member.username}}</p>
-            <p>Email：{{member.email}}</p>
-            <p>手机：{{member.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}}</p>
+            <p>Email：{{member.email||'空'}}</p>
+            <p>手机：{{member.mobile||'空'}}</p>
           </td>
           <td>
             <p>是否验证手机：{{{member.is_verify_mobile==0?'<span class="text-primary">No</span>':'<span class="text-success">Yes</span>'}}}</p>
@@ -74,26 +74,28 @@
 </div>
 <script type="text/javascript">
   requirejs(['../js/config.js'], function () {
-    requirejs(['cmsui'], function (cmsui) {
+    requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
+      domReady(function () {
 
-      $('#page').pagination({
-        pages: {{memberData.lastPage}},
-        styleClass: ['pagination-xl'],
-        showCtrl: true,
-        displayPage: 6,
-        currentPage: {{memberData.page}},
-        onSelect: function (num) {
-          var query = {{{toJSON(query)}}};
-          query.page = num;
-          var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
-          location.href = '/member/userList?'+url
-        }
+        $('#page').pagination({
+          pages: {{memberData.lastPage}},
+          styleClass: ['pagination-xl'],
+          showCtrl: true,
+          displayPage: 6,
+          currentPage: {{memberData.page}},
+          onSelect: function (num) {
+            var query = {{{toJSON(query)}}};
+            query.page = num;
+            var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
+            location.href = '/member/userList?'+url
+          }
+        });
+
+        $(function(){
+          $('.pagination').prepend('<div><span>共有 {{memberData.total}} 个会员</span></div>');
+        });
+
       });
-
-      $(function(){
-        $('.pagination').prepend('<div><span>共有 {{memberData.total}} 个会员</span></div>');
-      });
-
     });
   });
 </script>

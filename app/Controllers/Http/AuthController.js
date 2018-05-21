@@ -43,12 +43,13 @@ class AuthController {
         let saveData = {
           lastIp : userInfo.thisIp,
           thisIp : request.ip(),
-          lastlogin_at: userInfo.updated_at,
-          updated_at: new Date(),
+          last_at: userInfo.this_at,
+          this_at: new Date().getTime(),
           access_count: userInfo.access_count+1
         }
         let upMsg = ''
         try{
+          console.log(saveData)
           await Database.table('ni_admin_user').where('ni_id', userInfo.ni_id).update(saveData)
         }catch(error){
           upMsg = '用户信息更新失败。'

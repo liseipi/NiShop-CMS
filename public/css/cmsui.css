@@ -3,9 +3,12 @@
   display: none;
 }
 .thumb-border{
-  width: 100px;
   border: 1px solid #ddd;
+  padding: 5px;
   border-radius: 2px;
+  cursor: pointer;
+  width: 100px;
+  height: 100px;
 }
 .form-control {
     height: 32px;

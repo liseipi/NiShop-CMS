@@ -36,14 +36,14 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">控制器名称</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="controller" value="{{columnInfo.controller}}" data-rule-required="true">
+            <input type="text" class="form-control" name="controller" value="{{columnInfo.controller||''}}" data-rule-required="true">
           </div>
           <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('controller'), hasErrorFor('controller')) }}</div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">关键词</label>
           <div class="col-sm-6">
-            <textarea class="form-control" name="column_keywords" rows="3">{{columnInfo.column_keywords}}</textarea>
+            <textarea class="form-control" name="column_keywords" rows="3">{{columnInfo.column_keywords||''}}</textarea>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>
@@ -69,7 +69,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">分类描述</label>
           <div class="col-sm-6">
-            <textarea class="form-control" name="column_desc" rows="3">{{columnInfo.column_desc}}</textarea>
+            <textarea class="form-control" name="column_desc" rows="3">{{columnInfo.column_desc||''}}</textarea>
           </div>
           <div class="col-sm-4 error-container"></div>
         </div>

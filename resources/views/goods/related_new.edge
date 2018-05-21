@@ -1,0 +1,119 @@
+@layout('layout')
+@section('content')
+@include('select_model')
+<style>
+  .user{
+    font-size: 30px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+  }
+  .addressItem{
+    border: 2px solid #e6e6e6;
+    padding: 15px;
+    margin: 0 0 10px;
+  }
+  .form-horizontal .control-label{
+    padding-top: 0px;
+  }
+</style>
+<div id="app-page">
+  <div class="container-fluid">
+    @include('notification')
+    <h5 class="page-header">创建商品关联</h5>
+    <div class="main">
+      <form class="form-horizontal" action="/goods/relatedNew" method="post" data-toggle="validate" novalidate="novalidate">
+        {{ csrfField() }}
+        <h3 class="text-center">创建商品关联</h3>
+        <div class="row">
+          <div class="col-sm-6 col-sm-offset-2">
+            <p><a data-toggle="modal" data-target="#selModal" onclick="document.getElementById('parWin').src='/getGoods'" class="btn btn-success btn-lg"><span class="fa fa-search"></span> 选择商品</a></p>
+          </div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">显示选择的属性名称</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" name="type_name" value="选择" data-rule-required="true">
+          </div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('type_name'), hasErrorFor('type_name')) }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-8 col-sm-offset-2">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>商品ID</th>
+                  <th>商品名称</th>
+                  <th>图片</th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr v-cloak v-for="(goods, index) in goodsData">
+                <td width="60"><label><input type="checkbox" name="goods_id[]" checked :value="goods.goods_id"> @{{goods.goods_id}}</label></td>
+                <td width="110"><img :src="'/file/pictures/'+goods.goods_thumb" class="thumb-border"></td>
+                <td>@{{goods.goods_name}}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="help-block">建议关联商品数不超过30</div>
+          </div>
+        </div>
+        <hr>
+        <div class="form-group">
+          <div class="col-sm-6 col-sm-offset-2">
+            <input type="submit" value="提交" class="btn btn-xl btn-primary">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  var app;
+
+  function getGoodsData(data, tag){
+    if(tag.tag=='default'){
+      console.log(data)
+      var isExist = app.goodsData.filter(function (item) {
+        if(item.goods_id==data.goodsId){
+          return item;
+        }
+      }).length;
+      if(isExist==0){
+        var saveData = {
+          goods_id: data.goodsId,
+          goods_name: data.goodsName,
+          goods_thumb: data.goodsPic
+        }
+        app.goodsData.push(saveData);
+        //$('#selModal').modal('hide');
+        $.toast('加入成功.');
+      }else{
+        $('#selModal').modal('hide');
+        $.toast('商品已经存在.');
+      }
+
+    }
+  }
+
+  requirejs(['/js/config.js'], function () {
+    requirejs(['domReady', 'cmsui', 'vue'], function (domReady, cmsui, Vue) {
+      domReady(function () {
+        app = new Vue({
+          el: '#app-page',
+          data:{
+            goodsData: []
+          },
+          methods:{
+
+          }
+        });
+      });
+    });
+  });
+</script>
+@endsection

@@ -21,7 +21,7 @@ class GoodsCategorySchema extends Schema {
 
     this.schedule(async (trx) => {
       let rows = [
-        {column_name: '测试栏目', parent_id: 0}
+        {column_name: '测试栏目', parent_id: 0, column_sku: 'test'}
       ]
       await Database.table('ni_goods_categories').transacting(trx).insert(rows)
     })

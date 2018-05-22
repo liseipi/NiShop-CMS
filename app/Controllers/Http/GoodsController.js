@@ -12,6 +12,7 @@ const goodsTable = 'ni_goods'
 const goodsAttrTable = 'ni_goods_attrs'
 const goodsGroupTable = 'ni_goods_groups'
 const goodsGalleryTable = 'ni_goods_galleries'
+const goodsRelatedTable = 'ni_goods_related'
 
 const moment = use('moment')
 
@@ -922,7 +923,60 @@ class GoodsController {
   }
 
   async relatedNewSave({request, response, session}){
-    console.log(request.all())
+    const saveData = await GlobalFn.formatSubmitData(goodsRelatedTable, request.all())
+
+    if(!(saveData.goods_id && saveData.goods_id.length>=2)){
+      session.flash({notification: '请选择2个及以上的关联商品！'})
+      return response.redirect('back')
+    }
+
+    let saveMsg = ''
+    let related_id = null
+    try{
+      let insertData = Object.assign({}, saveData)
+      insertData.goods_id = insertData.goods_id.join(',')
+      related_id = await Database.from(goodsRelatedTable).insert(insertData)
+      saveMsg += '关联组创建成功。'
+    }catch(error){
+      saveMsg += '关联组创建失败！'
+      session.flash({notification: saveMsg})
+      return response.redirect('back')
+    }
+
+    if(related_id){
+      let realtedID = saveData.goods_id.map(item=>{
+        return {
+          ni_id: item,
+          related_id: related_id.join()
+        }
+      })
+
+      try{
+        const insert = Database.table(goodsTable).insert(realtedID).toString()
+        await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE related_id=VALUES(related_id)`)
+        session.flash({notification: saveMsg+'商品已经分配关联ID。'})
+        return response.redirect('/goods/related')
+      }catch(error){
+        session.flash({notification: saveMsg+'商品分配关联ID失败！'})
+        return response.redirect('/goods/related')
+      }
+
+
+    }
+
+  }
+
+  async related({view, request}){
+    const query = request.get()
+    const page = query.page || 1
+    const perPage = 20
+    const goods_id = query.goods_id || ''
+
+    const relatedData = await Database.from(goodsRelatedTable)
+      .where(goodsRelatedTable+'.goods_id', 'like', `%${goods_id}%`)
+      .orderBy('ni_id', 'desc')
+      .paginate(page, perPage)
+    return view.render('goods.related', {relatedData, query: query})
   }
 
 }

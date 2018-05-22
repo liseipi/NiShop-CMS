@@ -49,7 +49,6 @@ class AuthController {
         }
         let upMsg = ''
         try{
-          console.log(saveData)
           await Database.table('ni_admin_user').where('ni_id', userInfo.ni_id).update(saveData)
         }catch(error){
           upMsg = '用户信息更新失败。'

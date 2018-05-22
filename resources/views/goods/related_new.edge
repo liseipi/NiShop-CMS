@@ -37,9 +37,9 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">显示选择的属性名称</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" name="type_name" value="选择" data-rule-required="true">
+            <input type="text" class="form-control" name="attr_name" value="选择" data-rule-required="true">
           </div>
-          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('type_name'), hasErrorFor('type_name')) }}</div>
+          <div class="col-sm-4 error-container">{{ elIf('<span class="text-danger">$self</span>', getErrorFor('attr_name'), hasErrorFor('attr_name')) }}</div>
         </div>
         <div class="row">
           <div class="col-sm-8 col-sm-offset-2">
@@ -53,13 +53,13 @@
               </thead>
               <tbody>
               <tr v-cloak v-for="(goods, index) in goodsData">
-                <td width="60"><label><input type="checkbox" name="goods_id[]" checked :value="goods.goods_id"> @{{goods.goods_id}}</label></td>
+                <td width="60"><label><input type="hidden" name="goods_id[]" checked :value="goods.goods_id"> @{{goods.goods_id}}</label></td>
                 <td width="110"><img :src="'/file/pictures/'+goods.goods_thumb" class="thumb-border"></td>
                 <td>@{{goods.goods_name}}</td>
               </tr>
               </tbody>
             </table>
-            <div class="help-block">建议关联商品数不超过30</div>
+            <div class="help-block">建议关联商品数不超过20</div>
           </div>
         </div>
         <hr>

@@ -25,7 +25,7 @@
     @include('notification')
     <h5 class="page-header">创建商品关联</h5>
     <div class="main">
-      <form class="form-horizontal" action="/goods/relatedNew" method="post" data-toggle="validate" novalidate="novalidate">
+      <form class="form-horizontal" action="/goods/relatedEdit/{{relatedInfo.ni_id}}" method="post" data-toggle="validate" novalidate="novalidate">
         {{ csrfField() }}
         <h3 class="text-center">创建商品关联</h3>
         <div class="row">
@@ -45,15 +45,15 @@
           <div class="col-sm-8 col-sm-offset-2">
             <table class="table table-bordered">
               <thead>
-                <tr>
-                  <th width="60">商品ID</th>
-                  <th width="110">图片</th>
-                  <th>商品名称</th>
-                </tr>
+              <tr>
+                <th width="80">商品ID</th>
+                <th width="110">图片</th>
+                <th>商品名称</th>
+              </tr>
               </thead>
               <tbody>
               <tr v-cloak v-for="(goods, index) in goodsData">
-                <td width="60"><label><input type="hidden" name="goods_id[]" checked :value="goods.goods_id"> @{{goods.goods_id}}</label></td>
+                <td width="80"><label><input type="checkbox" name="goods_id[]" checked :value="goods.goods_id"> @{{goods.goods_id}}</label></td>
                 <td width="110"><img :src="'/file/pictures/'+goods.goods_thumb" class="thumb-border"></td>
                 <td>@{{goods.goods_name}}</td>
               </tr>
@@ -105,7 +105,7 @@
         app = new Vue({
           el: '#app-page',
           data:{
-            goodsData: []
+            goodsData: {{{toJSON(goodsData)}}}
           },
           methods:{
 

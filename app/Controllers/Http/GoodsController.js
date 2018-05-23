@@ -918,6 +918,8 @@ class GoodsController {
     }
   }
 
+
+  //关联
   async relatedNew({view}){
     return view.render('goods.related_new')
   }
@@ -950,7 +952,6 @@ class GoodsController {
           related_id: related_id.join()
         }
       })
-
       try{
         const insert = Database.table(goodsTable).insert(realtedID).toString()
         await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE related_id=VALUES(related_id)`)
@@ -960,8 +961,6 @@ class GoodsController {
         session.flash({notification: saveMsg+'商品分配关联ID失败！'})
         return response.redirect('/goods/related')
       }
-
-
     }
 
   }
@@ -977,6 +976,128 @@ class GoodsController {
       .orderBy('ni_id', 'desc')
       .paginate(page, perPage)
     return view.render('goods.related', {relatedData, query: query})
+  }
+
+  async relatedEdit({view, params}){
+    const relatedInfo = await Database.table(goodsRelatedTable).where('ni_id', params.id).first()
+    const goodsData = await Database.select('ni_id as goods_id', 'goods_name', 'goods_thumb').table(goodsTable).whereIn('ni_id', relatedInfo.goods_id.split(','))
+
+    return view.render('goods.related_edit', {relatedInfo, goodsData})
+  }
+
+  async relatedEditSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(goodsRelatedTable, request.all())
+    const relatedInfo = await Database.table(goodsRelatedTable).where('ni_id', params.id).first()
+
+    if(!(saveData.goods_id && saveData.goods_id.length>=2)){
+      session.flash({notification: '请选择2个及以上的关联商品！'})
+      return response.redirect('back')
+    }
+
+    let saveMsg = ''
+    let related_id = null
+    try{
+      let updateData = Object.assign({}, saveData)
+      updateData.goods_id = updateData.goods_id.join(',')
+      related_id = await Database.from(goodsRelatedTable).where('ni_id', params.id).update(updateData)
+      saveMsg += '关联组修改成功。'
+    }catch(error){
+      saveMsg += '关联组修改失败！'
+      session.flash({notification: saveMsg})
+      return response.redirect('back')
+    }
+
+    if(related_id){
+      const nData = saveData.goods_id
+      const oData = relatedInfo.goods_id.split(',')
+
+      //分析新增
+      const newData = nData.filter(item => {
+        return oData.every(oldItem => {
+          return !(oldItem==item)
+        })
+      })
+
+      //分析删除
+      const delData = oData.filter(item => {
+        return nData.every(oldItem => {
+          return (oldItem!=item)
+        })
+      })
+
+      //处理新增
+      let newMsg = ''
+      if(newData.length>0){
+        const saveID = newData.map(item=>{
+          return {
+            ni_id: item,
+            related_id: params.id
+          }
+        })
+        try{
+          const insert = Database.table(goodsTable).insert(saveID).toString()
+          await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE related_id=VALUES(related_id)`)
+          newMsg+='新增商品ID成功。'
+        }catch(error){
+          newMsg+='新增商品ID失败！'
+        }
+      }
+
+      //处理删除
+      let delMsg = ''
+      if(delData.length>0){
+        const delID = delData.map(item=>{
+          return {
+            ni_id: item,
+            related_id: 0
+          }
+        })
+        try{
+          const insert = Database.table(goodsTable).insert(delID).toString()
+          await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE related_id=VALUES(related_id)`)
+          delMsg+='删除商品ID成功。'
+        }catch(error){
+          delMsg+='删除商品ID失败！'
+        }
+      }
+
+      try{
+        session.flash({notification: saveMsg+newMsg+delMsg})
+        response.redirect('/goods/related')
+      }catch(error){
+        session.flash({notification: saveMsg+newMsg+delMsg})
+        response.redirect('back')
+      }
+    }
+  }
+
+  async relatedDestroy({response, params, session}){
+    const relatedInfo = await Database.select('goods_id').table(goodsRelatedTable).where('ni_id', params.id).first()
+
+    const delID = (relatedInfo.goods_id.split(',')).map(item=>{
+      return {
+        ni_id: item,
+        related_id: 0
+      }
+    })
+    let delMsg = ''
+    try{
+      const insert = Database.table(goodsTable).insert(delID).toString()
+      await Database.schema.raw(insert + ` ON DUPLICATE KEY UPDATE related_id=VALUES(related_id)`)
+      delMsg+='删除商品ID成功。'
+    }catch(error){
+      delMsg+='删除商品ID失败！'
+    }
+
+    try{
+      await Database.table(goodsRelatedTable).where('ni_id', params.id).delete()
+      session.flash({notification: '关联组删除成功！'+delMsg})
+      response.redirect('/goods/related')
+    }catch(error){
+      session.flash({notification: '关联组删除失败！'+error})
+      response.redirect('back')
+    }
+
   }
 
 }

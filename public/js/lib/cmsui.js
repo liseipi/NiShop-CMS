@@ -15,7 +15,7 @@ define(['jquery', 'domReady', 'sui', 'metisMenu'],function($, domReady, sui, met
       height = height - topOffset;
       if (height < 1) height = 1;
       if (height > topOffset) {
-        $("#page-wrapper, #iframe-wrapper").css("height", (height) + "px");
+        $("#page-wrapper, #iframe-wrapper, #sidebar-navbar").css("height", (height) + "px");
       }
     }
     loadrs();

@@ -57,17 +57,17 @@
 
       $('#page').pagination({
         pages: {{relatedData.lastPage}},
-      styleClass: ['pagination-xl'],
+        styleClass: ['pagination-xl'],
         showCtrl: true,
         displayPage: 6,
         currentPage: {{relatedData.page}},
-      onSelect: function (num) {
-        var query = {{{toJSON(query)}}};
-        query.page = num;
-        var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
-        location.href = '/article/list?'+url
-      }
-    });
+        onSelect: function (num) {
+          var query = {{{toJSON(query)}}};
+          query.page = num;
+          var url = (((JSON.stringify(query)).replace(/\{|\}|\"/g, '')).replace(/\,/g, '&')).replace(/\:/g, '=');
+          location.href = '/article/list?'+url
+        }
+      });
 
       $(function(){
         $('.pagination').prepend('<div><span>共有 {{relatedData.total}} 条文章</span></div>');

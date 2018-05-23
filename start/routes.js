@@ -95,8 +95,8 @@ Route.group(()=>{
   Route.get('/goods/relatedNew', 'GoodsController.relatedNew')
   Route.post('/goods/relatedNew', 'GoodsController.relatedNewSave')
   Route.get('/goods/related', 'GoodsController.related')
-  Route.get('/goods/relatedEdit/:id', 'GoodsController.relatedNew')
-  Route.post('/goods/relatedEdit/:id', 'GoodsController.relatedNewSave')
+  Route.get('/goods/relatedEdit/:id', 'GoodsController.relatedEdit')
+  Route.post('/goods/relatedEdit/:id', 'GoodsController.relatedEditSave')
   Route.get('/goods/relatedDestroy/:id', 'GoodsController.relatedDestroy')
 
   Route.get('/advert/list', 'AdvertController.list')

@@ -13,6 +13,7 @@ const goodsAttrTable = 'ni_goods_attrs'
 const goodsGroupTable = 'ni_goods_groups'
 const goodsGalleryTable = 'ni_goods_galleries'
 const goodsRelatedTable = 'ni_goods_related'
+const classAttrTable = 'ni_class_attr'
 
 const moment = use('moment')
 
@@ -69,6 +70,88 @@ class GoodsController {
   }
 
   async categoryDestroy({response, params, session}){
+    const columnData = await Database.select('ni_id', 'parent_id').from(categoryTable)
+    const formatSubData = await GlobalFn.findSubData([...columnData], params.id)
+
+    if(formatSubData.length>0){
+      session.flash({notification: '删除失败，当前项包含子列表！'})
+      response.redirect('back')
+      return
+    }
+
+    try{
+      await Database.table(categoryTable).where('ni_id', params.id).delete()
+      session.flash({notification: '删除成功！'})
+      response.redirect('/goods/category')
+    }catch(error){
+      session.flash({notification: '删除失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  //分类主要属性
+  async categoryAttrAdd({view}){
+    const categoryData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+    return view.render('goods.category_attr_add', {categoryData: formatData})
+  }
+
+  async categoryAttrAddSave({request, response, session}){
+    console.log(request.all())
+    const saveData = await GlobalFn.formatSubmitData(classAttrTable, request.all())
+
+    let classMsg = ''
+    let classID = null
+    try{
+      classID = await Database.from(classAttrTable).insert(saveData)
+      classMsg += '主要属性增加成功。'
+    }catch(error){
+      classMsg += '主要属性增加失败！'
+    }
+
+    if(classID){
+      const valueData = request.collect(['class_value', 'class_value_alias', 'class_is_show']);
+      valueData.foreach(item=>{
+        item.category_id = 1
+        item.class_attr_id = 1
+      })
+      console.log(valueData)
+    }
+
+
+  }
+
+  async categoryAttr({view}){
+    const categoryData = await Database.select('*').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort(categoryData)
+    return view.render('goods.category', {categoryData: formatData})
+  }
+
+  async categoryAttrEdit({request, response, view, params}){
+    const columnInfo = await Database.table(categoryTable).where('ni_id', params.id).first()
+
+    const columnData = await Database.select('ni_id', 'column_name', 'parent_id').from(categoryTable)
+    const formatData = await GlobalFn.soleTreeSort([...columnData])
+
+    const formatSubData = await GlobalFn.findSubData([...columnData], columnInfo.ni_id)
+
+    return view.render('goods.category_edit', {columnInfo, columnData:formatData, subData:formatSubData})
+  }
+
+  async categoryAttrEditSave({request, response, params, session}){
+    const saveData = await GlobalFn.formatSubmitData(categoryTable, request.all())
+
+    try{
+      await Database.table(categoryTable).where('ni_id', params.id).update(saveData)
+      session.flash({notification: '修改成功！'})
+      response.redirect('/goods/category')
+    }catch(error){
+      session.flash({notification: '修改失败！'+error})
+      response.redirect('back')
+    }
+  }
+
+  async categoryAttrDestroy({response, params, session}){
     const columnData = await Database.select('ni_id', 'parent_id').from(categoryTable)
     const formatSubData = await GlobalFn.findSubData([...columnData], params.id)
 
@@ -918,6 +1001,7 @@ class GoodsController {
     }
   }
 
+  //分类属性
 
   //关联
   async relatedNew({view}){

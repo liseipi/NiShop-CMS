@@ -63,18 +63,28 @@ Route.group(()=>{
   Route.post('/article/edit/:id', 'ArticleController.editSave').validator('article')
   Route.get('/article/destroy/:id', 'ArticleController.destroy')
 
+  /*--goods--*/
   Route.get('/goods/category', 'GoodsController.category')
   Route.get('/goods/categoryAdd', 'GoodsController.categoryAdd')
   Route.post('/goods/categoryAdd', 'GoodsController.categorySave').validator('goodsCategory')
   Route.get('/goods/categoryEdit/:id', 'GoodsController.categoryEdit')
   Route.post('/goods/categoryEdit/:id', 'GoodsController.categoryEditSave').validator('goodsCategory')
   Route.get('/goods/categoryDestroy/:id', 'GoodsController.categoryDestroy')
+
+  Route.get('/goods/categoryAttrAdd', 'GoodsController.categoryAttrAdd')
+  Route.post('/goods/categoryAttrAdd', 'GoodsController.categoryAttrAddSave')
+  Route.get('/goods/categoryAttr', 'GoodsController.categoryAttr')
+  Route.get('/goods/categoryAttrEdit/:id', 'GoodsController.categoryAttrEdit')
+  Route.post('/goods/categoryAttrEdit/:id', 'GoodsController.categoryAttrEditSave')
+  Route.get('/goods/categoryAttrDestroy/:id', 'GoodsController.categoryAttrDestroy')
+
   Route.get('/goods/brands', 'GoodsController.brands')
   Route.get('/goods/brandsAdd', 'GoodsController.brandsAdd')
   Route.post('/goods/brandsAdd', 'GoodsController.brandsSave').validator('brands')
   Route.get('/goods/brandsEdit/:id', 'GoodsController.brandsEdit')
   Route.post('/goods/brandsEdit/:id', 'GoodsController.brandsEditSave').validator('brands')
   Route.get('/goods/brandsDestroy/:id', 'GoodsController.brandsDestroy')
+
   Route.get('/goods/attr', 'GoodsController.attr')
   Route.get('/goods/attrAdd', 'GoodsController.attrAdd')
   Route.post('/goods/attrAdd', 'GoodsController.attrSave').validator('attr')
@@ -82,9 +92,10 @@ Route.group(()=>{
   Route.post('/goods/attrEdit/:id', 'GoodsController.attrEditSave').validator('attr')
   Route.get('/goods/attrDestroy/:id', 'GoodsController.attrDestroy')
   Route.get('/goods/getAttr', 'GoodsController.getAttr')
-  Route.get('/goods/list', 'GoodsController.list')
+
   Route.get('/goods/add', 'GoodsController.add')
   Route.post('/goods/add', 'GoodsController.addSave').validator('goods')
+  Route.get('/goods/list', 'GoodsController.list')
   Route.get('/goods/edit/:id', 'GoodsController.edit')
   Route.post('/goods/edit/:id', 'GoodsController.editSave').validator('goodsEdit')
   Route.get('/goods/destroy/:id', 'GoodsController.destroy')
@@ -92,12 +103,14 @@ Route.group(()=>{
   Route.get('/goods/delAttr', 'GoodsController.delAttr')
   Route.get('/goods/delGroup', 'GoodsController.delGroup')
   Route.get('/goods/delGallery', 'GoodsController.delGallery')
+
   Route.get('/goods/relatedNew', 'GoodsController.relatedNew')
   Route.post('/goods/relatedNew', 'GoodsController.relatedNewSave')
   Route.get('/goods/related', 'GoodsController.related')
   Route.get('/goods/relatedEdit/:id', 'GoodsController.relatedEdit')
   Route.post('/goods/relatedEdit/:id', 'GoodsController.relatedEditSave')
   Route.get('/goods/relatedDestroy/:id', 'GoodsController.relatedDestroy')
+  /*--end goods--*/
 
   Route.get('/advert/list', 'AdvertController.list')
   Route.get('/advert/add', 'AdvertController.add')

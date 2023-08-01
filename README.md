@@ -10,8 +10,3 @@
 npm install
 
 ```
-接着安装mysql
-
-```js
-npm i --save mysql
-```
